@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match History - Pool Tour</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="data.js"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <nav class="bg-blue-900 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Pool Tour</h1>
+            <ul class="flex space-x-6">
+                <li><a href="rankings.html" class="hover:text-blue-300">Rankings</a></li>
+                <li><a href="tournaments.html" class="hover:text-blue-300">Tournaments</a></li>
+                <li><a href="match_history.html" class="hover:text-blue-300 font-bold">Match History</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mx-auto py-8">
+        <h2 class="text-3xl font-bold mb-6">Match History</h2>
+        <div class="flex space-x-4 mb-4">
+            <button id="add-match-btn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 hidden">+</button>
+            <button id="filter-btn" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707v3.586a1 1 0 01-.293.707l-2 2A1 1 0 0110 21v-5.586a1 1 0 00-.293-.707L3.293 8.293A1 1 0 013 7.586V4z"></path>
+                </svg>
+                Filter
+            </button>
+        </div>
+        <div id="add-match-form" class="bg-white p-6 rounded-lg shadow-md mb-4 hidden">
+            <h3 class="text-xl font-semibold mb-4">Add New Match</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-700">Player 1</label>
+                    <select id="player1-id" class="w-full p-2 border rounded">
+                        <option value="">Select Player 1</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Score 1</label>
+                    <input id="score1" type="number" min="0" class="w-full p-2 border rounded">
+                </div>
+                <div>
+                    <label class="block text-gray-700">Player 2</label>
+                    <select id="player2-id" class="w-full p-2 border rounded">
+                        <option value="">Select Player 2</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Score 2</label>
+                    <input id="score2" type="number" min="0" class="w-full p-2 border rounded">
+                </div>
+                <button id="save-match" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save</button>
+                <button id="cancel-match" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
+            </div>
+        </div>
+        <div id="filter-form" class="bg-white p-6 rounded-lg shadow-md mb-4 hidden">
+            <h3 class="text-xl font-semibold mb-4">Filter Matches</h3>
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700">Player 1</label>
+                        <select id="filter-player1" class="w-full p-2 border rounded">
+                            <option value="">Any Player</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">Player 2</label>
+                        <select id="filter-player2" class="w-full p-2 border rounded">
+                            <option value="">Any Player</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700">Month</label>
+                        <select id="filter-month" class="w-full p-2 border rounded">
+                            <option value="">Any Month</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">Year</label>
+                        <select id="filter-year" class="w-full p-2 border rounded">
+                            <option value="">Any Year</option>
+                            <option value="2020">2020</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Tournament</label>
+                    <select id="filter-tournament" class="w-full p-2 border rounded">
+                        <option value="">Any Tournament</option>
+                        <option value="Bàn nước">Bàn nước</option>
+                    </select>
+                </div>
+                <button id="apply-filter" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Apply Filter</button>
+                <button id="clear-filter" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Clear Filter</button>
+            </div>
+        </div>
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-blue-800 text-white">
+                    <tr>
+                        <th class="p-3 text-left">Match</th>
+                        <th class="p-3 text-left">Date</th>
+                        <th class="p-3 text-left">Tournament</th>
+                    </tr>
+                </thead>
+                <tbody id="history-table"></tbody>
+            </table>
+            <div class="p-3 flex justify-center space-x-2" id="pagination"></div>
+        </div>
+    </div>
+    <footer class="bg-blue-900 text-white p-4 mt-8">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2025 Pool Tour. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+         window.addEventListener('data-loading', () => {
+            document.getElementById('loading').classList.remove('hidden');
+        });
+        window.addEventListener('data-loaded', () => {
+            document.getElementById('loading').classList.add('hidden');
+        });
+        async function renderPage() {
+            await initializePoolData();
+        }
+        // Hàm chuyển định dạng ngày DD/MM/YYYY thành Date object
+        function parseDateVN(dateStr) {
+            const [day, month, year] = dateStr.split('/').map(Number);
+            return new Date(year, month - 1, day);
+        }
+
+        // Hàm lọc dữ liệu
+        function filterMatches() {
+            const player1Id = document.getElementById('filter-player1').value;
+            const player2Id = document.getElementById('filter-player2').value;
+            const month = document.getElementById('filter-month').value;
+            const year = document.getElementById('filter-year').value;
+            const tournament = document.getElementById('filter-tournament').value;
+
+            return poolData.matchHistory.filter(match => {
+                // Lọc theo player
+                let playerMatch = true;
+                if (player1Id && player2Id) {
+                    playerMatch = (
+                        (match.player1Id == player1Id && match.player2Id == player2Id) ||
+                        (match.player1Id == player2Id && match.player2Id == player1Id)
+                    );
+                } else if (player1Id) {
+                    playerMatch = match.player1Id == player1Id || match.player2Id == player1Id;
+                } else if (player2Id) {
+                    playerMatch = match.player1Id == player2Id || match.player2Id == player2Id;
+                }
+
+                // Lọc theo tháng và năm
+                const matchDate = parseDateVN(match.date);
+                const monthMatch = !month || (matchDate.getMonth() + 1) == parseInt(month);
+                const yearMatch = !year || matchDate.getFullYear() == parseInt(year);
+
+                // Lọc theo giải đấu
+                const tournamentName = match.tournament || poolData.tournaments.find(t => t.id == match.tournamentId)?.name || 'Bàn nước';
+                const tournamentMatch = !tournament || tournamentName == tournament;
+
+                return playerMatch && monthMatch && yearMatch && tournamentMatch;
+            }).sort((a, b) => parseDateVN(b.date) - parseDateVN(a.date));
+        }
+
+        function renderMatchHistory(page = 1) {
+    const matches = filterMatches().sort((a, b) => parseInt(b.id) - parseInt(a.id)); // Sắp xếp id giảm dần
+    const matchesPerPage = 10;
+    const totalPages = Math.ceil(matches.length / matchesPerPage);
+    const startIndex = (page - 1) * matchesPerPage;
+    const endIndex = startIndex + matchesPerPage;
+    const paginatedMatches = matches.slice(startIndex, endIndex);
+
+    const tableBody = document.getElementById('history-table');
+    tableBody.innerHTML = ''; // Xóa nội dung cũ
+    paginatedMatches.forEach(match => {
+        const row = document.createElement('tr');
+        row.className = 'border-b';
+        const player1 = poolData.players.find(u => u.id == match.player1Id)?.name || 'Unknown';
+        const player2 = poolData.players.find(u => u.id == match.player2Id)?.name || 'Unknown';
+        const player1Class = match.winnerId == match.player1Id ? 'text-green-600' : 'text-red-600';
+        const player2Class = match.winnerId == match.player2Id ? 'text-green-600' : 'text-red-600';
+        const tournamentName = poolData.tournaments.find(t => t.id == match.tournamentId)?.name || match.tournamentId;
+        row.innerHTML = `
+            <td class="p-3"><span class="${player1Class}">${player1}</span> ${match.score1} - ${match.score2} <span class="${player2Class}">${player2}</span></td>
+            <td class="p-3">${match.date}</td>
+            <td class="p-3">${tournamentName}</td>
+        `;
+        tableBody.appendChild(row);
+    });
+
+    // Render phân trang
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+    for (let i = 1; i <= totalPages; i++) {
+        const button = document.createElement('button');
+        button.className = `px-3 py-1 rounded ${i == page ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`;
+        button.textContent = i;
+        button.addEventListener('click', () => renderMatchHistory(i));
+        pagination.appendChild(button);
+    }
+}
+
+        // Gọi hàm render khi tải trang
+        renderMatchHistory();
+
+        // Điền danh sách người chơi vào select (form thêm trận đấu)
+        const player1Select = document.getElementById('player1-id');
+        const player2Select = document.getElementById('player2-id');
+        poolData.players.forEach(player => {
+            const option1 = document.createElement('option');
+            option1.value = player.id;
+            option1.textContent = player.name;
+            player1Select.appendChild(option1);
+            const option2 = document.createElement('option');
+            option2.value = player.id;
+            option2.textContent = player.name;
+            player2Select.appendChild(option2);
+        });
+
+        // Điền danh sách người chơi vào select (bộ lọc)
+        const filterPlayer1Select = document.getElementById('filter-player1');
+        const filterPlayer2Select = document.getElementById('filter-player2');
+        poolData.players.forEach(player => {
+            const option1 = document.createElement('option');
+            option1.value = player.id;
+            option1.textContent = player.name;
+            filterPlayer1Select.appendChild(option1);
+            const option2 = document.createElement('option');
+            option2.value = player.id;
+            option2.textContent = player.name;
+            filterPlayer2Select.appendChild(option2);
+        });
+
+        // Điền danh sách giải đấu vào select (bộ lọc)
+        const filterTournamentSelect = document.getElementById('filter-tournament');
+        poolData.tournaments.forEach(tournament => {
+            const option = document.createElement('option');
+            option.value = tournament.name;
+            option.textContent = tournament.name;
+            filterTournamentSelect.appendChild(option);
+        });
+
+        // Xử lý hiển thị form bộ lọc
+        const filterBtn = document.getElementById('filter-btn');
+        const filterForm = document.getElementById('filter-form');
+        const addMatchBtn = document.getElementById('add-match-btn');
+        const addMatchForm = document.getElementById('add-match-form');
+
+        filterBtn.addEventListener('click', () => {
+            filterForm.classList.toggle('hidden');
+            if (!filterForm.classList.contains('hidden')) {
+                addMatchForm.classList.add('hidden'); // Đóng form thêm trận đấu
+            }
+        });
+
+        // Xử lý hiển thị form thêm trận đấu
+        addMatchBtn.addEventListener('click', () => {
+            addMatchForm.classList.toggle('hidden');
+            if (!addMatchForm.classList.contains('hidden')) {
+                filterForm.classList.add('hidden'); // Đóng form bộ lọc
+            }
+        });
+
+        // Xử lý lưu trận đấu mới
+        document.getElementById('save-match').addEventListener('click', () => {
+            // console.log(poolData.matchHistory);
+            
+            const player1Id = document.getElementById('player1-id').value;
+            const score1 = document.getElementById('score1').value;
+            const player2Id = document.getElementById('player2-id').value;
+            const score2 = document.getElementById('score2').value;
+
+            // Kiểm tra dữ liệu hợp lệ
+            if (!player1Id || !player2Id || player1Id == player2Id || score1 == '' || score2 == '' || isNaN(score1) || isNaN(score2)) {
+                alert('Please select different players and enter valid scores.');
+                return;
+            }
+
+            // Tạo trận đấu mới
+            const winnerId = parseInt(score1) > parseInt(score2) ? player1Id : (parseInt(score2) > parseInt(score1) ? player2Id : null);
+            const newMatch = {
+                id: String(poolData.matchHistory.length + 1),
+                player1Id,
+                score1: parseInt(score1),
+                player2Id,
+                score2: parseInt(score2),
+                winnerId,
+                date: new Date().toLocaleDateString('vi-VN'),
+                tournamentId:'Bàn nước',
+                tournamentMatchId:'',
+                matchType:'',
+            };
+            createData('match-history', newMatch);
+            updatePlayerPoints(player1Id,parseInt(score1));
+            updatePlayerPoints(player2Id,parseInt(score2));
+            sessionStorage.removeItem('poolData_matchHistory');
+            poolData.matchHistory.push(newMatch);
+
+            // Xóa bộ lọc
+            document.getElementById('filter-player1').value = '';
+            document.getElementById('filter-player2').value = '';
+            document.getElementById('filter-month').value = '';
+            document.getElementById('filter-year').value = '';
+            document.getElementById('filter-tournament').value = '';
+
+            // Cập nhật lại bảng lịch sử trận đấu
+            renderMatchHistory();
+
+            // Ẩn form và xóa dữ liệu
+            addMatchForm.classList.add('hidden');
+            document.getElementById('player1-id').value = '';
+            document.getElementById('score1').value = '';
+            document.getElementById('player2-id').value = '';
+            document.getElementById('score2').value = '';
+            // console.log(poolData.matchHistory);
+            
+        });
+
+        // Xử lý hủy form thêm trận đấu
+        document.getElementById('cancel-match').addEventListener('click', () => {
+            addMatchForm.classList.add('hidden');
+            document.getElementById('player1-id').value = '';
+            document.getElementById('score1').value = '';
+            document.getElementById('player2-id').value = '';
+            document.getElementById('score2').value = '';
+        });
+
+        // Xử lý áp dụng bộ lọc
+        document.getElementById('apply-filter').addEventListener('click', () => {
+            renderMatchHistory();
+        });
+
+        // Xử lý xóa bộ lọc
+        document.getElementById('clear-filter').addEventListener('click', () => {
+            document.getElementById('filter-player1').value = '';
+            document.getElementById('filter-player2').value = '';
+            document.getElementById('filter-month').value = '';
+            document.getElementById('filter-year').value = '';
+            document.getElementById('filter-tournament').value = '';
+            renderMatchHistory();
+        });
+        checkAdminAccess();
+    </script>
+</body>
+</html>

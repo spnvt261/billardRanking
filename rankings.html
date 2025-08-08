@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rankings - Pool Tour</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="data.js"></script>
+</head>
+
+<body class="bg-gray-100 font-sans">
+    <nav class="bg-blue-900 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Pool Tour</h1>
+            <ul class="flex space-x-6">
+                <li><a href="rankings.html" class="hover:text-blue-300 font-bold">Rankings</a></li>
+                <li><a href="tournaments.html" class="hover:text-blue-300">Tournaments</a></li>
+                <li><a href="match_history.html" class="hover:text-blue-300">Match History</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mx-auto py-8">
+        <h2 class="text-3xl font-bold mb-6">Friend Nineball Rankings</h2>
+        <button id="add-player-btn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4 hidden">+</button>
+        <div id="add-player-form" class="bg-white p-6 rounded-lg shadow-md mt-4 hidden">
+            <h3 class="text-xl font-semibold mb-4">Add New Player</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-700">Name</label>
+                    <input id="player-name" type="text" class="w-full p-2 border rounded">
+                </div>
+                <div>
+                    <label class="block text-gray-700">Image URL (leave blank for default)</label>
+                    <input id="player-image" type="text" class="w-full p-2 border rounded">
+                </div>
+                <button id="save-player"
+                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save</button>
+                <button id="cancel-player"
+                    class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
+            </div>
+        </div>
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-blue-800 text-white">
+                    <tr>
+                        <th class="p-3 text-left">Rank</th>
+                        <th class="p-3 text-left">Player</th>
+                        <th class="p-3 text-left">Points</th>
+                    </tr>
+                </thead>
+                <tbody id="rankings-table"></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <footer class="bg-blue-900 text-white p-4 mt-8">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2025 Pool Tour. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+        window.addEventListener('data-loading', () => {
+            document.getElementById('loading').classList.remove('hidden');
+        });
+        window.addEventListener('data-loaded', () => {
+            document.getElementById('loading').classList.add('hidden');
+            
+        });
+        async function renderPage() {
+            await initializePoolData();
+        }
+        // renderPage();
+        // Hiển thị bảng xếp hạng
+        function renderRankings() {
+            const tableBody = document.getElementById('rankings-table');
+            tableBody.innerHTML = ''; // Xóa nội dung cũ
+            poolData.players
+                .sort((a, b) => b.points - a.points) // Sắp xếp theo điểm giảm dần
+                .forEach((player, index) => {
+                    const imageSrc = (!player.images || player.images.trim() == '')
+                        ? '../images/default.jpg' : player.images;
+                    const row = document.createElement('tr');
+                    row.className = 'border-b';
+                    row.innerHTML = `
+                        <td class="p-3">${index + 1}</td>
+                        <td class="p-3 flex items-center space-x-2">
+                            <div class="relative w-12 h-16" style="aspect-ratio: 3/4;">
+                                <img src="${imageSrc}" alt="${player.name}" class="absolute inset-0 w-full h-full object-cover rounded">
+                            </div>
+                            <span>${player.name}</span>
+                        </td>
+                        <td class="p-3">${player.points}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+        }
+
+        // Gọi hàm render khi tải trang
+        renderRankings();
+
+        // Xử lý hiển thị form thêm người chơi
+        const addPlayerBtn = document.getElementById('add-player-btn');
+        const addPlayerForm = document.getElementById('add-player-form');
+        addPlayerBtn.addEventListener('click', () => {
+            addPlayerForm.classList.toggle('hidden');
+        });
+
+        // Xử lý lưu người chơi mới
+        document.getElementById('save-player').addEventListener('click', () => {
+            const name = document.getElementById('player-name').value;
+            const image = document.getElementById('player-image').value;
+
+            // Kiểm tra dữ liệu hợp lệ
+            if (!name) {
+                alert('Please fill in the Name field.');
+                return;
+            }
+
+            // Tạo người chơi mới
+            const newPlayer = {
+                id: String(poolData.players.length + 1),
+                name,
+                points: 0,
+                images: image.trim() == '' ? '../images/default.jpg' : image.trim()
+            };
+            createData('players',newPlayer)
+            poolData.players.push(newPlayer);
+
+            // Cập nhật lại bảng xếp hạng
+            renderRankings();
+
+            // Ẩn form và xóa dữ liệu
+            addPlayerForm.classList.add('hidden');
+            document.getElementById('player-name').value = '';
+            document.getElementById('player-image').value = '';
+        });
+
+        // Xử lý hủy form
+        document.getElementById('cancel-player').addEventListener('click', () => {
+            addPlayerForm.classList.add('hidden');
+            document.getElementById('player-name').value = '';
+            document.getElementById('player-image').value = '';
+        });
+        checkAdminAccess();
+    </script>
+</body>
+
+</html>
