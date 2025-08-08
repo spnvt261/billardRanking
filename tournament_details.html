@@ -5,9 +5,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tournament Details - Pool Tour</title>
+    <link rel="icon" type="image/png" href="images/icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="data.js"></script>
 </head>
+<style>
+    .ongoing {
+        color: green;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        background-color: rgba(0, 255, 0, 0.1);
+        padding: 2px 5px;
+        border-radius: 3px;
+    }
+
+    .finished {
+        color: red;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        background-color: rgba(255, 0, 0, 0.1);
+        padding: 2px 5px;
+        border-radius: 3px;
+    }
+</style>
 
 <body class="bg-gray-100 font-sans">
     <nav class="bg-blue-900 text-white p-4">
@@ -185,6 +205,7 @@
             const top1Player = poolData.players.find(p => p.id == tournament.top1Id)?.name || 'N/A';
             const top2Player = poolData.players.find(p => p.id == tournament.top2Id)?.name || 'N/A';
             document.getElementById('tournament-status').textContent = tournament.status;
+            document.getElementById('tournament-status').className = tournament.status === 'Đang diễn ra' ? 'ongoing' : 'finished';
 
             // Hiển thị hoặc ẩn các tính năng dựa trên trạng thái giải đấu
             const isOngoing = tournament.status == 'Đang diễn ra';
@@ -221,39 +242,45 @@
                 addPlayerBtn.classList.add('hidden');
                 endTournamentBtn.classList.add('hidden')
                 // console.log(tournament);
-                const newTournament ={
+                const newTournament = {
                     ...tournament,
                     status: 'Đã kết thúc'
                 }
                 console.log(newTournament);
-                
-                updateData('tournaments',tournament._id,newTournament);
+
+                updateData('tournaments', tournament.id, newTournament);
                 // console.log(champion.id,tournament.top1_point);
-                
-                updatePlayerPoints(champion.id,tournament.top1_point);
-                updatePlayerPoints(runnerUp.id,tournament.top2_point);
-                
+
+                updatePlayerPoints(champion.id, tournament.top1_point);
+                updatePlayerPoints(runnerUp.id, tournament.top2_point);
+                initializePoolData();
+
             });
 
             // Hiển thị danh sách trận đấu
-            const matchesTable = document.getElementById('matches-table');
-            const matches = poolData.matchHistory.filter(match => match.tournamentId == tournamentId);
-            matches
-                .sort((a, b) => parseInt(a.tournamentMatchId) - parseInt(b.tournamentMatchId))
-                .forEach(match => {
-                    const row = document.createElement('tr');
-                    row.className = 'border-b';
-                    const player1 = poolData.players.find(u => u.id == match.player1Id)?.name || 'Unknown';
-                    const player2 = poolData.players.find(u => u.id == match.player2Id)?.name || 'Unknown';
-                    const player1Class = match.winnerId == match.player1Id ? 'text-green-600' : 'text-red-600';
-                    const player2Class = match.winnerId == match.player2Id ? 'text-green-600' : 'text-red-600';
-                    row.innerHTML = `
+            function renderMatchsTable() {
+                const matchesTable = document.getElementById('matches-table');
+                matchesTable.innerHTML = '';
+                const matches = poolData.matchHistory.filter(match => match.tournamentId == tournamentId);
+                matches
+                    .sort((a, b) => parseInt(a.tournamentMatchId) - parseInt(b.tournamentMatchId))
+                    .forEach(match => {
+                        const row = document.createElement('tr');
+                        row.className = 'border-b';
+                        const player1 = poolData.players.find(u => u.id == match.player1Id)?.name || 'Unknown';
+                        const player2 = poolData.players.find(u => u.id == match.player2Id)?.name || 'Unknown';
+                        const player1Class = match.winnerId == match.player1Id ? 'text-green-600' : 'text-red-600';
+                        const player2Class = match.winnerId == match.player2Id ? 'text-green-600' : 'text-red-600';
+                        row.innerHTML = `
                         <td class="p-3">${match.tournamentMatchId}</td>
                         <td class="p-3">${match.matchType || 'N/A'}</td>
                         <td class="p-3"><span class="${player1Class}">${player1}</span> ${match.score1} - ${match.score2} <span class="${player2Class}">${player2}</span></td>
                     `;
-                    matchesTable.appendChild(row);
-                });
+                        matchesTable.appendChild(row);
+                    });
+            }
+            renderMatchsTable();
+
 
             // Hiển thị xếp hạng người chơi trong giải đấu
             const rankingsTable = document.getElementById('rankings-table');
@@ -263,7 +290,7 @@
             renderPlayerRankings(tournament)
             // Hiển thị bảng Player Rankings
             async function renderPlayerRankings(tournament) {
-                await initializePoolData();
+                // await initializePoolData();
                 const tableBody = document.getElementById('rankings-table-body');
                 tableBody.innerHTML = '';
                 // Sắp xếp người chơi: Vô địch -> Hạng 2 -> Other
@@ -352,6 +379,8 @@
                 const player2Id = document.getElementById('match-player2').value;
                 const score2 = document.getElementById('match-score2').value;
                 const matchType = document.getElementById('match-type').value;
+                const player1name = poolData.players.find(u => u.id === player1Id)?.name || 'Unknown';
+                const player2name = poolData.players.find(u => u.id === player2Id)?.name || 'Unknown';
 
                 // Kiểm tra dữ liệu hợp lệ
                 if (!player1Id || !player2Id || !score1 || !score2 || !matchType || player1Id == player2Id) {
@@ -362,6 +391,10 @@
                     alert('Scores cannot be equal. Please ensure one player has a higher score.');
                     return;
                 }
+                if (!confirm(`Bạn có chắc chắn kết quả là ${player1name} ${score1} - ${score2} ${player2name} là chính xác?`)) {
+                    return;
+                }
+
 
                 // Kiểm tra số trận tối đa của giải
                 // const maxMatches = tournamentId == "1" ? 6 : 4;
@@ -388,37 +421,37 @@
                     matchType
                 };
                 createData('match-history', newMatch);
-                updatePlayerPoints(player1Id,parseInt(score1));
-                updatePlayerPoints(player2Id,parseInt(score2));
+                updatePlayerPoints(player1Id, parseInt(score1));
+                updatePlayerPoints(player2Id, parseInt(score2));
                 sessionStorage.removeItem('poolData_matchHistory');
                 sessionStorage.removeItem('isInitialLoad');
                 poolData.matchHistory.push(newMatch);
-
+                renderMatchsTable()
                 // Thêm hàng mới vào bảng
-                const row = document.createElement('tr');
-                row.className = 'border-b';
-                const player1 = poolData.players.find(u => u.id === newMatch.player1Id)?.name || 'Unknown';
-                const player2 = poolData.players.find(u => u.id === newMatch.player2Id)?.name || 'Unknown';
-                const player1Class = newMatch.winnerId === newMatch.player1Id ? 'text-green-600' : 'text-red-600';
-                const player2Class = newMatch.winnerId === newMatch.player2Id ? 'text-green-600' : 'text-red-600';
-                row.innerHTML = `
-        <td class="p-3">${newMatch.tournamentMatchId}</td>
-        <td class="p-3">${newMatch.matchType}</td>
-        <td class="p-3"><span class="${player1Class}">${player1}</span> ${newMatch.score1} - ${newMatch.score2} <span class="${player2Class}">${player2}</span></td>
-    `;
-                matchesTable.appendChild(row);
+                // const row = document.createElement('tr');
+                // row.className = 'border-b';
+                // const player1 = poolData.players.find(u => u.id === newMatch.player1Id)?.name || 'Unknown';
+                // const player2 = poolData.players.find(u => u.id === newMatch.player2Id)?.name || 'Unknown';
+                // const player1Class = newMatch.winnerId === newMatch.player1Id ? 'text-green-600' : 'text-red-600';
+                // const player2Class = newMatch.winnerId === newMatch.player2Id ? 'text-green-600' : 'text-red-600';
+                // row.innerHTML = `
+                //                     <td class="p-3">${newMatch.tournamentMatchId}</td>
+                //                     <td class="p-3">${newMatch.matchType}</td>
+                //                     <td class="p-3"><span class="${player1Class}">${player1}</span> ${newMatch.score1} - ${newMatch.score2} <span class="${player2Class}">${player2}</span></td>
+                //                 `;
+                // matchesTable.appendChild(row);
 
                 // Sắp xếp bảng theo tournamentMatchId tăng dần
-                const rows = Array.from(matchesTable.querySelectorAll('tr'));
-                rows.sort((a, b) => {
-                    const idA = parseInt(a.querySelector('td:first-child').textContent) || 0;
-                    const idB = parseInt(b.querySelector('td:first-child').textContent) || 0;
-                    return idA - idB;
-                });
+                // const rows = Array.from(matchesTable.querySelectorAll('tr'));
+                // rows.sort((a, b) => {
+                //     const idA = parseInt(a.querySelector('td:first-child').textContent) || 0;
+                //     const idB = parseInt(b.querySelector('td:first-child').textContent) || 0;
+                //     return idA - idB;
+                // });
 
                 // Xóa các hàng hiện tại và thêm lại các hàng đã sắp xếp
-                matchesTable.innerHTML = '';
-                rows.forEach(row => matchesTable.appendChild(row));
+                // matchesTable.innerHTML = '';
+                // rows.forEach(row => matchesTable.appendChild(row));
 
 
                 // Ẩn form và xóa dữ liệu
@@ -428,6 +461,7 @@
                 document.getElementById('match-player2').value = '';
                 document.getElementById('match-score2').value = '';
                 document.getElementById('match-type').value = '';
+                // initializePoolData();
             });
 
             // Xử lý hủy form thêm trận đấu

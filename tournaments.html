@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tournaments - Pool Tour</title>
+    <link rel="icon" type="image/png" href="images/icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="data.js"></script>
     <style>
@@ -26,7 +27,7 @@
                 <li><a href="rankings.html" class="hover:text-blue-300">Rankings</a></li>
                 <li><a href="tournaments.html" class="hover:text-blue-300 font-bold">Tournaments</a></li>
                 <li><a href="match_history.html" class="hover:text-blue-300">Match History</a></li>
-                <li><a href="#" id="logout-btn" class="hover:text-blue-300 hidden">Logout</a></li>
+                <!-- <li><a href="#" id="logout-btn" class="hover:text-blue-300 hidden">Logout</a></li> -->
             </ul>
         </div>
     </nav>
@@ -83,33 +84,40 @@
 
     <script>
         let selectedPlayers = [];
+        // Hàm định dạng ngày từ Date object sang DD/MM/YYYY
+        function formatDateVN(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
 
         // Kiểm tra quyền admin
         function checkAdminAccess() {
             const adminKey = localStorage.getItem('adminKey');
-            console.log('Admin Key:', adminKey);
+            // console.log('Admin Key:', adminKey);
             const adminElements = [
                 document.getElementById('add-tournament-btn'),
                 document.getElementById('logout-btn')
             ];
             adminElements.forEach(btn => {
                 if (!btn) {
-                    console.warn(`Element ${btn?.id} not found.`);
+                    // console.warn(`Element ${btn?.id} not found.`);
                     return;
                 }
                 if (adminKey === 'admin_access') {
                     btn.classList.remove('hidden');
-                    console.log(`Removed hidden from ${btn.id}`);
+                    // console.log(`Removed hidden from ${btn.id}`);
                 } else {
                     btn.classList.add('hidden');
-                    console.log(`Added hidden to ${btn.id}`);
+                    // console.log(`Added hidden to ${btn.id}`);
                 }
             });
         }
 
         // Điền danh sách người chơi vào select
         async function populatePlayerSelect() {
-            await initializePoolData();
+            // await initializePoolData();
             const select = document.getElementById('tournament-players');
             select.innerHTML = '<option value="">-- Select a player --</option>';
             poolData.players.forEach(player => {
@@ -124,7 +132,7 @@
 
         // Render danh sách giải đấu
         async function renderTournaments() {
-            await initializePoolData();
+            // await initializePoolData();
             const grid = document.getElementById('tournaments-grid');
             const loading = document.getElementById('loading');
             const error = document.getElementById('error');
@@ -134,17 +142,18 @@
 
             try {
                 if (!poolData.tournaments || poolData.tournaments.length === 0) {
-                    grid.innerHTML = '<p class="text-gray-600 col-span-full text-center">No tournaments available.</p>';
+                    grid.innerHTML = '<p class="text-gray-600 col-span-full text-center">Loading ...</p>';
                     return;
                 }
+                const sortedTournaments = [...poolData.tournaments].sort((a, b) => b.id - a.id);
 
-                poolData.tournaments.forEach(tournament => {
+                sortedTournaments.forEach(tournament => {
                     const card = document.createElement('div');
                     card.className = 'bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow';
                     const participants = tournament.players.length;
                     const winner = tournament.top1Id ? poolData.players.find(p => p.id === tournament.top1Id)?.name || 'Unknown' : 'TBD';
                     card.innerHTML = `
-                        <h3 class="text-xl font-semibold mb-2">${tournament.name}</h3>
+                        <h3 class="text-xl font-semibold mb-2">${tournament.name} - <span style="color: ${tournament.status === 'Đang diễn ra' ? 'green' : 'red'}">${tournament.status}</span></h3>
                         <p class="text-gray-600">Date: ${tournament.date}</p>
                         <p class="text-gray-600">Location: ${tournament.location}</p>
                         <p class="text-gray-600 truncate-150" title="${participants}">Participants: ${participants}</p>
@@ -189,7 +198,7 @@
             }
         });
 
-        document.getElementById('create-tournament').addEventListener('click', () => {
+        document.getElementById('create-tournament').addEventListener('click', async () => {
             const name = document.getElementById('tournament-name').value;
             const date = document.getElementById('tournament-date').value;
             const location = document.getElementById('tournament-location').value;
@@ -219,14 +228,18 @@
                 top2Id: '',
                 status: 'Đang diễn ra'
             };
-            createData('tournaments', newTournament)
+            console.log(newTournament);
+            
+            createData('tournaments', newTournament).then(() =>{
+                initializePoolData();
+            })
             poolData.tournaments.push(newTournament);
 
             // Cập nhật lại bảng giải đấu
-            renderTournaments();
+            // renderTournaments();
 
             // Ẩn form và xóa dữ liệu
-            addTournamentForm.classList.add('hidden');
+            document.getElementById('add-tournament-form').classList.add('hidden');
             document.getElementById('tournament-name').value = '';
             document.getElementById('tournament-date').value = '';
             document.getElementById('tournament-location').value = '';
@@ -235,7 +248,7 @@
             document.getElementById('tournament-top2-points').value = '';
             document.getElementById('tournament-other-points').value = '';
             selectedPlayers = [];
-            renderSelectedPlayers();
+            // renderSelectedPlayers();
         });
 
         document.getElementById('cancel-tournament')?.addEventListener('click', () => {

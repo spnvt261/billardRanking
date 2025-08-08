@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Match History - Pool Tour</title>
+    <link rel="icon" type="image/png" href="images/icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="data.js"></script>
 </head>
+
 <body class="bg-gray-100 font-sans">
     <nav class="bg-blue-900 text-white p-4">
         <div class="container mx-auto flex justify-between items-center">
@@ -21,10 +24,15 @@
     <div class="container mx-auto py-8">
         <h2 class="text-3xl font-bold mb-6">Match History</h2>
         <div class="flex space-x-4 mb-4">
-            <button id="add-match-btn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 hidden">+</button>
-            <button id="filter-btn" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707v3.586a1 1 0 01-.293.707l-2 2A1 1 0 0110 21v-5.586a1 1 0 00-.293-.707L3.293 8.293A1 1 0 013 7.586V4z"></path>
+            <button id="add-match-btn"
+                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 hidden">+</button>
+            <button id="filter-btn"
+                class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707v3.586a1 1 0 01-.293.707l-2 2A1 1 0 0110 21v-5.586a1 1 0 00-.293-.707L3.293 8.293A1 1 0 013 7.586V4z">
+                    </path>
                 </svg>
                 Filter
             </button>
@@ -52,8 +60,10 @@
                     <label class="block text-gray-700">Score 2</label>
                     <input id="score2" type="number" min="0" class="w-full p-2 border rounded">
                 </div>
-                <button id="save-match" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save</button>
-                <button id="cancel-match" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
+                <button id="save-match"
+                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save</button>
+                <button id="cancel-match"
+                    class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
             </div>
         </div>
         <div id="filter-form" class="bg-white p-6 rounded-lg shadow-md mb-4 hidden">
@@ -112,8 +122,10 @@
                         <option value="Bàn nước">Bàn nước</option>
                     </select>
                 </div>
-                <button id="apply-filter" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Apply Filter</button>
-                <button id="clear-filter" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Clear Filter</button>
+                <button id="apply-filter" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Apply
+                    Filter</button>
+                <button id="clear-filter" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Clear
+                    Filter</button>
             </div>
         </div>
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
@@ -130,18 +142,25 @@
             <div class="p-3 flex justify-center space-x-2" id="pagination"></div>
         </div>
     </div>
+    <div id="loading" class="text-center text-gray-600 hidden">Loading...</div>
     <footer class="bg-blue-900 text-white p-4 mt-8">
         <div class="container mx-auto text-center">
             <p>&copy; 2025 Pool Tour. All rights reserved.</p>
         </div>
     </footer>
     <script>
-         window.addEventListener('data-loading', () => {
-            document.getElementById('loading').classList.remove('hidden');
-        });
-        window.addEventListener('data-loaded', () => {
-            document.getElementById('loading').classList.add('hidden');
-        });
+        function formatDateVN(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        // window.addEventListener('data-loading', () => {
+        //     document.getElementById('loading').classList.remove('hidden');
+        // });
+        // window.addEventListener('data-loaded', () => {
+        //     document.getElementById('loading').classList.add('hidden');
+        // });
         async function renderPage() {
             await initializePoolData();
         }
@@ -185,44 +204,50 @@
                 return playerMatch && monthMatch && yearMatch && tournamentMatch;
             }).sort((a, b) => parseDateVN(b.date) - parseDateVN(a.date));
         }
-
+        const loading = document.getElementById('loading');
         function renderMatchHistory(page = 1) {
-    const matches = filterMatches().sort((a, b) => parseInt(b.id) - parseInt(a.id)); // Sắp xếp id giảm dần
-    const matchesPerPage = 10;
-    const totalPages = Math.ceil(matches.length / matchesPerPage);
-    const startIndex = (page - 1) * matchesPerPage;
-    const endIndex = startIndex + matchesPerPage;
-    const paginatedMatches = matches.slice(startIndex, endIndex);
+            if (!poolData.matchHistory || poolData.matchHistory.length === 0) {
+                loading.classList.remove('hidden');
+                return;
+            }
+            loading.classList.add('hidden');
+            const matches = filterMatches().sort((a, b) => parseInt(b.id) - parseInt(a.id)); // Sắp xếp id giảm dần
+            const matchesPerPage = 10;
+            const totalPages = Math.ceil(matches.length / matchesPerPage);
+            const startIndex = (page - 1) * matchesPerPage;
+            const endIndex = startIndex + matchesPerPage;
+            const paginatedMatches = matches.slice(startIndex, endIndex);
 
-    const tableBody = document.getElementById('history-table');
-    tableBody.innerHTML = ''; // Xóa nội dung cũ
-    paginatedMatches.forEach(match => {
-        const row = document.createElement('tr');
-        row.className = 'border-b';
-        const player1 = poolData.players.find(u => u.id == match.player1Id)?.name || 'Unknown';
-        const player2 = poolData.players.find(u => u.id == match.player2Id)?.name || 'Unknown';
-        const player1Class = match.winnerId == match.player1Id ? 'text-green-600' : 'text-red-600';
-        const player2Class = match.winnerId == match.player2Id ? 'text-green-600' : 'text-red-600';
-        const tournamentName = poolData.tournaments.find(t => t.id == match.tournamentId)?.name || match.tournamentId;
-        row.innerHTML = `
+            const tableBody = document.getElementById('history-table');
+            tableBody.innerHTML = ''; // Xóa nội dung cũ
+            paginatedMatches.forEach(match => {
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+                const player1 = poolData.players.find(u => u.id == match.player1Id)?.name || 'Unknown';
+                const player2 = poolData.players.find(u => u.id == match.player2Id)?.name || 'Unknown';
+                const player1Class = match.winnerId == match.player1Id ? 'text-green-600' : 'text-red-600';
+                const player2Class = match.winnerId == match.player2Id ? 'text-green-600' : 'text-red-600';
+                const tournamentName = poolData.tournaments.find(t => t.id == match.tournamentId)?.name || match.tournamentId;
+                row.innerHTML = `
             <td class="p-3"><span class="${player1Class}">${player1}</span> ${match.score1} - ${match.score2} <span class="${player2Class}">${player2}</span></td>
             <td class="p-3">${match.date}</td>
             <td class="p-3">${tournamentName}</td>
         `;
-        tableBody.appendChild(row);
-    });
+                tableBody.appendChild(row);
+                // loading.classList.add('hidden');
+            });
 
-    // Render phân trang
-    const pagination = document.getElementById('pagination');
-    pagination.innerHTML = '';
-    for (let i = 1; i <= totalPages; i++) {
-        const button = document.createElement('button');
-        button.className = `px-3 py-1 rounded ${i == page ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`;
-        button.textContent = i;
-        button.addEventListener('click', () => renderMatchHistory(i));
-        pagination.appendChild(button);
-    }
-}
+            // Render phân trang
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement('button');
+                button.className = `px-3 py-1 rounded ${i == page ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`;
+                button.textContent = i;
+                button.addEventListener('click', () => renderMatchHistory(i));
+                pagination.appendChild(button);
+            }
+        }
 
         // Gọi hàm render khi tải trang
         renderMatchHistory();
@@ -288,7 +313,7 @@
         // Xử lý lưu trận đấu mới
         document.getElementById('save-match').addEventListener('click', () => {
             // console.log(poolData.matchHistory);
-            
+
             const player1Id = document.getElementById('player1-id').value;
             const score1 = document.getElementById('score1').value;
             const player2Id = document.getElementById('player2-id').value;
@@ -310,13 +335,13 @@
                 score2: parseInt(score2),
                 winnerId,
                 date: new Date().toLocaleDateString('vi-VN'),
-                tournamentId:'Bàn nước',
-                tournamentMatchId:'',
-                matchType:'',
+                tournamentId: 'Bàn nước',
+                tournamentMatchId: '',
+                matchType: '',
             };
             createData('match-history', newMatch);
-            updatePlayerPoints(player1Id,parseInt(score1));
-            updatePlayerPoints(player2Id,parseInt(score2));
+            updatePlayerPoints(player1Id, parseInt(score1));
+            updatePlayerPoints(player2Id, parseInt(score2));
             sessionStorage.removeItem('poolData_matchHistory');
             poolData.matchHistory.push(newMatch);
 
@@ -337,7 +362,7 @@
             document.getElementById('player2-id').value = '';
             document.getElementById('score2').value = '';
             // console.log(poolData.matchHistory);
-            
+
         });
 
         // Xử lý hủy form thêm trận đấu
@@ -366,4 +391,5 @@
         checkAdminAccess();
     </script>
 </body>
+
 </html>
