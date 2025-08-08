@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tournament Details - Pool Tour</title>
+    <title>Tournament Details - 9Pool</title>
     <link rel="icon" type="image/png" href="images/icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="data.js"></script>
@@ -32,7 +32,7 @@
 <body class="bg-gray-100 font-sans">
     <nav class="bg-blue-900 text-white p-4">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Pool Tour</h1>
+            <h1 class="text-2xl font-bold">NineBall</h1>
             <ul class="flex space-x-6">
                 <li><a href="rankings.html" class="hover:text-blue-300">Rankings</a></li>
                 <li><a href="tournaments.html" class="hover:text-blue-300 font-bold">Tournaments</a></li>
@@ -158,7 +158,7 @@
     </div>
     <footer class="bg-blue-900 text-white p-4 mt-8">
         <div class="container mx-auto text-center">
-            <p>&copy; 2025 Pool Tour. All rights reserved.</p>
+            <p>&copy; 2025 NineBall. All rights reserved.</p>
         </div>
     </footer>
     <script>
@@ -391,7 +391,7 @@
                     alert('Scores cannot be equal. Please ensure one player has a higher score.');
                     return;
                 }
-                if (!confirm(`Bạn có chắc chắn kết quả là ${player1name} ${score1} - ${score2} ${player2name} là chính xác?`)) {
+                if (!confirm(`Bạn có chắc chắn kết quả là [ ${player1name} ${score1} - ${score2} ${player2name} ]là chính xác?`)) {
                     return;
                 }
 
@@ -406,10 +406,12 @@
 
                 // Xác định winnerId dựa trên tỉ số
                 const winnerId = parseInt(score1) > parseInt(score2) ? player1Id : player2Id;
-
+                const maxId = poolData.matchHistory.length > 0
+                ? Math.max(...poolData.matchHistory.map(item => parseInt(item.id, 10))) + 1
+                : 1; // Nếu mảng rỗng, bắt đầu từ 1
                 // Tạo trận đấu mới
                 const newMatch = {
-                    id: String(poolData.matchHistory.length + 1),
+                    id: String(maxId),
                     player1Id,
                     score1: parseInt(score1),
                     player2Id,

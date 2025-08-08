@@ -4,16 +4,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rankings - Pool Tour</title>
+    <title>Rankings - 9Pool</title>
     <link rel="icon" type="image/png" href="images/icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="data.js"></script>
 </head>
+<style>
+    /* CSS để định dạng thẻ div ở dưới cùng */
+    .rules-container {
+      position: relative;
+      bottom: 0;
+      width: 100%;
+      padding: 20px;
+      background-color: #f8f8f8;
+      border-top: 1px solid #ccc;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      margin-top: 20px;
+    }
+    @media (max-width: 600px){
+        .rules-container{
+            text-align: left ;
+        }
+      }
+  </style>
 
 <body class="bg-gray-100 font-sans">
     <nav class="bg-blue-900 text-white p-4">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Pool Tour</h1>
+            <h1 class="text-2xl font-bold">NineBall</h1>
             <ul class="flex space-x-6">
                 <li><a href="rankings.html" class="hover:text-blue-300 font-bold">Rankings</a></li>
                 <li><a href="tournaments.html" class="hover:text-blue-300">Tournaments</a></li>
@@ -22,7 +41,7 @@
         </div>
     </nav>
     <div class="container mx-auto py-8">
-        <h2 class="text-3xl font-bold mb-6">Friend Nineball Rankings</h2>
+        <h2 class="text-3xl font-bold mb-6">Friend Rankings</h2>
         <div >
             <button id="add-player-btn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4 hidden">+</button>
             <button id="load-data" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4 ml-2" onclick="loadData()">Load Data</button>
@@ -59,9 +78,18 @@
         </div>
     </div>
     <div id="loading" class="text-center text-gray-600 hidden">Loading...</div>
+    <div class="rules-container">
+    <h2>Quy tắc tính điểm</h2>
+    <p>
+      <!-- Các cách tăng điểm:<br> -->
+      - Thắng 1 rack: +1 điểm<br>
+      - Vô địch hoặc Á quân<br>
+      - Điểm bổ sung: chấm
+    </p>
+  </div>
     <footer class="bg-blue-900 text-white p-4 mt-8">
         <div class="container mx-auto text-center">
-            <p>&copy; 2025 Pool Tour. All rights reserved.</p>
+            <p>&copy; 2025 NineBall. All rights reserved.</p>
         </div>
     </footer>
     <script>
@@ -139,8 +167,11 @@
             }
 
             // Tạo người chơi mới
+            const maxId = poolData.players.length > 0
+                ? Math.max(...poolData.players.map(item => parseInt(item.id, 10))) + 1
+                : 1; // Nếu mảng rỗng, bắt đầu từ 1
             const newPlayer = {
-                id: String(poolData.players.length + 1),
+                id: String(maxId),
                 name,
                 points: 0,
                 images: image.trim() == '' ? '../images/default.jpg' : image.trim()
