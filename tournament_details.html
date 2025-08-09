@@ -340,7 +340,7 @@
                     row.className = 'border-b';
 
                     let rankContent = '-';
-                    let pointsReceived = 0;
+                    let pointsReceived = tournament.other_point;
                     if (tournament.top1Id && player.id === tournament.top1Id) {
                         rankContent = '<span class="bg-yellow-600 text-white px-2 py-1 rounded">VĐ</span>';
                         pointsReceived = tournament.top1_point;
