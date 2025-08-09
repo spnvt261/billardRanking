@@ -4,10 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tournament Details - 9Pool</title>
+    <title>Tournament Details - Pool</title>
     <link rel="icon" type="image/png" href="images/icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="data.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <style>
     .ongoing {
@@ -69,7 +70,9 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-gray-700">Player 1</label>
-                        <select id="match-player1" class="w-full p-2 border rounded"></select>
+                        <select id="match-player1" class="w-full p-2 border rounded">
+                            <option value="">Select Player 1</option>
+                        </select>
                     </div>
                     <div>
                         <label class="block text-gray-700">Score Player 1</label>
@@ -77,13 +80,15 @@
                     </div>
                     <div>
                         <label class="block text-gray-700">Player 2</label>
-                        <select id="match-player2" class="w-full p-2 border rounded"></select>
+                        <select id="match-player2" class="w-full p-2 border rounded">
+                            <option value="">Select Player 2</option>
+                        </select>
                     </div>
                     <div>
-                        <label class="block text-gray-700">Score Player 2</label>
+                        <label id="score2-label" class="block text-gray-700">Score Player 2</label>
                         <input id="match-score2" type="number" min="0" class="w-full p-2 border rounded">
                     </div>
-                    <div>
+                    <div id="match-type-label">
                         <label class="block text-gray-700">Match Type</label>
                         <select id="match-type" class="w-full p-2 border rounded">
                             <option value="">-- Select match type --</option>
@@ -104,7 +109,7 @@
                 <table class="w-full">
                     <thead class="bg-blue-800 text-white">
                         <tr>
-                            <th class="p-3 text-left ">Tournament Match ID</th>
+                            <th class="p-3 text-left ">#</th>
                             <th class="p-3 text-left ">Match Type</th>
                             <th class="p-3 text-left w-50">Match</th>
                         </tr>
@@ -262,6 +267,7 @@
                 const matchesTable = document.getElementById('matches-table');
                 matchesTable.innerHTML = '';
                 const matches = poolData.matchHistory.filter(match => match.tournamentId == tournamentId);
+                let indexShow=0;
                 matches
                     .sort((a, b) => parseInt(a.tournamentMatchId) - parseInt(b.tournamentMatchId))
                     .forEach(match => {
@@ -271,8 +277,12 @@
                         const player2 = poolData.players.find(u => u.id == match.player2Id)?.name || 'Unknown';
                         const player1Class = match.winnerId == match.player1Id ? 'text-green-600' : 'text-red-600';
                         const player2Class = match.winnerId == match.player2Id ? 'text-green-600' : 'text-red-600';
+                        if(player2=="Chấm"){
+                            return
+                        }
+                        indexShow+=1;
                         row.innerHTML = `
-                        <td class="p-3">${match.tournamentMatchId}</td>
+                        <td class="p-3">${indexShow}</td>
                         <td class="p-3">${match.matchType || 'N/A'}</td>
                         <td class="p-3"><span class="${player1Class}">${player1}</span> ${match.score1} - ${match.score2} <span class="${player2Class}">${player2}</span></td>
                     `;
@@ -329,23 +339,73 @@
 
             }
 
-            // Điền danh sách người chơi vào select cho thêm trận đấu
+            // Điền danh sách người chơi vào select (form thêm trận đấu)
             const player1Select = document.getElementById('match-player1');
             const player2Select = document.getElementById('match-player2');
-            participantIds.forEach(playerId => {
-                const player = poolData.players.find(p => p.id == playerId);
-                if (player) {
-                    const option1 = document.createElement('option');
-                    option1.value = player.id;
-                    option1.textContent = player.name;
-                    player1Select.appendChild(option1);
+            const score2Input = document.getElementById('match-score2');
 
-                    const option2 = document.createElement('option');
-                    option2.value = player.id;
-                    option2.textContent = player.name;
-                    player2Select.appendChild(option2);
+            // Function to populate player1 dropdown (excluding "Chấm")
+            function populatePlayer1Dropdown() {
+                player1Select.innerHTML = '<option value="">Select Player 1</option>';
+                poolData.players
+                    .filter(player => player.name !== 'Chấm' && participantIds.includes(player.id))
+                    .forEach(player => {
+                        const option = document.createElement('option');
+                        option.value = player.id;
+                        option.textContent = player.name;
+                        player1Select.appendChild(option);
+                    });
+            }
+
+            // Function to populate player2 dropdown based on player1 selection
+            function populatePlayer2Dropdown(selectedPlayer1Id) {
+                player2Select.innerHTML = '<option value="">Select Player 2</option>';
+
+                // Always add "Chấm" at the top
+                const chamPlayer = poolData.players.find(player => player.name === 'Chấm');
+                if (chamPlayer) {
+                    const chamOption = document.createElement('option');
+                    chamOption.value = chamPlayer.id;
+                    chamOption.textContent = chamPlayer.name;
+                    player2Select.appendChild(chamOption);
                 }
+
+                // Add other players, excluding the selected player1
+                poolData.players
+                    .filter(player => player.id !== selectedPlayer1Id && player.name !== 'Chấm' && participantIds.includes(player.id))
+                    .forEach(player => {
+                        const option = document.createElement('option');
+                        option.value = player.id;
+                        option.textContent = player.name;
+                        player2Select.appendChild(option);
+                    });
+            }
+            // Function to handle score2 input based on player2 selection
+            function handleScore2Input() {
+                const selectedPlayer2 = poolData.players.find(player => player.id === player2Select.value);
+                if (selectedPlayer2 && selectedPlayer2.name === 'Chấm') {
+                    document.getElementById('score2-label').classList.add('hidden');
+                    // document.getElementById('match-type-label').classList.add('hidden');
+                    score2Input.classList.add('hidden');
+                    score2Input.value = 0;
+                } else {
+                    // document.getElementById('match-type-label').classList.remove('hidden');
+                    score2Input.classList.remove('hidden');
+                    score2Input.value = ''; // Clear value when not "Chấm"
+                }
+            }
+
+            // Initial population of player1 dropdown
+            populatePlayer1Dropdown();
+
+            // Event listener for player1 selection change
+            player1Select.addEventListener('change', (e) => {
+                populatePlayer2Dropdown(e.target.value);
+                handleScore2Input(); // Update score2 input when player1 changes
             });
+
+            // Event listener for player2 selection change
+            player2Select.addEventListener('change', handleScore2Input);
 
             // Điền danh sách người chơi vào select cho thêm người chơi
             const newPlayerSelect = document.getElementById('new-player');
@@ -381,7 +441,7 @@
                 const matchType = document.getElementById('match-type').value;
                 const player1name = poolData.players.find(u => u.id === player1Id)?.name || 'Unknown';
                 const player2name = poolData.players.find(u => u.id === player2Id)?.name || 'Unknown';
-
+                
                 // Kiểm tra dữ liệu hợp lệ
                 if (!player1Id || !player2Id || !score1 || !score2 || !matchType || player1Id == player2Id) {
                     alert('Please fill in all fields with valid data. Player 1 and Player 2 must be different.');
@@ -407,8 +467,8 @@
                 // Xác định winnerId dựa trên tỉ số
                 const winnerId = parseInt(score1) > parseInt(score2) ? player1Id : player2Id;
                 const maxId = poolData.matchHistory.length > 0
-                ? Math.max(...poolData.matchHistory.map(item => parseInt(item.id, 10))) + 1
-                : 1; // Nếu mảng rỗng, bắt đầu từ 1
+                    ? Math.max(...poolData.matchHistory.map(item => parseInt(item.id, 10))) + 1
+                    : 1; // Nếu mảng rỗng, bắt đầu từ 1
                 // Tạo trận đấu mới
                 const newMatch = {
                     id: String(maxId),

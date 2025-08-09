@@ -4,10 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rankings - 9Pool</title>
+    <title>Rankings - Pool</title>
     <link rel="icon" type="image/png" href="images/icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="data.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <style>
     /* CSS để định dạng thẻ div ở dưới cùng */
@@ -84,7 +85,7 @@
       <!-- Các cách tăng điểm:<br> -->
       - Thắng 1 rack: +1 điểm<br>
       - Vô địch hoặc Á quân<br>
-      - Điểm bổ sung: chấm
+      - Điểm bổ sung: chấm<br>
     </p>
   </div>
     <footer class="bg-blue-900 text-white p-4 mt-8">
@@ -121,15 +122,20 @@
                     return;
                 }
                 loading.classList.add('hidden');
+                let indexShow = 0;
                 poolData.players
                 .sort((a, b) => b.points - a.points) // Sắp xếp theo điểm giảm dần
                 .forEach((player, index) => {
+                    if(player.name==="Chấm"){
+                        return;
+                    }
+                    indexShow +=1;
                     const imageSrc = (!player.images || player.images.trim() == '')
                         ? '../images/default.jpg' : player.images;
                     const row = document.createElement('tr');
                     row.className = 'border-b';
                     row.innerHTML = `
-                        <td class="p-3">${index + 1}</td>
+                        <td class="p-3">${indexShow}</td>
                         <td class="p-3 flex items-center space-x-2">
                             <div class="relative w-12 h-16" style="aspect-ratio: 3/4;">
                                 <img src="${imageSrc}" alt="${player.name}" class="absolute inset-0 w-full h-full object-cover rounded">

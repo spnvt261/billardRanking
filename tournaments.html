@@ -4,10 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tournaments - 9Pool </title>
+    <title>Tournaments - Pool </title>
     <link rel="icon" type="image/png" href="images/icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="data.js"></script>
+    <link rel="stylesheet" href="style.css">
     <style>
         /* Cắt ngắn văn bản dài */
         .truncate-150 {
@@ -81,8 +82,7 @@
             <p>&copy; 2025 NineBall. All rights reserved.</p>
         </div>
     </footer>
-
-    <script>
+    <script>   
         let selectedPlayers = [];
         // Hàm định dạng ngày từ Date object sang DD/MM/YYYY
         function formatDateVN(date) {
@@ -121,6 +121,9 @@
             const select = document.getElementById('tournament-players');
             select.innerHTML = '<option value="">-- Select a player --</option>';
             poolData.players.forEach(player => {
+                if(player.name=="Chấm"){
+                    return;
+                }
                 if (!selectedPlayers.includes(player.id)) {
                     const option = document.createElement('option');
                     option.value = player.id;
@@ -220,7 +223,7 @@
             const newTournament = {
                 id: String(maxId),
                 name,
-                date: formatDateVN(new Date(date)),
+                date: new Date().toLocaleDateString('vi-VN'),
                 location,
                 prize,
                 players: [...selectedPlayers],

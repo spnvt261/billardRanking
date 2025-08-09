@@ -22,12 +22,14 @@
  *   renderPage();
  *   ```
  * - Đảm bảo HTML có logic xử lý poolData rỗng hoặc lỗi (như trong rankings.html).
+ * testKey: 
  */
 
 const poolData = {
     players: [],
     tournaments: [],
-    matchHistory: []
+    matchHistory: [],
+    history_point: []
 };
 const adminKey = localStorage.getItem('adminKey');
 
@@ -43,10 +45,17 @@ const adminKey = localStorage.getItem('adminKey');
 const API_BASE_URL = 'https://tabfpepqvdcecwnewpfx.supabase.co/rest/v1/';
 const PUBLISHABLE_KEY = 'sb_publishable__7iV7NXURl8Jo9GKORvoFg_3N1Mvs4G';
 const SECRET_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhYmZwZXBxdmRjZWN3bmV3cGZ4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDY4NDg0MywiZXhwIjoyMDcwMjYwODQzfQ.bIsr5yGL7DEbBoDHxDeuZssIv1FKVDcHvVGxK9peODs';
+
+// const API_BASE_URL = 'https://sjrexafyojloinbbraye.supabase.co/rest/v1/';
+// const PUBLISHABLE_KEY = 'sb_publishable_f_OIbYVcEvNY2AbbmuArGg_onyUF8aR';
+// const SECRET_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcmV4YWZ5b2psb2luYmJyYXllIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDczMDQ1NywiZXhwIjoyMDcwMzA2NDU3fQ.tvWitEsTEAArKFT1byvNZ7wiO4j8TfHTl58ou_j042w';
+
+
 const SESSION_STORAGE_KEYS = {
     players: 'poolData_players',
     tournaments: 'poolData_tournaments',
     matchHistory: 'poolData_matchHistory',
+    history_point: 'poolData_historyPoint',
     isInitialLoad: 'isInitialLoad'
 };
 
@@ -155,13 +164,14 @@ async function initializePoolData() {
         const storedPlayers = sessionStorage.getItem(SESSION_STORAGE_KEYS.players);
         const storedTournaments = sessionStorage.getItem(SESSION_STORAGE_KEYS.tournaments);
         const storedMatchHistory = sessionStorage.getItem(SESSION_STORAGE_KEYS.matchHistory);
+        const storedHistoryPoint = sessionStorage.getItem(SESSION_STORAGE_KEYS.history_point);
 
 
         // Khởi tạo dữ liệu từ SessionStorage nếu không rỗng
         let playersData = storedPlayers ? JSON.parse(storedPlayers) : null;
         let tournamentsData = storedTournaments ? JSON.parse(storedTournaments) : null;
         let matchHistoryData = storedMatchHistory ? JSON.parse(storedMatchHistory) : null;
-
+        let historyPointData = storedHistoryPoint ? JSON.parse(storedHistoryPoint) : null;
 
 
         // Kiểm tra dữ liệu rỗng và gọi API nếu cần
@@ -184,6 +194,12 @@ async function initializePoolData() {
                 sessionStorage.setItem(SESSION_STORAGE_KEYS.matchHistory, JSON.stringify(data));
             }));
         }
+        if (!historyPointData || historyPointData.length === 0) {
+            fetchPromises.push(fetchData('history_point').then(data => {
+                historyPointData = data;
+                sessionStorage.setItem(SESSION_STORAGE_KEYS.history_point, JSON.stringify(data));
+            }));
+        }
         // Chờ tất cả API hoàn tất (nếu có)
         if (fetchPromises.length > 0) {
             await Promise.all(fetchPromises);
@@ -193,6 +209,7 @@ async function initializePoolData() {
         poolData.players = playersData || [];
         poolData.tournaments = tournamentsData || [];
         poolData.matchHistory = matchHistoryData || [];
+        poolData.history_point = historyPointData || []
 
         // Phát sự kiện hoàn tất tải dữ liệu
         window.dispatchEvent(new CustomEvent('data-loaded'));
@@ -241,10 +258,24 @@ async function updatePlayerPoints(playerId, score) {
     if (!player) {
         throw new Error(`Player with ID ${playerId} not found.`);
     }
-
+    const maxId = poolData.history_point.length > 0
+                ? Math.max(...poolData.history_point.map(item => parseInt(item.id, 10))) + 1
+                : 3; // Nếu mảng rỗng, bắt đầu từ 1
+                // console.log(Math.max(...poolData.history_point.map(item => parseInt(item.id, 10))));
+                
+    const newDataHistoryPoint ={
+        id : maxId,
+        playerId: parseInt(player.id, 10),
+        point: score,
+        date: new Date().toLocaleDateString('vi-VN')
+    }
+    // console.log(newDataHistoryPoint);
+    poolData.history_point.push(newDataHistoryPoint);
+    
     const newPoints = player.points + score;
     try {
         await updateData('players', playerId, { points: newPoints });
+        await createData('history_point',newDataHistoryPoint);
         player.points = newPoints; // Cập nhật poolData.players cục bộ
         return { playerId, newPoints };
     } catch (error) {
@@ -263,9 +294,6 @@ function checkAdminAccess() {
 }
 
 function loadData() {
-    sessionStorage.removeItem(SESSION_STORAGE_KEYS.players);
-    sessionStorage.removeItem(SESSION_STORAGE_KEYS.tournaments);
-    sessionStorage.removeItem(SESSION_STORAGE_KEYS.matchHistory);
-    sessionStorage.removeItem(SESSION_STORAGE_KEYS.isInitialLoad);
+    sessionStorage.clear();
     initializePoolData();
 }
