@@ -80,7 +80,7 @@
     </div>
     <div id="loading" class="text-center text-gray-600 hidden">Loading...</div>
     <div class="rules-container">
-    <h2>Quy tắc tính điểm</h2>
+    <ul>Tính điểm</ul>
     <p>
       <!-- Các cách tăng điểm:<br> -->
       - Thắng 1 rack: +1 điểm<br>
@@ -180,7 +180,7 @@
                 id: String(maxId),
                 name,
                 points: 0,
-                images: image.trim() == '' ? '../images/default.jpg' : image.trim()
+                images: image.trim() == '' ? 'https://cdn-icons-png.freepik.com/512/8428/8428718.png' : image.trim()
             };
             createData('players',newPlayer)
             poolData.players.push(newPlayer);

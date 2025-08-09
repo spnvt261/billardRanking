@@ -55,6 +55,7 @@ function filterMatches() {
 }
 const loading = document.getElementById('loading');
 function renderMatchHistory(page = 1) {
+
     if (!poolData.matchHistory || poolData.matchHistory.length === 0) {
         loading.classList.remove('hidden');
         return;
@@ -96,6 +97,12 @@ function renderMatchHistory(page = 1) {
         button.addEventListener('click', () => renderMatchHistory(i));
         pagination.appendChild(button);
     }
+    
+    if(paginatedMatches.length==0){
+        tableBody.innerHTML = 'Không có trận nào';
+        return
+    }
+    
 }
 
 // Gọi hàm render khi tải trang
@@ -293,11 +300,13 @@ document.getElementById('cancel-match').addEventListener('click', () => {
 
 // Xử lý áp dụng bộ lọc
 document.getElementById('apply-filter').addEventListener('click', () => {
+    filterForm.classList.add('hidden');
     renderMatchHistory();
 });
 
 // Xử lý xóa bộ lọc
 document.getElementById('clear-filter').addEventListener('click', () => {
+    filterForm.classList.add('hidden');
     document.getElementById('filter-player1').value = '';
     document.getElementById('filter-player2').value = '';
     document.getElementById('filter-month').value = '';
