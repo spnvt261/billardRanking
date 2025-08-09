@@ -229,7 +229,7 @@
             }
 
             // Xử lý nút kết thúc giải
-            document.getElementById('end-tournament-btn').addEventListener('click', () => {
+            document.getElementById('end-tournament-btn').addEventListener('click', async () => {
                 if (!tournament.top1Id || !tournament.top2Id) {
                     alert('Cannot end tournament: Both Top 1 and Top 2 players must be selected.');
                     return;
@@ -251,14 +251,34 @@
                     ...tournament,
                     status: 'Đã kết thúc'
                 }
-                console.log(newTournament);
+                // console.log(newTournament);
+                
+                
+                try {
+                    // Cập nhật dữ liệu giải đấu
+                    await updateData('tournaments', tournament.id, newTournament);
 
-                updateData('tournaments', tournament.id, newTournament);
-                // console.log(champion.id,tournament.top1_point);
+                    // Cập nhật điểm cho nhà vô địch và á quân
+                    await addPlayerPoints(champion.id, tournament.top1_point);
+                    await addPlayerPoints(runnerUp.id, tournament.top2_point);
 
-                updatePlayerPoints(champion.id, tournament.top1_point);
-                updatePlayerPoints(runnerUp.id, tournament.top2_point);
-                initializePoolData();
+                    // Cập nhật điểm cho các người chơi khác tham gia giải
+                    const otherPlayers = poolData.players.filter(player =>
+                    
+                        participantIds.includes(player.id) &&
+                        player.id !== tournament.top1Id &&
+                        player.id !== tournament.top2Id
+                    );
+                    for (const player of otherPlayers) {
+                        await addPlayerPoints(player.id, tournament.other_point || 0);
+                    }
+
+                    // Làm mới dữ liệu
+                    await initializePoolData();
+                } catch (error) {
+                    console.error('Error ending tournament:', error);
+                    alert('Failed to end tournament. Please try again.');
+                }
 
             });
 
@@ -267,7 +287,7 @@
                 const matchesTable = document.getElementById('matches-table');
                 matchesTable.innerHTML = '';
                 const matches = poolData.matchHistory.filter(match => match.tournamentId == tournamentId);
-                let indexShow=0;
+                let indexShow = 0;
                 matches
                     .sort((a, b) => parseInt(a.tournamentMatchId) - parseInt(b.tournamentMatchId))
                     .forEach(match => {
@@ -277,10 +297,10 @@
                         const player2 = poolData.players.find(u => u.id == match.player2Id)?.name || 'Unknown';
                         const player1Class = match.winnerId == match.player1Id ? 'text-green-600' : 'text-red-600';
                         const player2Class = match.winnerId == match.player2Id ? 'text-green-600' : 'text-red-600';
-                        if(player2=="Chấm"){
+                        if (player2 == "Chấm") {
                             return
                         }
-                        indexShow+=1;
+                        indexShow += 1;
                         row.innerHTML = `
                         <td class="p-3">${indexShow}</td>
                         <td class="p-3">${match.matchType || 'N/A'}</td>
@@ -441,7 +461,7 @@
                 const matchType = document.getElementById('match-type').value;
                 const player1name = poolData.players.find(u => u.id === player1Id)?.name || 'Unknown';
                 const player2name = poolData.players.find(u => u.id === player2Id)?.name || 'Unknown';
-                
+
                 // Kiểm tra dữ liệu hợp lệ
                 if (!player1Id || !player2Id || !score1 || !score2 || !matchType || player1Id == player2Id) {
                     alert('Please fill in all fields with valid data. Player 1 and Player 2 must be different.');
@@ -483,8 +503,8 @@
                     matchType
                 };
                 createData('match-history', newMatch);
-                updatePlayerPoints(player1Id, parseInt(score1));
-                updatePlayerPoints(player2Id, parseInt(score2));
+                addPlayerPoints(player1Id, parseInt(score1));
+                addPlayerPoints(player2Id, parseInt(score2));
                 sessionStorage.removeItem('poolData_matchHistory');
                 sessionStorage.removeItem('isInitialLoad');
                 poolData.matchHistory.push(newMatch);

@@ -210,7 +210,22 @@ async function initializePoolData() {
         poolData.tournaments = tournamentsData || [];
         poolData.matchHistory = matchHistoryData || [];
         poolData.history_point = historyPointData || []
-
+        if (poolData.players) {
+            
+            // Duyệt qua từng người chơi trong poolData.players
+            for (const player of poolData.players) {
+                // Tính tổng điểm từ history_point cho playerId tương ứng
+                const totalPoints = poolData.history_point
+                    .filter(history => parseInt(history.playerId) === parseInt(player.id))
+                    .reduce((sum, history) => sum + parseInt(history.point), 0);
+                // console.log(totalPoints);
+                // console.log(player);
+                
+                player.points = totalPoints;
+                // console.log(player);
+                
+            }
+        }
         // Phát sự kiện hoàn tất tải dữ liệu
         window.dispatchEvent(new CustomEvent('data-loaded'));
         // if(isInitialLoad == null){
@@ -247,7 +262,7 @@ initializePoolData().catch(error => {
     window.dispatchEvent(new CustomEvent('data-loaded', { detail: { error: error.message } }));
 });
 
-async function updatePlayerPoints(playerId, score) {
+async function addPlayerPoints(playerId, score) {
     if (!playerId || typeof score !== 'number' || isNaN(score) || score < 0) {
         throw new Error('Invalid playerId or score. Score must be a non-negative number.');
     }
@@ -259,23 +274,23 @@ async function updatePlayerPoints(playerId, score) {
         throw new Error(`Player with ID ${playerId} not found.`);
     }
     const maxId = poolData.history_point.length > 0
-                ? Math.max(...poolData.history_point.map(item => parseInt(item.id, 10))) + 1
-                : 3; // Nếu mảng rỗng, bắt đầu từ 1
-                // console.log(Math.max(...poolData.history_point.map(item => parseInt(item.id, 10))));
-                
-    const newDataHistoryPoint ={
-        id : maxId,
+        ? Math.max(...poolData.history_point.map(item => parseInt(item.id, 10))) + 1
+        : 3; // Nếu mảng rỗng, bắt đầu từ 1
+    // console.log(Math.max(...poolData.history_point.map(item => parseInt(item.id, 10))));
+
+    const newDataHistoryPoint = {
+        id: maxId,
         playerId: parseInt(player.id, 10),
         point: score,
         date: new Date().toLocaleDateString('vi-VN')
     }
     // console.log(newDataHistoryPoint);
     poolData.history_point.push(newDataHistoryPoint);
-    
+
     const newPoints = player.points + score;
     try {
         await updateData('players', playerId, { points: newPoints });
-        await createData('history_point',newDataHistoryPoint);
+        await createData('history_point', newDataHistoryPoint);
         player.points = newPoints; // Cập nhật poolData.players cục bộ
         return { playerId, newPoints };
     } catch (error) {

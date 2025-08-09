@@ -258,9 +258,9 @@ document.getElementById('save-match').addEventListener('click', () => {
         matchType: '',
     };
     createData('match-history', newMatch);
-    updatePlayerPoints(player1Id, parseInt(score1));
+    addPlayerPoints(player1Id, parseInt(score1));
     if (player2name != "Chấm") {
-        updatePlayerPoints(player2Id, parseInt(score2));
+        addPlayerPoints(player2Id, parseInt(score2));
     }
     // console.log(poolData.matchHistory);
 
