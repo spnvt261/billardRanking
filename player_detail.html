@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Details - NineBall</title>
+    <link rel="icon" type="image/png" href="images/icon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="tournament.css">
+    <!-- CDN cho Chart.js để vẽ biểu đồ -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="data.js"></script> <!-- Link data.js để sử dụng poolData -->
+</head>
+
+<body class="bg-gray-100 font-sans">
+
+    <nav class="bg-blue-800 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">NineBall</h1>
+            <div class="space-x-4">
+                <a href="rankings.html" class="hover:underline">Rankings</a>
+                <a href="tournaments.html" class="hover:underline">Tournaments</a>
+                <a href="match_history.html" class="hover:underline">Match History</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4">
+        <h2 class="text-2xl font-bold mb-4">Player Details</h2>
+
+        <div id="loading" class="text-center text-gray-600">Loading data...</div>
+
+        <section id="player-info" class="bg-white p-4 rounded shadow mb-6 hidden">
+            <div class="flex items-center mb-4">
+                <img id="player-avatar" src="" alt="Avatar" class="w-16 h-16 rounded-full mr-4">
+                <div>
+                    <h3 id="player-name" class="text-xl font-bold"></h3>
+                    <p>Points: <span id="player-points"></span></p>
+                    <p>Matches Played: <span id="player-matches-count"></span></p>
+                    <p>Số chấm đã từng đi: <span id="cham-matches-count"></span></p>
+                </div>
+            </div>
+
+            <h4 class="text-lg font-bold mb-2">Achievements</h4>
+            <ul id="achievements-list" class="list-disc pl-5 mb-4"></ul>
+        </section>
+
+        <section id="matches-section" class="bg-white p-4 rounded shadow mb-6 hidden">
+            <h4 class="text-lg font-bold mb-2">Match History</h4>
+            <table class="w-full mb-4">
+                <thead class="bg-blue-800 text-white">
+                    <tr>
+                        <th class="p-3 text-left">Match</th>
+                        <th class="p-3 text-left">Date</th>
+                        <th class="p-3 text-left">Tournament</th>
+                    </tr>
+                </thead>
+                <tbody id="player-matches-table"></tbody>
+            </table>
+            <div id="pagination" class="flex space-x-2"></div>
+        </section>
+
+        <section id="points-chart-section" class="bg-white p-4 rounded shadow mb-6 hidden">
+            <h4 class="text-lg font-bold mb-2">Points History</h4>
+            <canvas id="points-chart" width="400" height="200"></canvas>
+        </section>
+    </main>
+
+    <footer class="bg-blue-800 text-white p-4 text-center">
+        © 2025 NineBall. All rights reserved.
+    </footer>
+
+    <script>
+        // Hàm parse date VN (DD/MM/YYYY) thành Date object
+        function parseDateVN(dateStr) {
+            if (!dateStr || typeof dateStr !== 'string') {
+                console.warn('Invalid date:', dateStr); // Log để debug
+                return new Date(0); // Trả về date cũ nhất (1970-01-01) để sort đẩy xuống cuối
+            }
+            const parts = dateStr.split('/');
+            if (parts.length !== 3) {
+                console.warn('Invalid date format:', dateStr);
+                return new Date(0);
+            }
+            const [day, month, year] = parts.map(Number);
+            if (isNaN(day) || isNaN(month) || isNaN(year)) {
+                console.warn('Invalid date numbers:', dateStr);
+                return new Date(0);
+            }
+            return new Date(year, month - 1, day);
+        }
+
+        // Lấy playerId từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const playerId = urlParams.get('id');
+        console.log(playerId);
+
+        if (!playerId) {
+            alert('Player ID not provided.');
+            window.location.href = 'rankings.html';
+            // return;
+        }
+
+        // Render trang sau khi data loaded
+        async function renderPlayerDetails() {
+            await initializePoolData(); // Từ data.js
+            // console.log(1);
+
+            const player = poolData.players.find(p => p.id == playerId);
+            if (!player) {
+                // alert('Player not found.1');
+                document.getElementById('loading').innerHTML('Player không tồn tại');
+                // window.location.href = 'rankings.html';
+                return;
+            }
+
+            // Hiển thị info cơ bản
+            document.getElementById('player-avatar').src = player.images || 'images/default.jpg'; // Default nếu không có
+            document.getElementById('player-name').textContent = player.name;
+            document.getElementById('player-points').textContent = player.points;
+
+            // Tính số trận
+            const matchesCountAll = poolData.matchHistory.filter(m => m.player1Id == playerId || m.player2Id == playerId).length;
+            // Tính số trận, loại bỏ trận với "Chấm"
+            const matchesCount = poolData.matchHistory.filter(m => {
+                const isPlayerInMatch = m.player1Id == playerId || m.player2Id == playerId;
+                if (!isPlayerInMatch) return false;
+                const opponentId = m.player1Id == playerId ? m.player2Id : m.player1Id;
+                const opponentName = poolData.players.find(p => p.id == opponentId)?.name || 'Unknown';
+                return opponentName !== "Chấm";
+            }).length;
+
+            document.getElementById('player-matches-count').textContent = matchesCount;
+            document.getElementById('cham-matches-count').textContent = (parseInt(matchesCountAll) - parseInt(matchesCount)).toString();
+
+            // Hiển thị giải thưởng
+            const achievements = [];
+            poolData.tournaments.forEach(t => {
+                if (t.top1Id == playerId) {
+                    achievements.push({ type: 'Vô địch', name: t.name, date: t.date });
+                } else if (t.top2Id == playerId) {
+                    achievements.push({ type: 'Á quân', name: t.name, date: t.date });
+                }
+            });
+            // Sort: Vô địch trước, rồi á quân, theo date desc
+            achievements.sort((a, b) => {
+                if (a.type === 'Vô địch' && b.type !== 'Vô địch') return -1;
+                if (a.type !== 'Vô địch' && b.type === 'Vô địch') return 1;
+                return parseDateVN(b.date) - parseDateVN(a.date);
+            });
+            const achievementsList = document.getElementById('achievements-list');
+            achievements.forEach(ach => {
+                const li = document.createElement('li');
+                li.textContent = `${ach.type} - ${ach.name} (${ach.date})`;
+                achievementsList.appendChild(li);
+            });
+            if (achievements.length === 0) {
+                achievementsList.innerHTML = '<li>Chưa có giải thưởng</li>';
+            }
+
+            // Hiển thị list trận đấu với pagination
+            renderPlayerMatches(1);
+
+            // Vẽ biểu đồ points history
+            renderPointsChart();
+
+            // Hiển thị sections
+            document.getElementById('player-info').classList.remove('hidden');
+            document.getElementById('matches-section').classList.remove('hidden');
+            document.getElementById('points-chart-section').classList.remove('hidden');
+        }
+
+        // Render list trận đấu
+        function renderPlayerMatches(page = 1) {
+            // Filter trước để loại bỏ trận với "Chấm"
+            const matches = poolData.matchHistory
+                .filter(m => {
+                    const isPlayerInMatch = m.player1Id == playerId || m.player2Id == playerId;
+                    if (!isPlayerInMatch) return false;
+                    const opponentId = m.player1Id == playerId ? m.player2Id : m.player1Id;
+                    const opponentName = poolData.players.find(p => p.id == opponentId)?.name || 'Unknown';
+                    return opponentName !== "Chấm";
+                })
+                .sort((a, b) => parseInt(b.id) - parseInt(a.id)); // Sort desc by id
+
+            const matchesPerPage = 5;
+            const totalPages = Math.ceil(matches.length / matchesPerPage);
+            const startIndex = (page - 1) * matchesPerPage;
+            const paginatedMatches = matches.slice(startIndex, startIndex + matchesPerPage);
+
+            const tableBody = document.getElementById('player-matches-table');
+            tableBody.innerHTML = '';
+            paginatedMatches.forEach(match => {
+                const player1 = poolData.players.find(p => p.id == match.player1Id)?.name || 'Unknown';
+                const player2 = poolData.players.find(p => p.id == match.player2Id)?.name || 'Unknown';
+                const row = document.createElement('tr');
+                const player1Class = match.winnerId == match.player1Id ? 'text-green-600' : 'text-red-600';
+                const player2Class = match.winnerId == match.player2Id ? 'text-green-600' : 'text-red-600';
+                const tournamentName = poolData.tournaments.find(t => t.id == match.tournamentId)?.name || 'Bàn nước';
+                row.innerHTML = `
+            <td class="p-3"><span class="${player1Class}">${player1}</span> ${match.score1} - ${match.score2} <span class="${player2Class}">${player2}</span></td>
+            <td class="p-3">${match.date}</td>
+            <td class="p-3">${tournamentName}</td>
+            `;
+                tableBody.appendChild(row);
+            });
+            if (paginatedMatches.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="3" class="p-3 text-center">Chưa có trận đấu</td></tr>';
+            }
+
+            // Pagination
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement('button');
+                button.className = `px-3 py-1 rounded ${i === page ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`;
+                button.textContent = i;
+                button.addEventListener('click', () => renderPlayerMatches(i));
+                pagination.appendChild(button);
+            }
+        }
+
+        // Vẽ biểu đồ với Chart.js
+        function renderPointsChart() {
+            const history = poolData.history_point
+                .filter(h => h.playerId == playerId && h.date) // Lọc bỏ null date
+                .sort((a, b) => parseDateVN(a.date) - parseDateVN(b.date)); // Sort asc by date
+
+            if (history.length === 0) {
+                // Xử lý nếu không có data
+                const ctx = document.getElementById('points-chart').getContext('2d');
+                ctx.font = '16px Arial';
+                ctx.fillText('Chưa có lịch sử điểm', 10, 50);
+                return;
+            }
+
+            const labels = history.map(h => h.date);
+
+            // Tính điểm tích lũy
+            let cumulative = 0;
+            const data = history.map(h => {
+                cumulative += h.point;
+                return cumulative;
+            });
+
+            const ctx = document.getElementById('points-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Cumulative Points',
+                        data: data,
+                        borderColor: 'blue',
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // Xử lý loading events từ data.js
+        window.addEventListener('data-loading', () => {
+            document.getElementById('loading').classList.remove('hidden');
+        });
+        window.addEventListener('data-loaded', () => {
+            document.getElementById('loading').classList.add('hidden');
+        });
+
+        // Gọi render
+        renderPlayerDetails().catch(error => console.error('Error rendering player details:', error));
+    </script>
+
+</body>
+
+</html>

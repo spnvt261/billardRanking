@@ -137,10 +137,12 @@
                     row.innerHTML = `
                         <td class="p-3">${indexShow}</td>
                         <td class="p-3 flex items-center space-x-2">
+                            <a href="player_detail.html?id=${player.id}" class="text-black underline hover:text-blue p-3 flex items-center space-x-2">
                             <div class="relative w-12 h-16" style="aspect-ratio: 3/4;">
                                 <img src="${imageSrc}" alt="${player.name}" class="absolute inset-0 w-full h-full object-cover rounded">
                             </div>
                             <span>${player.name}</span>
+                            </a>
                         </td>
                         <td class="p-3">${player.points}</td>
                     `;
