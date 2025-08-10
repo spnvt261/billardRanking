@@ -91,6 +91,11 @@
             }
             return new Date(year, month - 1, day);
         }
+        // Chuyển "30/7/2025" thành đối tượng Date
+        function parseVNDate(str) {
+            let [day, month, year] = str.split('/').map(Number);
+            return new Date(year, month - 1, day); // month - 1 vì JS đếm tháng từ 0
+        }
 
         // Lấy playerId từ URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -223,28 +228,84 @@
         }
 
         // Vẽ biểu đồ với Chart.js
-        function renderPointsChart() {
-            const history = poolData.history_point
-                .filter(h => h.playerId == playerId && h.date) // Lọc bỏ null date
-                .sort((a, b) => parseDateVN(a.date) - parseDateVN(b.date)); // Sort asc by date
+        // function renderPointsChart() {
+        //     const history = poolData.history_point
+        //         .filter(h => h.playerId == playerId && h.date) // Lọc bỏ null date
+        //         .sort((a, b) => parseDateVN(a.date) - parseDateVN(b.date)); // Sort asc by date
 
-            if (history.length === 0) {
-                // Xử lý nếu không có data
+        //     if (history.length === 0) {
+        //         // Xử lý nếu không có data
+        //         const ctx = document.getElementById('points-chart').getContext('2d');
+        //         ctx.font = '16px Arial';
+        //         ctx.fillText('Chưa có lịch sử điểm', 10, 50);
+        //         return;
+        //     }
+
+        //     const labels = history.map(h => h.date);
+
+        //     // Tính điểm tích lũy
+        //     let cumulative = 0;
+        //     const data = history.map(h => {
+        //         cumulative += h.point;
+        //         return cumulative;
+        //     });
+
+        //     const ctx = document.getElementById('points-chart').getContext('2d');
+        //     new Chart(ctx, {
+        //         type: 'line',
+        //         data: {
+        //             labels: labels,
+        //             datasets: [{
+        //                 label: 'Điểm tích lũy',
+        //                 data: data,
+        //                 borderColor: 'blue',
+        //                 fill: false
+        //             }]
+        //         },
+        //         options: {
+        //             scales: {
+        //                 y: { beginAtZero: true }
+        //             }
+        //         }
+        //     });
+        // }
+        function renderPointsChart() {
+            // Lấy lịch sử điểm của player hiện tại
+            const playerHistory = poolData.history_point
+                .filter(h => h.playerId == playerId && h.date)
+                .sort((a, b) => parseDateVN(a.date) - parseDateVN(b.date));
+
+            // Xác định ngày bắt đầu: ngày sớm nhất của player hoặc mặc định
+            let startDate = parseVNDate("29/7/2025");
+            let endDate = new Date(); // Ngày hiện tại
+
+            const labels = [];
+            let currentDate = new Date(startDate); // copy để tránh thay đổi startDate gốc
+
+            while (currentDate <= endDate) {
+                labels.push(currentDate.toLocaleDateString('vi-VN'));
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            // Tính điểm tích lũy cho mỗi ngày
+            let cumulative = 0;
+            const data = labels.map(date => {
+                const pointsOnDate = playerHistory
+                    .filter(h => h.date === date)
+                    .reduce((sum, h) => sum + h.point, 0);
+                cumulative += pointsOnDate;
+                return cumulative;
+            });
+            console.log(currentDate, endDate);
+
+
+            // Nếu không có dữ liệu để vẽ
+            if (playerHistory.length === 0) {
                 const ctx = document.getElementById('points-chart').getContext('2d');
                 ctx.font = '16px Arial';
                 ctx.fillText('Chưa có lịch sử điểm', 10, 50);
                 return;
             }
-
-            const labels = history.map(h => h.date);
-
-            // Tính điểm tích lũy
-            let cumulative = 0;
-            const data = history.map(h => {
-                cumulative += h.point;
-                return cumulative;
-            });
-
+            // Vẽ biểu đồ
             const ctx = document.getElementById('points-chart').getContext('2d');
             new Chart(ctx, {
                 type: 'line',
@@ -259,7 +320,13 @@
                 },
                 options: {
                     scales: {
-                        y: { beginAtZero: true }
+                        y: { beginAtZero: true },
+                        x: {
+                            ticks: {
+                                // Giảm số lượng label trên trục x để tránh chồng chéo
+                                maxTicksLimit: 10
+                            }
+                        }
                     }
                 }
             });
