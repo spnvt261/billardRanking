@@ -34,12 +34,12 @@
 
         <section id="player-info" class="bg-white p-4 rounded shadow mb-6 hidden">
             <div class="flex items-center mb-4">
-                <img id="player-avatar" src="" alt="Avatar" class="w-16 h-16 rounded-full mr-4">
+                <img id="player-avatar" src="" alt="Avatar" class=" rounded-full mr-4" style="width: 10rem; height:10rem">
                 <div>
                     <h3 id="player-name" class="text-xl font-bold"></h3>
-                    <p>Points: <span id="player-points"></span></p>
+                    <p>Elo: <span id="player-points"></span></p>
                     <p>Matches Played: <span id="player-matches-count"></span></p>
-                    <p>Số chấm đã từng đi: <span id="cham-matches-count"></span></p>
+                    <p>Số chấm: <span id="cham-matches-count"></span></p>
                 </div>
             </div>
 
@@ -63,7 +63,7 @@
         </section>
 
         <section id="points-chart-section" class="bg-white p-4 rounded shadow mb-6 hidden">
-            <h4 class="text-lg font-bold mb-2">Points History</h4>
+            <h4 class="text-lg font-bold mb-2">Elo Received History</h4>
             <canvas id="points-chart" width="400" height="200"></canvas>
         </section>
     </main>
@@ -100,7 +100,7 @@
         // Lấy playerId từ URL
         const urlParams = new URLSearchParams(window.location.search);
         const playerId = urlParams.get('id');
-        console.log(playerId);
+        // console.log(playerId);
 
         if (!playerId) {
             alert('Player ID not provided.');
@@ -122,23 +122,97 @@
             }
 
             // Hiển thị info cơ bản
-            document.getElementById('player-avatar').src = player.images || 'images/default.jpg'; // Default nếu không có
+            document.getElementById('player-avatar').src = player.images || 'https://cdn-icons-png.freepik.com/512/8428/8428718.png'; // Default nếu không có
             document.getElementById('player-name').textContent = player.name;
             document.getElementById('player-points').textContent = player.points;
 
+            // Tính số trận đối đầu với "Chấm" (trận đơn và trận đôi)
+            function calculateMatchesAgainstCham(playerId) {
+                let ChamDon = 0; // Số trận đơn đối đầu với "Chấm"
+                let ChamDoi = 0; // Số trận đôi đối đầu với "Chấm"
+
+                // Hàm helper để lấy danh sách ID người chơi từ teamId
+                function getPlayerIds(teamId) {
+                    const teamIdStr = String(teamId);
+                    if (teamIdStr.length === 8) {
+                        // Trận đôi: tách thành 2 phần 4 ký tự
+                        const part1 = teamIdStr.substring(0, 4);
+                        const part2 = teamIdStr.substring(4, 8);
+                        return [String(parseInt(part1) - 1000), String(parseInt(part2) - 1000)];
+                    }
+                    // Trận đơn: trả về ID đơn
+                    return [teamIdStr];
+                }
+
+                poolData.matchHistory.forEach(m => {
+                    // Lấy danh sách ID người chơi từ cả hai đội
+                    const team1Ids = getPlayerIds(m.player1Id);
+                    const team2Ids = getPlayerIds(m.player2Id);
+
+                    // Kiểm tra playerId có trong trận
+                    const isPlayerInMatch = team1Ids.includes(String(playerId)) || team2Ids.includes(String(playerId));
+                    if (!isPlayerInMatch) return;
+
+                    // Xác định đội đối thủ
+                    const opponentTeamIds = team1Ids.includes(String(playerId)) ? team2Ids : team1Ids;
+
+                    // Kiểm tra xem đối thủ có "Chấm" hay không
+                    const opponentNames = opponentTeamIds.map(id => poolData.players.find(p => p.id == id)?.name || 'Unknown');
+                    const hasCham = opponentNames.includes('Chấm');
+
+                    if (hasCham) {
+                        // Phân loại trận đơn hay đôi
+                        if (m.matchType === 'doubles' || String(m.player1Id).length === 8 || String(m.player2Id).length === 8) {
+                            ChamDoi++;
+                        } else {
+                            ChamDon++;
+                        }
+                    }
+                });
+
+                return { ChamDon, ChamDoi };
+            }
+
+            // Cách sử dụng: 
+            const { ChamDon, ChamDoi } = calculateMatchesAgainstCham(playerId);
+            // console.log(`Số trận đơn đối đầu với Chấm: ${ChamDon}`);
+            // console.log(`Số trận đôi đối đầu với Chấm: ${ChamDoi}`);
+
             // Tính số trận
-            const matchesCountAll = poolData.matchHistory.filter(m => m.player1Id == playerId || m.player2Id == playerId).length;
-            // Tính số trận, loại bỏ trận với "Chấm"
+            // const matchesCountAll = poolData.matchHistory.filter(m => m.player1Id == playerId || m.player2Id == playerId).length;
+            // Tính số trận, bao gồm cả trận đôi và loại bỏ trận với "Chấm"
             const matchesCount = poolData.matchHistory.filter(m => {
-                const isPlayerInMatch = m.player1Id == playerId || m.player2Id == playerId;
+                // Hàm helper để lấy danh sách ID người chơi từ teamId
+                function getPlayerIds(teamId) {
+                    const teamIdStr = String(teamId);
+                    if (teamIdStr.length === 8) {
+                        // Trận đôi: tách thành 2 phần 4 ký tự
+                        const part1 = teamIdStr.substring(0, 4);
+                        const part2 = teamIdStr.substring(4, 8);
+                        return [String(parseInt(part1) - 1000), String(parseInt(part2) - 1000)];
+                    }
+                    // Trận đơn: trả về ID đơn
+                    return [teamIdStr];
+                }
+
+                // Lấy danh sách ID người chơi từ cả hai đội
+                const team1Ids = getPlayerIds(m.player1Id);
+                const team2Ids = getPlayerIds(m.player2Id);
+
+                // Kiểm tra playerId có trong trận
+                const isPlayerInMatch = team1Ids.includes(String(playerId)) || team2Ids.includes(String(playerId));
                 if (!isPlayerInMatch) return false;
-                const opponentId = m.player1Id == playerId ? m.player2Id : m.player1Id;
-                const opponentName = poolData.players.find(p => p.id == opponentId)?.name || 'Unknown';
-                return opponentName !== "Chấm";
+
+                // Xác định opponent team
+                const opponentTeamIds = team1Ids.includes(String(playerId)) ? team2Ids : team1Ids;
+
+                // Loại bỏ nếu opponent là "Chấm"
+                const opponentNames = opponentTeamIds.map(id => poolData.players.find(p => p.id == id)?.name || 'Unknown');
+                return !opponentNames.includes('Chấm');
             }).length;
 
             document.getElementById('player-matches-count').textContent = matchesCount;
-            document.getElementById('cham-matches-count').textContent = (parseInt(matchesCountAll) - parseInt(matchesCount)).toString();
+            document.getElementById('cham-matches-count').textContent = ChamDon + " Chấm đơn & " + ChamDoi+ " Chấm đôi" ;
 
             // Hiển thị giải thưởng
             const achievements = [];
@@ -179,14 +253,53 @@
 
         // Render list trận đấu
         function renderPlayerMatches(page = 1) {
-            // Filter trước để loại bỏ trận với "Chấm"
+            // Hàm helper để lấy danh sách ID người chơi từ teamId
+            function getPlayerIds(teamId) {
+                const teamIdStr = String(teamId);
+                if (teamIdStr.length === 8) {
+                    // Trận đôi: tách thành 2 phần 4 ký tự
+                    const part1 = teamIdStr.substring(0, 4);
+                    const part2 = teamIdStr.substring(4, 8);
+                    return [String(parseInt(part1) - 1000), String(parseInt(part2) - 1000)];
+                }
+                // Trận đơn: trả về ID đơn
+                return [teamIdStr];
+            }
+
+            // Hàm helper để lấy tên hiển thị từ teamId
+            function getPlayerDisplay(teamId) {
+                const teamIdStr = String(teamId);
+                if (teamIdStr.length === 8) {
+                    // Trận đôi: tách thành 2 phần 4 ký tự
+                    const part1 = teamIdStr.substring(0, 4);
+                    const part2 = teamIdStr.substring(4, 8);
+                    const id1 = parseInt(part1) - 1000;
+                    const id2 = parseInt(part2) - 1000;
+                    const name1 = poolData.players.find(u => u.id == id1)?.name || 'Unknown';
+                    const name2 = poolData.players.find(u => u.id == id2)?.name || 'Unknown';
+                    return `${name1} & ${name2}`;
+                } else {
+                    // Trận đơn
+                    return poolData.players.find(u => u.id == teamId)?.name || 'Unknown';
+                }
+            }
+
+            // Filter trước để loại bỏ trận với "Chấm" và chỉ lấy trận có playerId tham gia
             const matches = poolData.matchHistory
                 .filter(m => {
-                    const isPlayerInMatch = m.player1Id == playerId || m.player2Id == playerId;
+                    const team1Ids = getPlayerIds(m.player1Id);
+                    const team2Ids = getPlayerIds(m.player2Id);
+
+                    // Kiểm tra playerId có trong trận
+                    const isPlayerInMatch = team1Ids.includes(String(playerId)) || team2Ids.includes(String(playerId));
                     if (!isPlayerInMatch) return false;
-                    const opponentId = m.player1Id == playerId ? m.player2Id : m.player1Id;
-                    const opponentName = poolData.players.find(p => p.id == opponentId)?.name || 'Unknown';
-                    return opponentName !== "Chấm";
+
+                    // Xác định opponent team
+                    const opponentTeamIds = team1Ids.includes(String(playerId)) ? team2Ids : team1Ids;
+
+                    // Loại bỏ nếu opponent là "Chấm"
+                    const opponentNames = opponentTeamIds.map(id => poolData.players.find(p => p.id == id)?.name || 'Unknown');
+                    return !opponentNames.includes('Chấm');
                 })
                 .sort((a, b) => parseInt(b.id) - parseInt(a.id)); // Sort desc by id
 
@@ -198,17 +311,17 @@
             const tableBody = document.getElementById('player-matches-table');
             tableBody.innerHTML = '';
             paginatedMatches.forEach(match => {
-                const player1 = poolData.players.find(p => p.id == match.player1Id)?.name || 'Unknown';
-                const player2 = poolData.players.find(p => p.id == match.player2Id)?.name || 'Unknown';
-                const row = document.createElement('tr');
+                const player1Display = getPlayerDisplay(match.player1Id);
+                const player2Display = getPlayerDisplay(match.player2Id);
                 const player1Class = match.winnerId == match.player1Id ? 'text-green-600' : 'text-red-600';
                 const player2Class = match.winnerId == match.player2Id ? 'text-green-600' : 'text-red-600';
                 const tournamentName = poolData.tournaments.find(t => t.id == match.tournamentId)?.name || 'Bàn nước';
+                const row = document.createElement('tr');
                 row.innerHTML = `
-            <td class="p-3"><span class="${player1Class}">${player1}</span> ${match.score1} - ${match.score2} <span class="${player2Class}">${player2}</span></td>
-            <td class="p-3">${match.date}</td>
-            <td class="p-3">${tournamentName}</td>
-            `;
+                    <td class="p-3"><span class="${player1Class}">${player1Display}</span> ${match.score1} - ${match.score2} <span class="${player2Class}">${player2Display}</span></td>
+                    <td class="p-3">${match.date}</td>
+                    <td class="p-3">${tournamentName}</td>
+                `;
                 tableBody.appendChild(row);
             });
             if (paginatedMatches.length === 0) {
@@ -269,6 +382,8 @@
         //         }
         //     });
         // }
+        // console.log(player.name);
+        // const player = poolData.players.find(p => p.id == playerId);
         function renderPointsChart() {
             // Lấy lịch sử điểm của player hiện tại
             const playerHistory = poolData.history_point
@@ -295,7 +410,7 @@
                 cumulative += pointsOnDate;
                 return cumulative;
             });
-            console.log(currentDate, endDate);
+            // console.log(currentDate, endDate);
 
 
             // Nếu không có dữ liệu để vẽ
@@ -312,7 +427,7 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Cumulative Points',
+                        label: `${poolData.players.find(p => p.id == playerId).name}`,
                         data: data,
                         borderColor: 'blue',
                         fill: false

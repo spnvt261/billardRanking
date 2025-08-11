@@ -303,6 +303,8 @@ function checkAdminAccess() {
     // console.log(adminKey);
 
     if (adminKey) {
+        // console.log(1);
+        
         document.getElementById('add-match-btn')?.classList.remove('hidden');
         document.getElementById('add-player-btn')?.classList.remove('hidden');
         document.getElementById('add-tournament-btn')?.classList.remove('hidden');
