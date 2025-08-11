@@ -54,9 +54,9 @@
             <p><strong>Location:</strong> <span id="tournament-location"></span></p>
             <p><strong>Participants:</strong> <span id="tournament-participants"></span></p>
             <p><strong>Prize:</strong> <span id="tournament-prize"></span></p>
-            <p><strong>Top 1 Points:</strong> <span id="tournament-top1-points"></span></p>
-            <p><strong>Top 2 Points:</strong> <span id="tournament-top2-points"></span></p>
-            <p><strong>Other Players Points:</strong> <span id="tournament-other-points"></span></p>
+            <p><strong>Top 1 elo recevied:</strong> <span id="tournament-top1-points"></span></p>
+            <p><strong>Top 2 elo recevied:</strong> <span id="tournament-top2-points"></span></p>
+            <p><strong>Other Players elo recevied:</strong> <span id="tournament-other-points"></span></p>
             <p><strong>Status:</strong> <span id="tournament-status"></span></p>
         </div>
         <div id="matches-section" class="bg-white p-6 rounded-lg shadow-md mb-6">
@@ -152,7 +152,7 @@
                         <tr>
                             <th class="p-3 text-left">Rank</th>
                             <th class="p-3 text-left">Player</th>
-                            <th class="p-3 text-left">Points</th>
+                            <th class="p-3 text-left">Elo Received</th>
                         </tr>
                     </thead>
                     <tbody id="rankings-table-body"></tbody>
@@ -342,7 +342,7 @@
                     let rankContent = '-';
                     let pointsReceived = tournament.other_point;
                     if (tournament.top1Id && player.id === tournament.top1Id) {
-                        rankContent = '<span class="bg-yellow-600 text-white px-2 py-1 rounded">VĐ</span>';
+                        rankContent = '<span class="bg-yellow-600 text-white px-2 py-1 rounded">1</span>';
                         pointsReceived = tournament.top1_point;
                     } else if (tournament.top2Id && player.id === tournament.top2Id) {
                         rankContent = '<span class="bg-gray-600 text-white px-2 py-1 rounded">2</span>';

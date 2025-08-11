@@ -39,7 +39,8 @@
                     <h3 id="player-name" class="text-xl font-bold"></h3>
                     <p>Elo: <span id="player-points"></span></p>
                     <p>Matches Played: <span id="player-matches-count"></span></p>
-                    <p>Số chấm: <span id="cham-matches-count"></span></p>
+                    <p>Chấm đơn: <span id="cham-don"></span></p>
+                    <p>Chấm đôi: <span id="cham-doi"></span></p>
                 </div>
             </div>
 
@@ -212,7 +213,8 @@
             }).length;
 
             document.getElementById('player-matches-count').textContent = matchesCount;
-            document.getElementById('cham-matches-count').textContent = ChamDon + " Chấm đơn & " + ChamDoi+ " Chấm đôi" ;
+            document.getElementById('cham-don').textContent = ChamDon;
+            document.getElementById('cham-doi').textContent = ChamDoi ;
 
             // Hiển thị giải thưởng
             const achievements = [];

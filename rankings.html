@@ -13,22 +13,23 @@
 <style>
     /* CSS để định dạng thẻ div ở dưới cùng */
     .rules-container {
-      position: relative;
-      bottom: 0;
-      width: 100%;
-      padding: 20px;
-      background-color: #f8f8f8;
-      border-top: 1px solid #ccc;
-      text-align: center;
-      font-family: Arial, sans-serif;
-      margin-top: 20px;
+        position: relative;
+        bottom: 0;
+        width: 100%;
+        padding: 20px;
+        background-color: #f8f8f8;
+        border-top: 1px solid #ccc;
+        text-align: center;
+        font-family: Arial, sans-serif;
+        margin-top: 20px;
     }
-    @media (max-width: 600px){
-        .rules-container{
-            text-align: left ;
+
+    @media (max-width: 600px) {
+        .rules-container {
+            text-align: left;
         }
-      }
-  </style>
+    }
+</style>
 
 <body class="bg-gray-100 font-sans">
     <nav class="bg-blue-900 text-white p-4">
@@ -43,11 +44,13 @@
     </nav>
     <div class="container mx-auto py-8">
         <h2 class="text-3xl font-bold mb-6">Friend Rankings</h2>
-        <div >
-            <button id="add-player-btn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4 hidden">+</button>
-            <button id="load-data" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4 ml-2" onclick="loadData()">Load Data</button>
+        <div>
+            <button id="add-player-btn"
+                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4 hidden">+</button>
+            <button id="load-data" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4 ml-2"
+                onclick="loadData()">Load Data</button>
         </div>
-        
+
         <div id="add-player-form" class="bg-white p-6 rounded-lg shadow-md mt-4 hidden">
             <h3 class="text-xl font-semibold mb-4">Add New Player</h3>
             <div class="space-y-4">
@@ -80,14 +83,14 @@
     </div>
     <div id="loading" class="text-center text-gray-600 hidden">Loading...</div>
     <div class="rules-container">
-    <ul>Tính Elo</ul>
-    <p>
-      <!-- Các cách tăng điểm:<br> -->
-      - Thắng 1 rack: +1 Elo<br>
-      - Vô địch hoặc Á quân<br>
-      - Điểm bổ sung: chấm<br>
-    </p>
-  </div>
+        <ul>Tính Elo</ul>
+        <p>
+            <!-- Các cách tăng điểm:<br> -->
+            - Thắng 1 rack: +1 Elo<br>
+            - Vô địch hoặc Á quân<br>
+            - Điểm bổ sung: chấm<br>
+        </p>
+    </div>
     <footer class="bg-blue-900 text-white p-4 mt-8">
         <div class="container mx-auto text-center">
             <p>&copy; 2025 NineBall. All rights reserved.</p>
@@ -102,7 +105,7 @@
         //     console.log(123);
         //     document.getElementById('loading').classList.add('hidden');
         // });
-        
+
         async function renderPage() {
             await initializePoolData();
         }
@@ -110,13 +113,13 @@
         // Hiển thị bảng xếp hạng
         async function renderRankings() {
             // await initializePoolData(); // Đợi data load xong
-            
+
             const tableBody = document.getElementById('rankings-table');
             const loading = document.getElementById('loading');
             // loading.classList.remove('hidden');
             tableBody.innerHTML = ''; // Xóa nội dung cũ
 
-            try{
+            try {
                 if (!poolData.players || poolData.players.length === 0) {
                     loading.classList.remove('hidden');
                     return;
@@ -124,18 +127,31 @@
                 loading.classList.add('hidden');
                 let indexShow = 0;
                 poolData.players
-                .sort((a, b) => b.points - a.points) // Sắp xếp theo điểm giảm dần
-                .forEach((player, index) => {
-                    if(player.name==="Chấm"){
-                        return;
-                    }
-                    indexShow +=1;
-                    const imageSrc = (!player.images || player.images.trim() == '')
-                        ? '../images/default.jpg' : player.images;
-                    const row = document.createElement('tr');
-                    row.className = 'border-b';
-                    row.innerHTML = `
-                        <td class="p-3">${indexShow}</td>
+                    .sort((a, b) => b.points - a.points) // Sắp xếp theo điểm giảm dần
+                    .forEach((player, index) => {
+                        if (player.name === "Chấm") {
+                            return;
+                        }
+                        indexShow += 1;
+                        let rankDisplay = `${indexShow}`; // Mặc định là text số thông thường
+
+                        // Xử lý hiển thị thứ hạng đặc biệt cho top 1, 2, 3
+                        if (indexShow === 1) {
+                            // Top 1: Vàng, hình tròn
+                            rankDisplay = `<div style="background-color: #FFD700; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold;">${indexShow}</div>`;
+                        } else if (indexShow === 2) {
+                            // Top 2: Bạc, hình tròn
+                            rankDisplay = `<div style="background-color: #C0C0C0; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold;">${indexShow}</div>`;
+                        } else if (indexShow === 3) {
+                            // Top 3: Đồng, hình tròn
+                            rankDisplay = `<div style="background-color: #CD7F32; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold;">${indexShow}</div>`;
+                        }
+                        const imageSrc = (!player.images || player.images.trim() == '')
+                            ? '../images/default.jpg' : player.images;
+                        const row = document.createElement('tr');
+                        row.className = 'border-b';
+                        row.innerHTML = `
+                        <td class="p-3">${rankDisplay}</td>
                         <td class="p-3 flex items-center space-x-2">
                             <a href="player_detail.html?id=${player.id}" class="text-black underline hover:text-blue p-3 flex items-center space-x-2">
                             <div class="relative w-12 h-16" style="aspect-ratio: 3/4;">
@@ -146,9 +162,9 @@
                         </td>
                         <td class="p-3">${player.points}</td>
                     `;
-                    tableBody.appendChild(row);
-                });
-            } finally{
+                        tableBody.appendChild(row);
+                    });
+            } finally {
                 // loading.classList.add('hidden');
             }
         }
@@ -184,7 +200,7 @@
                 points: 0,
                 images: image.trim() == '' ? 'https://cdn-icons-png.freepik.com/512/8428/8428718.png' : image.trim()
             };
-            createData('players',newPlayer)
+            createData('players', newPlayer)
             poolData.players.push(newPlayer);
 
             // Cập nhật lại bảng xếp hạng
