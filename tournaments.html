@@ -82,7 +82,7 @@
             <p>&copy; 2025 NineBall. All rights reserved.</p>
         </div>
     </footer>
-    <script>   
+    <script>
         let selectedPlayers = [];
         // Hàm định dạng ngày từ Date object sang DD/MM/YYYY
         function formatDateVN(date) {
@@ -121,7 +121,7 @@
             const select = document.getElementById('tournament-players');
             select.innerHTML = '<option value="">-- Select a player --</option>';
             poolData.players.forEach(player => {
-                if(player.name=="Chấm"){
+                if (player.name == "Chấm") {
                     return;
                 }
                 if (!selectedPlayers.includes(player.id)) {
@@ -155,8 +155,18 @@
                     card.className = 'bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow';
                     const participants = tournament.players.length;
                     const winner = tournament.top1Id ? poolData.players.find(p => p.id === tournament.top1Id)?.name || 'Unknown' : 'TBD';
+
                     card.innerHTML = `
-                        <h3 class="text-xl font-semibold mb-2">${tournament.name}  <span style=" ${tournament.status === 'Đang diễn ra' ? ' color: green' : 'display:none'}">${tournament.status}</span></h3>
+                        <h3 class="text-xl font-semibold mb-2">
+                        ${tournament.name} 
+                        ${tournament.name !== 'Đền'
+                            ? `<img src="https://cdn-icons-png.freepik.com/512/16853/16853146.png" alt="Cup" style="width:24px;display:inline-block;margin-left:5px;vertical-align:middle;">`
+                            : ''}
+
+                        <span style="${tournament.status === 'Đang diễn ra' ? 'color: green' : 'display:none'}">
+                            ${tournament.status}
+                        </span>
+                        </h3>
                         <p class="text-gray-600">Date: ${tournament.date}</p>
                         <p class="text-gray-600">Location: ${tournament.location}</p>
                         <p class="text-gray-600 truncate-150" title="${participants}">Participants: ${participants}</p>
@@ -215,8 +225,8 @@
 
             // Tạo giải đấu mới
             const maxId = poolData.tournaments.length > 0
-            ? Math.max(...poolData.tournaments.map(item => parseInt(item.id, 10))) + 1
-            : 1; // Nếu mảng rỗng, bắt đầu từ 1
+                ? Math.max(...poolData.tournaments.map(item => parseInt(item.id, 10))) + 1
+                : 1; // Nếu mảng rỗng, bắt đầu từ 1
             const newTournament = {
                 id: String(maxId),
                 name,
@@ -232,8 +242,8 @@
                 status: 'Đang diễn ra'
             };
             console.log(newTournament);
-            
-            createData('tournaments', newTournament).then(() =>{
+
+            createData('tournaments', newTournament).then(() => {
                 initializePoolData();
             })
             poolData.tournaments.push(newTournament);

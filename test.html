@@ -1,281 +1,154 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tournaments - Pool Tour</title>
+    <title>Tất cả người chơi - Lịch sử điểm</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="data.js"></script>
-    <link rel="stylesheet" href="./tournament.css">
 </head>
-
 <body class="bg-gray-100 font-sans">
-    <nav class="bg-blue-900 text-white p-4">
+
+    <nav class="bg-blue-800 text-white p-4">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Pool Tour</h1>
-            <ul class="flex space-x-6">
-                <li><a href="rankings.html" class="hover:text-blue-300">Rankings</a></li>
-                <li><a href="tournaments.html" class="hover:text-blue-300 font-bold">Tournaments</a></li>
-                <li><a href="match_history.html" class="hover:text-blue-300">Match History</a></li>
-            </ul>
-        </div>
-    </nav>
-    <div class="container mx-auto py-8">
-        <h2 class="text-3xl font-bold mb-6">Upcoming Tournaments</h2>
-        <div class="flex space-x-4 mb-4">
-            <button id="add-tournament-btn"
-                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 hidden">+</button>
-        </div>
-        <div id="add-tournament-form" class="bg-white p-6 rounded-lg shadow-md mb-4 hidden">
-            <h3 class="text-xl font-semibold mb-4">Create New Tournament</h3>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-gray-700">Tournament Name</label>
-                    <input id="tournament-name" type="text" class="w-full p-2 border rounded">
-                </div>
-                <div>
-                    <label class="block text-gray-700">Date</label>
-                    <input id="tournament-date" type="text" disabled class="w-full p-2 border rounded bg-gray-200">
-                </div>
-                <div>
-                    <label class="block text-gray-700">Location</label>
-                    <input id="tournament-location" type="text" class="w-full p-2 border rounded">
-                </div>
-                <div>
-                    <label class="block text-gray-700">Prize</label>
-                    <input id="tournament-prize" type="text" class="w-full p-2 border rounded">
-                </div>
-                <div>
-                    <label class="block text-gray-700">Top 1 Points</label>
-                    <input id="tournament-top1-points" type="number" value="20" min="0"
-                        class="w-full p-2 border rounded">
-                </div>
-                <div>
-                    <label class="block text-gray-700">Top 2 Points</label>
-                    <input id="tournament-top2-points" type="number" value="10" min="0"
-                        class="w-full p-2 border rounded">
-                </div>
-                <div>
-                    <label class="block text-gray-700">Other Players Points</label>
-                    <input id="tournament-other-points" type="number" value="0" min="0"
-                        class="w-full p-2 border rounded">
-                </div>
-                <div>
-                    <label class="block text-gray-700">Add Players</label>
-                    <select id="tournament-player-select" class="w-full p-2 border rounded">
-                        <option value="">-- Select a player --</option>
-                    </select>
-                    <button id="add-player-btn"
-                        class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 mt-2">Add Player</button>
-                    <ul id="selected-players" class="mt-2 space-y-1"></ul>
-                </div>
-                <button id="create-tournament"
-                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Create Tournament</button>
-                <button id="cancel-tournament"
-                    class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
+            <h1 class="text-xl font-bold">NineBall</h1>
+            <div class="space-x-4">
+                <a href="rankings.html" class="hover:underline">Rankings</a>
+                <a href="tournaments.html" class="hover:underline">Tournaments</a>
+                <a href="match_history.html" class="hover:underline">Match History</a>
             </div>
         </div>
-        
-        <div class=" bg-white shadow-md rounded-lg overflow-hidden">
-            <table class="w-full">
-                <thead class="bg-blue-800 text-white">
-                    <tr>
-                        <th class="p-3 text-left">Name</th>
-                        <th class="p-3 text-left">Date</th>
-                        <th class="p-3 text-left">Location</th>
-                        <th class="p-3 text-left">Participants</th>
-                        <th class="p-3 text-left">Total Prize</th>
-                        <th class="p-3 text-left">Top 1 Points</th>
-                        <th class="p-3 text-left">Winner</th>
-                        <th class="p-3 text-left">Details</th>
-                    </tr>
-                </thead>
-                <tbody id="tournaments-table"></tbody>
-            </table>
+    </nav>
+
+    <main class="container mx-auto p-4">
+        <h2 class="text-2xl font-bold mb-4">Biểu đồ lịch sử điểm của tất cả người chơi</h2>
+        <div class="bg-white p-4 rounded shadow">
+            <canvas id="all-players-chart" width="1000" height="500"></canvas>
         </div>
-    </div>
-    <footer class="bg-blue-900 text-white p-4 mt-8">
-        <div class="container mx-auto text-center">
-            <p>&copy; 2025 Pool Tour. All rights reserved.</p>
-        </div>
+    </main>
+
+    <footer class="bg-blue-800 text-white p-4 text-center">
+        © 2025 NineBall. All rights reserved.
     </footer>
+
     <script>
-        window.addEventListener('data-loading', () => {
-            document.getElementById('loading').classList.remove('hidden');
-        });
-        window.addEventListener('data-loaded', () => {
-            document.getElementById('loading').classList.add('hidden');
-        });
-        async function renderPage() {
-            await initializePoolData();
-        }
-        // Hàm chuyển định dạng ngày DD/MM/YYYY thành Date object
-        function parseDateVN(dateStr) {
-            const [day, month, year] = dateStr.split('/').map(Number);
+        function parseVNDate(str) {
+            let [day, month, year] = str.split('/').map(Number);
             return new Date(year, month - 1, day);
         }
 
-        // Hàm định dạng ngày từ Date object sang DD/MM/YYYY
-        function formatDateVN(date) {
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            return `${day}/${month}/${year}`;
+        function toVNString(date) {
+            return date.toLocaleDateString('vi-VN');
         }
 
-        // Danh sách người chơi được chọn
-        let selectedPlayers = [];
-
-        // Hiển thị danh sách giải đấu
-        function renderTournaments() {
-            const tableBody = document.getElementById('tournaments-table');
-            tableBody.innerHTML = ''; // Xóa nội dung cũ
-            poolData.tournaments
-                .sort((a, b) => parseDateVN(b.date) - parseDateVN(a.date)) // Sắp xếp theo ngày gần nhất
-                .forEach(tournament => {
-                    // Tính số người tham dự
-                    const participants = tournament.players ? tournament.players.length : 0;
-                    const top1Player = poolData.players.find(p => p.id == tournament.top1Id)?.name || 'N/A';
-                    const row = document.createElement('tr');
-                    row.className = 'border-b';
-                    row.innerHTML = `
-                        <td class="p-3">${tournament.name}</td>
-                        <td class="p-3">${tournament.date}</td>
-                        <td class="p-3">${tournament.location}</td>
-                        <td class="p-3">${participants}</td>
-                        <td class="p-3">${tournament.prize}</td>
-                        <td class="p-3">${tournament.top1_point}</td>
-                        <td class="p-3">${top1Player}</td>
-                        <td class="p-3">
-                            <a href="tournament_details.html?id=${tournament.id}" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">View Details</a>
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
-                });
+        function getRandomColor() {
+            const r = Math.floor(Math.random() * 200);
+            const g = Math.floor(Math.random() * 200);
+            const b = Math.floor(Math.random() * 200);
+            return `rgb(${r}, ${g}, ${b})`;
         }
 
-        // Điền danh sách người chơi vào select
-        function populatePlayerSelect() {
-            const playerSelect = document.getElementById('tournament-player-select');
-            playerSelect.innerHTML = '<option value="">-- Select a player --</option>';
-            poolData.players.forEach(player => {
-                const option = document.createElement('option');
-                option.value = player.id;
-                option.textContent = player.name;
-                playerSelect.appendChild(option);
-            });
-        }
+        async function renderAllPlayersChart() {
+            await initializePoolData();
 
-        // Hiển thị danh sách người chơi được chọn
-        function renderSelectedPlayers() {
-            const selectedPlayersList = document.getElementById('selected-players');
-            selectedPlayersList.innerHTML = '';
-            selectedPlayers.forEach(playerId => {
-                const player = poolData.players.find(p => p.id == playerId);
-                if (player) {
-                    const li = document.createElement('li');
-                    li.textContent = player.name;
-                    li.className = 'text-gray-700';
-                    selectedPlayersList.appendChild(li);
+            // Tìm ngày nhỏ nhất & lớn nhất
+            const allDatesInHistory = poolData.history_point
+                .filter(h => h.date)
+                .map(h => parseVNDate(h.date));
+
+            const minDateOverall = parseVNDate("29/07/2025");
+            const endDate = new Date();
+
+            // Tạo labels nhưng bỏ bớt ngày không biến động
+            let labels = [];
+            let stagnantCount = 0;
+
+            let currentDate = new Date(minDateOverall);
+            while (currentDate <= endDate) {
+                const dateStr = toVNString(currentDate);
+
+                // Kiểm tra xem ngày này có ai nhận điểm không
+                const hasChange = poolData.history_point.some(h => h.date === dateStr && h.point !== 0);
+
+                if (hasChange) {
+                    stagnantCount = 0;
+                    labels.push(dateStr);
+                } else {
+                    stagnantCount++;
+                    // Chỉ giữ tối đa 2 ngày liên tiếp không biến động
+                    if (stagnantCount <= 2) {
+                        labels.push(dateStr);
+                    }
+                }
+
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            // Dataset cho mỗi người
+            const datasets = poolData.players
+                .filter(player => player.name !== "Chấm")
+                .map(player => {
+                    const playerHistory = poolData.history_point
+                        .filter(h => h.playerId == player.id && h.date)
+                        .sort((a, b) => parseVNDate(a.date) - parseVNDate(b.date));
+
+                    if (playerHistory.length === 0) return null;
+
+                    // Start date = 1 ngày trước khi có điểm đầu tiên
+                    const firstDate = parseVNDate(playerHistory[0].date);
+                    firstDate.setDate(firstDate.getDate() - 1);
+
+                    let cumulative = 0;
+                    const dataPoints = labels.map(date => {
+                        const dateObj = parseVNDate(date);
+                        if (dateObj < firstDate) return null;
+
+                        const pointsOnDate = playerHistory
+                            .filter(h => h.date === date)
+                            .reduce((sum, h) => sum + h.point, 0);
+                        cumulative += pointsOnDate;
+                        return cumulative;
+                    });
+
+                    return {
+                        label: player.name,
+                        data: dataPoints,
+                        borderColor: getRandomColor(),
+                        spanGaps: true,
+                        fill: false
+                    };
+                })
+                .filter(dataset => dataset !== null);
+
+            // Vẽ Chart.js
+            const ctx = document.getElementById('all-players-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        title: {
+                            display: true,
+                            text: 'Điểm tích lũy theo ngày của tất cả người chơi'
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true },
+                        x: {
+                            ticks: { maxTicksLimit: 10 }
+                        }
+                    }
                 }
             });
         }
 
-        // Gọi hàm render khi tải trang
-        renderTournaments();
-        populatePlayerSelect();
-
-        // Xử lý hiển thị form thêm giải đấu
-        const addTournamentBtn = document.getElementById('add-tournament-btn');
-        const addTournamentForm = document.getElementById('add-tournament-form');
-        addTournamentBtn.addEventListener('click', () => {
-            // updateData('tournaments',tournament._id,tournament);
-            addTournamentForm.classList.toggle('hidden');
-            selectedPlayers = []; // Reset danh sách người chơi khi mở form
-            renderSelectedPlayers();
-        });
-
-        // Xử lý thêm người chơi vào danh sách
-        document.getElementById('add-player-btn').addEventListener('click', () => {
-            const playerId = document.getElementById('tournament-player-select').value;
-            if (playerId && !selectedPlayers.includes(playerId)) {
-                selectedPlayers.push(playerId);
-                renderSelectedPlayers();
-                document.getElementById('tournament-player-select').value = '';
-            }
-        });
-
-        // Xử lý tạo giải đấu mới
-        document.getElementById('create-tournament').addEventListener('click', () => {
-            const name = document.getElementById('tournament-name').value;
-            const date = document.getElementById('tournament-date').value;
-            const location = document.getElementById('tournament-location').value;
-            const top1Point = document.getElementById('tournament-top1-points').value;
-            const prize = document.getElementById('tournament-prize').value.trim() == '' ? 'N/A':document.getElementById('tournament-prize').value;
-            const top2Point = document.getElementById('tournament-top2-points').value;
-            const otherPoint = document.getElementById('tournament-other-points').value;
-
-            // Kiểm tra dữ liệu hợp lệ
-            if (!name || !date || !location || !top1Point || !top2Point || !otherPoint || isNaN(top1Point) || isNaN(top2Point) || isNaN(otherPoint) || selectedPlayers.length < 2) {
-                alert('Please fill in all fields with valid data and add at least 2 players.');
-                return;
-            }
-
-            // Tạo giải đấu mới
-            const newTournament = {
-                id: String(poolData.tournaments.length + 1),
-                name,
-                date: formatDateVN(new Date(date)),
-                location,
-                prize,
-                players: [...selectedPlayers],
-                top1_point: parseInt(top1Point),
-                top2_point: parseInt(top2Point),
-                other_point: parseInt(otherPoint),
-                top1Id:'',
-                top2Id:'',
-                status: 'Đang diễn ra'
-            };
-            createData('tournaments',newTournament)
-            poolData.tournaments.push(newTournament);
-
-            // Cập nhật lại bảng giải đấu
-            renderTournaments();
-
-            // Ẩn form và xóa dữ liệu
-            addTournamentForm.classList.add('hidden');
-            document.getElementById('tournament-name').value = '';
-            document.getElementById('tournament-date').value = '';
-            document.getElementById('tournament-location').value = '';
-            document.getElementById('tournament-top1-points').value = '';
-            document.getElementById('tournament-prize').value = '';
-            document.getElementById('tournament-top2-points').value = '';
-            document.getElementById('tournament-other-points').value = '';
-            selectedPlayers = [];
-            renderSelectedPlayers();
-        });
-
-        // Xử lý hủy form
-        document.getElementById('cancel-tournament').addEventListener('click', () => {
-            addTournamentForm.classList.add('hidden');
-            document.getElementById('tournament-name').value = '';
-            document.getElementById('tournament-date').value = '';
-            document.getElementById('tournament-location').value = '';
-            document.getElementById('tournament-top1-points').value = '';
-            document.getElementById('tournament-prize').value = '';
-            document.getElementById('tournament-top2-points').value = '';
-            document.getElementById('tournament-other-points').value = '';
-            selectedPlayers = [];
-            renderSelectedPlayers();
-        });
-        // Lấy phần tử input
-        const tournamentDateInput = document.getElementById('tournament-date');
-
-        // Gán giá trị ngày hiện tại theo định dạng 'vi-VN' (dd/mm/yyyy)
-        tournamentDateInput.value = new Date().toLocaleDateString('vi-VN');
-        checkAdminAccess();
+        renderAllPlayersChart();
     </script>
 </body>
-
 </html>

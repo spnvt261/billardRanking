@@ -34,10 +34,11 @@
 
         <section id="player-info" class="bg-white p-4 rounded shadow mb-6 hidden">
             <div class="flex items-center mb-4">
-                <img id="player-avatar" src="" alt="Avatar" class=" rounded-full mr-4" style="width: 10rem; height:10rem">
+                <img id="player-avatar" src="" alt="Avatar" class=" rounded-full mr-4"
+                    style="width: 10rem; height:10rem">
                 <div>
                     <h3 id="player-name" class="text-xl font-bold"></h3>
-                    <p>Elo: <span id="player-points"></span></p>
+                    <p>Elo: <span id="player-points"></span> - Rank <span id="player-rank" class="font-bold"></span></p>
                     <p>Matches Played: <span id="player-matches-count"></span></p>
                     <p>Chấm đơn: <span id="cham-don"></span></p>
                     <p>Chấm đôi: <span id="cham-doi"></span></p>
@@ -127,6 +128,28 @@
             document.getElementById('player-name').textContent = player.name;
             document.getElementById('player-points').textContent = player.points;
 
+            // 1. Hàm tính tổng điểm (Elo) từ history_point
+            function getCurrentPoints(pid) {
+                return poolData.history_point
+                    .filter(h => h.playerId == pid)
+                    .reduce((sum, h) => sum + (h.point || 0), 0);
+            }
+
+            // 2. Tạo mảng tất cả player kèm Elo hiện tại
+            const playersWithPoints = poolData.players.map(p => ({
+                id: p.id,
+                name: p.name,
+                points: getCurrentPoints(p.id)
+            }));
+
+            // 3. Sắp xếp giảm dần theo Elo
+            playersWithPoints.sort((a, b) => b.points - a.points);
+
+            // 4. Xác định rank hiện tại
+            const rank = playersWithPoints.findIndex(p => p.id == playerId) + 1;
+
+            document.getElementById('player-rank').textContent = `#${rank}`;
+
             // Tính số trận đối đầu với "Chấm" (trận đơn và trận đôi)
             function calculateMatchesAgainstCham(playerId) {
                 let ChamDon = 0; // Số trận đơn đối đầu với "Chấm"
@@ -214,11 +237,14 @@
 
             document.getElementById('player-matches-count').textContent = matchesCount;
             document.getElementById('cham-don').textContent = ChamDon;
-            document.getElementById('cham-doi').textContent = ChamDoi ;
+            document.getElementById('cham-doi').textContent = ChamDoi;
 
             // Hiển thị giải thưởng
             const achievements = [];
             poolData.tournaments.forEach(t => {
+                if(t.name == "Đền"){
+                    return;
+                }
                 if (t.top1Id == playerId) {
                     achievements.push({ type: 'Vô địch', name: t.name, date: t.date });
                 } else if (t.top2Id == playerId) {
@@ -317,7 +343,7 @@
                 const player2Display = getPlayerDisplay(match.player2Id);
                 const player1Class = match.winnerId == match.player1Id ? 'text-green-600' : 'text-red-600';
                 const player2Class = match.winnerId == match.player2Id ? 'text-green-600' : 'text-red-600';
-                const tournamentName = poolData.tournaments.find(t => t.id == match.tournamentId)?.name || 'Bàn nước';
+                const tournamentName = poolData.tournaments.find(t => t.id == match.tournamentId)?.name ? poolData.tournaments.find(t => t.id == match.tournamentId)?.name : match.tournamentId;
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td class="p-3"><span class="${player1Class}">${player1Display}</span> ${match.score1} - ${match.score2} <span class="${player2Class}">${player2Display}</span></td>
