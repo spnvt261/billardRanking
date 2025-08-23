@@ -38,14 +38,15 @@
 
 <body class="bg-gray-100 font-sans">
 
-    <nav class="bg-blue-800 text-white p-4">
+    <nav class="bg-blue-900 text-white p-4">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold">NineBall</h1>
-            <div class="space-x-4">
-                <a href="rankings.html" class="hover:underline">Rankings</a>
-                <a href="tournaments.html" class="hover:underline">Tournaments</a>
-                <a href="match_history.html" class="hover:underline">Match History</a>
-            </div>
+            <h1 class="text-2xl font-bold">NineBall</h1>
+            <ul class="flex space-x-6">
+                <li><a href="overall.html" class="hover:text-blue-300">Overall</a></li>
+                <li><a href="rankings.html" class="hover:text-blue-300">Rankings</a></li>
+                <li><a href="tournaments.html" class="hover:text-blue-300">Tournaments</a></li>
+                <li><a href="match_history.html" class="hover:text-blue-300">History</a></li>
+            </ul>
         </div>
     </nav>
 
@@ -99,6 +100,12 @@
                         <td class="px-4 py-2 font-semibold bg-gray-100">Achievements</td>
                         <td class="px-4 py-2">
                             <ul id="achievements-list" class="list-disc pl-5"></ul>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-2 font-semibold bg-gray-100">Đền</td>
+                        <td class="px-4 py-2">
+                            <ul id="achievements-den-list" class="list-disc pl-5"></ul>
                         </td>
                     </tr>
                 </tbody>
@@ -395,6 +402,45 @@
             });
             if (achievements.length === 0) {
                 achievementsList.innerHTML = '<li>Chưa có giải thưởng</li>';
+            }
+            
+            //Hiển thị giải đền
+            const achievementsDen = [];
+            poolData.tournaments.forEach(t => {
+                if (t.name != "Đền") {
+                    return;
+                }
+                let type=""
+                if (t.top1Id == playerId) {
+                    // achievementsDen.push({ type: 'Top1', name: t.name, date: t.date });
+                    type="Top1";
+                } else if (t.top2Id == playerId) {
+                    // achievementsDen.push({ type: 'Top2', name: t.name, date: t.date });
+                    type="Top2";
+                }
+                if(type==""){
+                    return;
+                }
+                const participantsNames = t.players.map(id => poolData.players.find(p => p.id == id)?.name || 'Unknown').join(', ');
+                achievementsDen.push({ type, name: t.name, date: t.date, participants: participantsNames });
+                
+            });
+            console.log(achievementsDen);
+            
+            // Sort: Top1 trước, rồi Top2, theo date desc
+            achievementsDen.sort((a, b) => {
+                if (a.type === 'Top1' && b.type !== 'Top2') return -1;
+                if (a.type !== 'Top1' && b.type === 'Top2') return 1;
+                return parseDateVN(b.date) - parseDateVN(a.date);
+            });
+            const achievementsDenList = document.getElementById('achievements-den-list');
+            achievementsDen.forEach(ach => {
+                const li = document.createElement('li');
+                li.textContent = `${ach.type} ( mâm ${ach.participants} ) - ${ach.date}`;
+                achievementsDenList.appendChild(li);
+            });
+            if (achievementsDen.length === 0) {
+                achievementsDenList.innerHTML = '<li>Chưa có giải thưởng</li>';
             }
 
             // Hiển thị list trận đấu với pagination

@@ -4,38 +4,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tất cả người chơi - Lịch sử điểm</title>
+    <title>Overall</title>
+    <link rel="icon" type="image/png" href="images/icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="data.js"></script>
+    <link rel="stylesheet" href="overall.css">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="tournament.css">
 </head>
 
 <body class="bg-gray-100 font-sans">
-
-    <nav class="bg-blue-800 text-white p-4">
+    <nav id="header" class="bg-blue-900 text-white p-4 hidden">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold">NineBall</h1>
-            <div class="space-x-4">
-                <a href="rankings.html" class="hover:underline">Rankings</a>
-                <a href="tournaments.html" class="hover:underline">Tournaments</a>
-                <a href="match_history.html" class="hover:underline">Match History</a>
-            </div>
+            <h1 class="text-2xl font-bold">NineBall</h1>
+            <ul class="flex space-x-6">
+                <li><a href="overall.html" class="hover:text-blue-300 font-bold">Overall</a></li>
+                <li><a href="rankings.html" class="hover:text-blue-300">Rankings</a></li>
+                <li><a href="tournaments.html" class="hover:text-blue-300">Tournaments</a></li>
+                <li><a href="match_history.html" class="hover:text-blue-300">History</a></li>
+            </ul>
         </div>
     </nav>
-
-    <main class="container mx-auto p-4">
+    <!-- Header -->
+    <button id="skip-btn"
+        class="absolute top-4 right-4 bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white font-semibold z-50">
+        Bỏ qua
+    </button>
+    <main id="chart" class="container mx-auto p-4 hidden">
         <h2 class="text-2xl font-bold mb-4">Biểu đồ lịch sử điểm của tất cả người chơi</h2>
         <div class="bg-white p-4 rounded shadow">
             <canvas id="all-players-chart" width="1000" height="500"></canvas>
         </div>
     </main>
+    <!-- Showcase -->
+    <main id="main-wrap" class="flex items-center justify-center h-screen p-4">
+        <section id="slideshow"
+            class="card relative w-full max-w-4xl aspect-video rounded-2xl shadow-lg bg-white flex items-center justify-center overflow-hidden">
+            <div class="ring" aria-hidden="true"></div>
+            <div id="stage" class="text-center p-6 w-full"></div>
+        </section>
+    </main>
 
-    <footer class="bg-blue-800 text-white p-4 text-center">
-        © 2025 NineBall. All rights reserved.
-    </footer>
-
+    <!-- <script src="app.js"></script> -->
+    <!-- <script src="data.js"></script> -->
     <script>
         function parseVNDate(str) {
             let [day, month, year] = str.split('/').map(Number);
@@ -159,6 +170,8 @@
 
         renderAllPlayersChart();
     </script>
+    <script src="app1.js"></script>
+    <script src="app2.js"></script>
 </body>
 
 </html>
