@@ -237,8 +237,8 @@ function renderResults(){
           <tr>
             <th class="p-2 text-left">#</th>
             <th class="p-2 text-left">Player</th>
-            <th class="p-2 text-left">Số lần tham dự giải</th>
-            <th class="p-2 text-left">Số lần nhận giải</th>
+            <th class="p-2 text-left">Số lần tham dự</th>
+            <th class="p-2 text-left">Số lần vào top</th>
             <th class="p-2 text-left">Tỉ lệ vào top</th>
             <th class="p-2 text-left">Vô địch</th>
           </tr>
