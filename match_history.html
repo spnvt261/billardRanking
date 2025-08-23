@@ -42,22 +42,47 @@
             </button>
         </div>
         <div id="add-match-form" class="bg-white p-6 rounded-lg shadow-md mb-4 hidden">
+            <h3 class="text-xl font-semibold mb-4">Add New Match</h3>
             <div>
                 <!-- <label class="block text-gray-700 mb-2">Loại trận</label> -->
-                    <div class="flex space-x-4">
-                        <label class="inline-flex items-center">
-                            <input type="radio" name="match-type" id="match-type-singles" value="singles" class="form-radio text-blue-600" checked>
-                            <span class="ml-2">Đơn</span>
-                        </label>
-                        <label class="inline-flex items-center">
-                            <input type="radio" name="match-type" id="match-type-doubles" value="doubles" class="form-radio text-blue-600">
-                            <span class="ml-2">Đôi</span>
-                        </label>
-                    </div>
+                <div class="flex space-x-4">
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="match-type" id="match-type-singles" value="singles"
+                            class="form-radio text-blue-600" checked>
+                        <span class="ml-2">Đơn</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="match-type" id="match-type-doubles" value="doubles"
+                            class="form-radio text-blue-600">
+                        <span class="ml-2">Đôi</span>
+                    </label>
+                </div>
             </div>
             <div id="singles-form">
-                <h3 class="text-xl font-semibold mb-4">Add New Match</h3>
                 <div class="space-y-4">
+                    <!-- Chọn loại trận -->
+                    <div>
+                        <label class="block text-gray-700">Loại trận</label>
+                        <select id="singles-match-type" class="w-full p-2 border rounded">
+                            <option value="ban-nuoc" selected>Bàn nước</option>
+                            <option value="keo-tien">Kèo tiền</option>
+                        </select>
+                    </div>
+
+                    <!-- Prize + Point (ẩn mặc định) -->
+                    <div id="keo-tien-fields" class="hidden space-y-4 mb-4 p-4 border border-yellow-500 rounded">
+                        <div>
+                            <div>
+                                <label class="block text-gray-700">Prize</label>
+                                <input id="prize-singles" type="text" min="0" class="w-full p-2 border rounded">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700">Point Receive</label>
+                                <input id="point-receive-singles" type="number" min="0" class="w-full p-2 border rounded">
+                            </div>
+                        </div>
+                    </div>
+
                     <div>
                         <label class="block text-gray-700">Player 1</label>
                         <select id="player1-id" class="w-full p-2 border rounded">
@@ -78,7 +103,7 @@
                         <label id="score2-label" class="block text-gray-700">Score 2</label>
                         <input id="score2" type="number" min="0" class="w-full p-2 border rounded">
                     </div>
-                    <button id="save-match"
+                    <button id="save-match-singles"
                         class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save</button>
                     <button id="cancel-match"
                         class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
@@ -86,6 +111,28 @@
             </div>
             <!-- Doubles Form (ẩn ban đầu) -->
             <div id="doubles-form" class="hidden">
+                <!-- Chọn loại trận -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700">Loại trận</label>
+                        <select id="doubles-match-type" class="w-full p-2 border rounded">
+                            <option value="ban-nuoc" selected>Bàn nước</option>
+                            <option value="keo-tien">Kèo tiền</option>
+                        </select>
+                    </div>
+
+                    <!-- Prize + Point (ẩn mặc định) -->
+                    <div id="keo-tien-doubles" class="hidden space-y-4 mb-4 p-4 border border-yellow-500 rounded">
+                        <div>
+                            <div>
+                                <label class="block text-gray-700">Prize</label>
+                                <input id="prize-doubles" type="text" min="0" class="w-full p-2 border rounded">
+                            </div>
+                            <!-- <div>
+                                <label class="block text-gray-700">Point Receive</label>
+                                <input id="point-receive-doubles" type="number" min="0" class="w-full p-2 border rounded">
+                            </div> -->
+                        </div>
+                    </div>
                 <div class="mb-4 p-4 border border-blue-500 rounded">
                     <h4 class="text-lg font-semibold text-blue-600 mb-2">Đội Xanh</h4>
                     <div class="space-y-2">
@@ -129,9 +176,9 @@
                     </div>
                 </div>
                 <button id="save-match-doubles"
-                        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save</button>
-                    <button id="cancel-match-doubles"
-                        class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
+                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save</button>
+                <button id="cancel-match-doubles"
+                    class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
             </div>
         </div>
 

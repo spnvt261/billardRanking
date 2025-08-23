@@ -252,8 +252,8 @@
                     status: 'Đã kết thúc'
                 }
                 // console.log(newTournament);
-                
-                
+
+
                 try {
                     // Cập nhật dữ liệu giải đấu
                     await updateData('tournaments', tournament.id, newTournament);
@@ -264,7 +264,7 @@
 
                     // Cập nhật điểm cho các người chơi khác tham gia giải
                     const otherPlayers = poolData.players.filter(player =>
-                    
+
                         participantIds.includes(player.id) &&
                         player.id !== tournament.top1Id &&
                         player.id !== tournament.top2Id
@@ -297,15 +297,26 @@
                         const player2 = poolData.players.find(u => u.id == match.player2Id)?.name || 'Unknown';
                         const player1Class = match.winnerId == match.player1Id ? 'text-green-600' : 'text-red-600';
                         const player2Class = match.winnerId == match.player2Id ? 'text-green-600' : 'text-red-600';
-                        if (player2 == "Chấm") {
-                            return
+                        if (player2 === "Chấm") {
+                            // Nếu là trận đi chấm
+                            row.classList.add("bg-yellow-100"); // nền vàng
+                            row.innerHTML = `
+                    <td class="p-3">-</td>
+                    <td class="p-3">${match.matchType || 'N/A'}</td>
+                    <td class="p-3">
+                        <span class="${player1Class}">${player1}</span> đi chấm +${match.score1} elo
+                    </td>
+                `;
+                        } else {
+                            indexShow += 1;
+                            row.innerHTML = `
+                    <td class="p-3">${indexShow}</td>
+                    <td class="p-3">${match.matchType || 'N/A'}</td>
+                    <td class="p-3">
+                        <span class="${player1Class}">${player1}</span> ${match.score1} - ${match.score2} <span class="${player2Class}">${player2}</span>
+                    </td>
+                `;
                         }
-                        indexShow += 1;
-                        row.innerHTML = `
-                        <td class="p-3">${indexShow}</td>
-                        <td class="p-3">${match.matchType || 'N/A'}</td>
-                        <td class="p-3"><span class="${player1Class}">${player1}</span> ${match.score1} - ${match.score2} <span class="${player2Class}">${player2}</span></td>
-                    `;
                         matchesTable.appendChild(row);
                     });
             }

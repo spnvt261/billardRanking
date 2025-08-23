@@ -442,24 +442,16 @@
                 }
             }
 
-            // Filter trước để loại bỏ trận với "Chấm" và chỉ lấy trận có playerId tham gia
             const matches = poolData.matchHistory
                 .filter(m => {
                     const team1Ids = getPlayerIds(m.player1Id);
                     const team2Ids = getPlayerIds(m.player2Id);
 
                     // Kiểm tra playerId có trong trận
-                    const isPlayerInMatch = team1Ids.includes(String(playerId)) || team2Ids.includes(String(playerId));
-                    if (!isPlayerInMatch) return false;
-
-                    // Xác định opponent team
-                    const opponentTeamIds = team1Ids.includes(String(playerId)) ? team2Ids : team1Ids;
-
-                    // Loại bỏ nếu opponent là "Chấm"
-                    const opponentNames = opponentTeamIds.map(id => poolData.players.find(p => p.id == id)?.name || 'Unknown');
-                    return !opponentNames.includes('Chấm');
+                    return team1Ids.includes(String(playerId)) || team2Ids.includes(String(playerId));
                 })
-                .sort((a, b) => parseInt(b.id) - parseInt(a.id)); // Sort desc by id
+                .sort((a, b) => parseInt(b.id) - parseInt(a.id));
+
 
             const matchesPerPage = 5;
             const totalPages = Math.ceil(matches.length / matchesPerPage);
@@ -478,6 +470,11 @@
                 const tournamentName = poolData.tournaments.find(t => t.id == match.tournamentId)?.name ? poolData.tournaments.find(t => t.id == match.tournamentId)?.name : match.tournamentId;
                 const row = document.createElement('tr');
 
+                // Kiểm tra xem đối thủ có phải "Chấm"
+                const opponentTeamIds = team1Ids.includes(String(playerId)) ? team2Ids : team1Ids;
+                const opponentNames = opponentTeamIds.map(id => poolData.players.find(p => p.id == id)?.name || 'Unknown');
+                const isChamMatch = opponentNames.includes('Chấm');
+
                 // Kiểm tra thắng/thua
                 let isWin = false;
                 if (team1Ids.includes(String(playerId)) && match.winnerId == match.player1Id) {
@@ -488,14 +485,31 @@
                 }
 
                 // Thêm class màu nền
-                row.className = isWin ? "bg-green-100 hover:bg-green-200" : "bg-red-100 hover:bg-red-200";
+                if (isChamMatch) {
+                    row.className = "bg-yellow-100 hover:bg-yellow-200";
+                } else {
+                    row.className = isWin ? "bg-green-100 hover:bg-green-200" : "bg-red-100 hover:bg-red-200";
+                }
+                let matchDisplay = "";
+
+                // Nếu đối thủ là "Chấm"
+                if (isChamMatch) {
+                    if (team1Ids.includes(String(playerId))) {
+                        matchDisplay = `${player1Display} đi chấm + ${match.score1} elo`;
+                    } else {
+                        matchDisplay = `${player2Display} đi chấm + ${match.score2} elo`;
+                    }
+                } else {
+                    matchDisplay = `<span class="${player1Class}">${player1Display}</span> ${match.score1} - ${match.score2} <span class="${player2Class}">${player2Display}</span>`;
+                }
 
                 row.innerHTML = `
-    <td class="p-3"><span class="${player1Class}">${player1Display}</span> ${match.score1} - ${match.score2} <span class="${player2Class}">${player2Display}</span></td>
-    <td class="p-3">${match.date}</td>
-    <td class="p-3">${tournamentName}</td>
-`;
+                    <td class="p-3">${matchDisplay}</td>
+                    <td class="p-3">${match.date}</td>
+                    <td class="p-3">${tournamentName}</td>
+                `;
                 tableBody.appendChild(row);
+
 
             });
             if (paginatedMatches.length === 0) {

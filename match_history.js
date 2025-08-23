@@ -120,11 +120,26 @@ function renderMatchHistory(page = 1) {
 
         const tournamentName = poolData.tournaments.find(t => t.id == match.tournamentId)?.name || match.tournamentId || 'Bàn nước';
 
+        let matchDisplay = `
+    <span class="${player1Class}">${player1Display}</span> ${match.score1} - ${match.score2} <span class="${player2Class}">${player2Display}</span>
+`;
+
+        // Nếu Player2 là "Chấm"
+        if (player2Display === 'Chấm') {
+            matchDisplay = `<span class="${player1Class}">${player1Display}</span> đi chấm + ${match.score1} Elo`;
+            row.classList.add('bg-yellow-100'); // nền vàng
+        }
+        // Nếu Player1 là "Chấm"
+        else if (player1Display === 'Chấm') {
+            matchDisplay = `<span class="${player2Class}">${player2Display}</span> đi chấm + ${match.score2} Elo`;
+            row.classList.add('bg-yellow-100'); // nền vàng
+        }
+
         row.innerHTML = `
-        <td class="p-3"><span class="${player1Class}">${player1Display}</span> ${match.score1} - ${match.score2} <span class="${player2Class}">${player2Display}</span></td>
-        <td class="p-3">${match.date}</td>
-        <td class="p-3">${tournamentName}</td>
-    `;
+    <td class="p-3">${matchDisplay}</td>
+    <td class="p-3">${match.date}</td>
+    <td class="p-3">${tournamentName}</td>
+`;
         tableBody.appendChild(row);
     });
 
@@ -263,15 +278,18 @@ addMatchBtn.addEventListener('click', () => {
 });
 
 // Xử lý lưu trận đấu mới đơn
-document.getElementById('save-match').addEventListener('click', () => {
+document.getElementById('save-match-singles').addEventListener('click', () => {
     // console.log(poolData.matchHistory);
-
     const player1Id = document.getElementById('player1-id').value;
     const score1 = document.getElementById('score1').value;
     const player2Id = document.getElementById('player2-id').value;
     const score2 = document.getElementById('score2').value;
     const player1name = poolData.players.find(u => u.id === player1Id)?.name || 'Unknown';
     const player2name = poolData.players.find(u => u.id === player2Id)?.name || 'Unknown';
+
+    const type = document.getElementById('singles-match-type').value;
+    const prizeSingles = document.getElementById('prize-singles').value;
+    const pointReceiveSingles = document.getElementById('point-receive-singles').value;
 
     // Kiểm tra dữ liệu hợp lệ
     if (!player1Id || !player2Id || player1Id == player2Id || score1 == '' || score2 == '' || isNaN(score1) || isNaN(score2)) {
@@ -282,7 +300,8 @@ document.getElementById('save-match').addEventListener('click', () => {
         if (!confirm(`Bạn có chắc ${player1name} đi chấm và nhận ${score1} Elo ?`)) {
             return;
         }
-    } else {
+    }
+    else {
         if (!confirm(`Bạn có chắc chắn kết quả là ${player1name} ${score1} - ${score2} ${player2name} là chính xác?`)) {
             return;
         }
@@ -295,6 +314,19 @@ document.getElementById('save-match').addEventListener('click', () => {
     const maxId = poolData.matchHistory.length > 0
         ? Math.max(...poolData.matchHistory.map(item => parseInt(item.id, 10))) + 1
         : 1; // Nếu mảng rỗng, bắt đầu từ 1
+
+    let tournamentName = 'Bàn nước'
+    console.log(type);
+
+    if (type == "keo-tien") {
+        if (!prizeSingles || pointReceiveSingles == '' || isNaN(pointReceiveSingles)) {
+            alert('Số tiền hoặc điểm không hợp lệ.');
+            return;
+        }
+        tournamentName = "Kèo " + convertPrize(prizeSingles);
+        addPlayerPoints(winnerId, parseInt(pointReceiveSingles));
+    }
+
     const newMatch = {
         id: String(maxId),
         player1Id,
@@ -303,7 +335,7 @@ document.getElementById('save-match').addEventListener('click', () => {
         score2: parseInt(score2),
         winnerId,
         date: new Date().toLocaleDateString('vi-VN'),
-        tournamentId: 'Bàn nước',
+        tournamentId: tournamentName,
         tournamentMatchId: '',
         matchType: '',
     };
@@ -546,6 +578,9 @@ document.getElementById('save-match-doubles').addEventListener('click', () => {
     const redPlayer1Name = poolData.players.find(u => u.id === redPlayer1Id)?.name || 'Unknown';
     const redPlayer2Name = poolData.players.find(u => u.id === redPlayer2Id)?.name || 'Unknown';
 
+    const type = document.getElementById('doubles-match-type').value;
+    const prizeDoubles = document.getElementById('prize-doubles').value;
+
     // Kiểm tra dữ liệu hợp lệ
     const allPlayers = [bluePlayer1Id, bluePlayer2Id, redPlayer1Id, redPlayer2Id].filter(id => id !== '');
     if (!bluePlayer1Id || !bluePlayer2Id || (redPlayer1Id === '' && redPlayer2Id === '') ||
@@ -584,6 +619,17 @@ document.getElementById('save-match-doubles').addEventListener('click', () => {
     const maxId = poolData.matchHistory.length > 0
         ? Math.max(...poolData.matchHistory.map(item => parseInt(item.id, 10))) + 1
         : 1;
+
+    let tournamentName = 'Đôi - Bàn nước'
+    // console.log(type);
+
+    if (type == "keo-tien") {
+        if (!prizeDoubles) {
+            alert('Số tiền không hợp lệ.');
+            return;
+        }
+        tournamentName = "Kèo Đôi " + convertPrize(prizeDoubles);
+    }
     const newMatch = {
         id: String(maxId),
         player1Id: blueTeamId,
@@ -592,7 +638,7 @@ document.getElementById('save-match-doubles').addEventListener('click', () => {
         score2: parseInt(redScore),
         winnerId,
         date: new Date().toLocaleDateString('vi-VN'),
-        tournamentId: 'Đánh đôi',
+        tournamentId: tournamentName,
         tournamentMatchId: '',
         matchType: '',
     };
@@ -605,7 +651,7 @@ document.getElementById('save-match-doubles').addEventListener('click', () => {
 
 
     // Cập nhật điểm cho Red team
-    if(redPlayer2Name != "Chấm" && redPlayer1Name != "Chấm"){
+    if (redPlayer2Name != "Chấm" && redPlayer1Name != "Chấm") {
         addPlayerPoints(redPlayer1Id, parseInt(redScore));
         addPlayerPoints(redPlayer2Id, parseInt(redScore));
     }
@@ -633,6 +679,93 @@ document.getElementById('save-match-doubles').addEventListener('click', () => {
     document.getElementById('red-score').value = '';
     handleRedTeamSelection(); // Reset trạng thái Red team
 })
+
+// Toggle hiển thị prize & pointReceive
+const singlesMatchTypeSelect = document.getElementById('singles-match-type');
+const keoTienFields = document.getElementById('keo-tien-fields');
+
+singlesMatchTypeSelect.addEventListener('change', () => {
+    if (singlesMatchTypeSelect.value === 'keo-tien') {
+        keoTienFields.classList.remove('hidden');
+    } else {
+        keoTienFields.classList.add('hidden');
+        document.getElementById('prize').value = '';
+        document.getElementById('pointReceive').value = '';
+    }
+});
+
+// Toggle hiển thị prize & pointReceive
+const doublesMatchTypeSelect = document.getElementById('doubles-match-type');
+const keoTienDoubles = document.getElementById('keo-tien-doubles');
+
+doublesMatchTypeSelect.addEventListener('change', () => {
+    if (doublesMatchTypeSelect.value === 'keo-tien') {
+        keoTienDoubles.classList.remove('hidden');
+    } else {
+        keoTienDoubles.classList.add('hidden');
+        document.getElementById('prize').value = '';
+        document.getElementById('pointReceive').value = '';
+    }
+});
+
+
+function formatNumber(value) {
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+document.getElementById("prize-singles").addEventListener("input", function () {
+    // Lấy số
+    let raw = this.value.replace(/\D/g, "");
+
+    if (raw === "") {
+        this.value = "";
+        return;
+    }
+
+    // Format bằng dấu phẩy
+    this.value = formatNumber(raw) + "đ";
+
+    // console.log(prizeInput.value);
+
+});
+document.getElementById("prize-doubles").addEventListener("input", function () {
+    // Lấy số
+    let raw = this.value.replace(/\D/g, "");
+
+    if (raw === "") {
+        this.value = "";
+        return;
+    }
+
+    // Format bằng dấu phẩy
+    this.value = formatNumber(raw) + "đ";
+
+    // console.log(prizeInput.value);
+
+});
+
+function convertPrize(value) {
+    // Lấy số gốc từ chuỗi (bỏ ký tự không phải số)
+    let raw = value.toString().replace(/\D/g, "");
+    if (raw === "") return "";
+
+    let num = parseInt(raw, 10);
+
+    if (num >= 1000000) {
+        // Từ 1 triệu trở lên → M
+        let mValue = num / 1000000;
+        // Giữ 1 số thập phân nếu không tròn
+        return (mValue % 1 === 0 ? mValue.toFixed(0) : mValue.toFixed(1)) + "M";
+    } else if (num >= 1000) {
+        // Từ 1 nghìn đến dưới 1 triệu → k
+        let kValue = Math.floor(num / 1000);
+        return kValue + "k";
+    } else {
+        // Dưới 1000 giữ nguyên
+        return num.toString() + "đ";
+    }
+}
+
 
 
 checkAdminAccess();

@@ -44,7 +44,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="tournaments-grid"></div>
     </div>
 
-    <div id="add-tournament-form" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden overflow-y-auto">
+    <div id="add-tournament-form"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden overflow-y-auto">
         <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-md my-8">
             <h3 class="text-xl font-semibold mb-4">Create New Tournament</h3>
             <div class="space-y-4">
@@ -83,6 +84,40 @@
         </div>
     </footer>
     <script>
+        const prizeInput = document.getElementById("tournament-prize");
+
+        function formatNumber(value) {
+            return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        prizeInput.addEventListener("input", function () {
+            // Lấy số
+            let raw = this.value.replace(/\D/g, "");
+
+            if (raw === "") {
+                this.value = "";
+                return;
+            }
+
+            // Format bằng dấu phẩy
+            this.value = formatNumber(raw) + "đ";
+
+            // console.log(prizeInput.value);
+            
+        });
+
+        // Khi focus thì bỏ "đ" để dễ sửa
+        //   prizeInput.addEventListener("focus", function () {
+        //     this.value = this.value.replace(/[^\d]/g, ""); // chỉ giữ số
+        //   });
+
+        // Khi blur thì format lại có "đ"
+        prizeInput.addEventListener("blur", function () {
+            let raw = this.value.replace(/\D/g, "");
+            if (raw !== "") {
+                this.value = formatNumber(raw) + "đ";
+            }
+        });
         let selectedPlayers = [];
         // Hàm định dạng ngày từ Date object sang DD/MM/YYYY
         function formatDateVN(date) {
