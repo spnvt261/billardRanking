@@ -51,7 +51,7 @@
                 onclick="loadData()">Load Data</button>
         </div>
 
-        <div id="add-player-form" class="bg-white p-6 rounded-lg shadow-md mt-4 hidden">
+        <!-- <div id="add-player-form" class="bg-white p-6 rounded-lg shadow-md mt-4 hidden">
             <h3 class="text-xl font-semibold mb-4">Add New Player</h3>
             <div class="space-y-4">
                 <div>
@@ -67,7 +67,43 @@
                 <button id="cancel-player"
                     class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
             </div>
+        </div> -->
+        <div id="add-player-form" class="bg-white p-6 rounded-lg shadow-md mt-4 hidden">
+            <h3 class="text-xl font-semibold mb-4">Add New Player</h3>
+            <div class="space-y-4">
+                <!-- Chọn loại Friend / Guest -->
+                <div>
+                    <label class="block text-gray-700 mb-2">Type</label>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center">
+                            <input type="radio" name="player-type" value="friend" checked class="mr-2">
+                            Friend
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="player-type" value="guest" class="mr-2">
+                            Khách
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700">Name</label>
+                    <input id="player-name" type="text" class="w-full p-2 border rounded">
+                </div>
+
+                <!-- Image URL (chỉ hiện khi chọn Friend) -->
+                <div id="image-input-container">
+                    <label class="block text-gray-700">Image URL (leave blank for default)</label>
+                    <input id="player-image" type="text" class="w-full p-2 border rounded">
+                </div>
+
+                <button id="save-player"
+                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save</button>
+                <button id="cancel-player"
+                    class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
+            </div>
         </div>
+
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
             <table class="w-full">
                 <thead class="bg-blue-800 text-white">
@@ -109,15 +145,25 @@
         async function renderPage() {
             await initializePoolData();
         }
+        // Toggle Image URL khi chọn Friend / Guest
+        document.querySelectorAll('input[name="player-type"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const imageInputContainer = document.getElementById('image-input-container');
+                if (document.querySelector('input[name="player-type"]:checked').value === 'guest') {
+                    imageInputContainer.classList.add('hidden');
+                } else {
+                    imageInputContainer.classList.remove('hidden');
+                }
+                // console.log(document.querySelector('input[name="player-type"]:checked').value);
+
+            });
+        });
         // renderPage();
         // Hiển thị bảng xếp hạng
         async function renderRankings() {
-            // await initializePoolData(); // Đợi data load xong
-
             const tableBody = document.getElementById('rankings-table');
             const loading = document.getElementById('loading');
-            // loading.classList.remove('hidden');
-            tableBody.innerHTML = ''; // Xóa nội dung cũ
+            tableBody.innerHTML = '';
 
             try {
                 if (!poolData.players || poolData.players.length === 0) {
@@ -125,49 +171,79 @@
                     return;
                 }
                 loading.classList.add('hidden');
-                let indexShow = 0;
-                poolData.players
-                    .sort((a, b) => b.points - a.points) // Sắp xếp theo điểm giảm dần
-                    .forEach((player, index) => {
-                        if (player.name === "Chấm") {
-                            return;
-                        }
-                        indexShow += 1;
-                        let rankDisplay = `${indexShow}`; // Mặc định là text số thông thường
 
-                        // Xử lý hiển thị thứ hạng đặc biệt cho top 1, 2, 3
-                        if (indexShow === 1) {
-                            // Top 1: Vàng, hình tròn
-                            rankDisplay = `<div style="background-color: #FFD700; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold;">${indexShow}</div>`;
-                        } else if (indexShow === 2) {
-                            // Top 2: Bạc, hình tròn
-                            rankDisplay = `<div style="background-color: #C0C0C0; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold;">${indexShow}</div>`;
-                        } else if (indexShow === 3) {
-                            // Top 3: Đồng, hình tròn
-                            rankDisplay = `<div style="background-color: #CD7F32; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold;">${indexShow}</div>`;
-                        }
-                        const imageSrc = (!player.images || player.images.trim() == '')
-                            ? '../images/default.jpg' : player.images;
-                        const row = document.createElement('tr');
-                        row.className = 'border-b';
-                        row.innerHTML = `
-                        <td class="p-3">${rankDisplay}</td>
-                        <td class="p-3 flex items-center space-x-2">
-                            <a href="player_detail.html?id=${player.id}" class="text-black underline hover:text-blue p-3 flex items-center space-x-2">
-                            <div class="relative w-12 h-16" style="aspect-ratio: 3/4;">
-                                <img src="${imageSrc}" alt="${player.name}" class="absolute inset-0 w-full h-full object-cover rounded">
-                            </div>
-                            <span>${player.name}</span>
-                            </a>
-                        </td>
-                        <td class="p-3">${player.points}</td>
-                    `;
-                        tableBody.appendChild(row);
-                    });
+                // Tách player thành 2 nhóm: Friend và Guest
+                let friends = poolData.players.filter(p => !p.name.includes("(Khách)"));
+                let guests = poolData.players.filter(p => p.name.includes("(Khách)"));
+
+                // Sắp xếp friends theo điểm giảm dần
+                friends.sort((a, b) => b.points - a.points);
+                // Guest cũng có thể sắp theo điểm nếu muốn, hoặc giữ nguyên thứ tự
+                guests.sort((a, b) => b.points - a.points);
+
+                let indexShow = 0;
+
+                // Render Friends
+                friends.forEach(player => {
+                    if (player.name === "Chấm") return;
+                    indexShow++;
+
+                    let rankDisplay = `${indexShow}`;
+                    if (indexShow === 1) {
+                        rankDisplay = `<div style="background-color: #FFD700; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold;">${indexShow}</div>`;
+                    } else if (indexShow === 2) {
+                        rankDisplay = `<div style="background-color: #C0C0C0; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold;">${indexShow}</div>`;
+                    } else if (indexShow === 3) {
+                        rankDisplay = `<div style="background-color: #CD7F32; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold;">${indexShow}</div>`;
+                    }
+
+                    const imageSrc = (!player.images || player.images.trim() == '')
+                        ? '../images/default.jpg' : player.images;
+
+                    const row = document.createElement('tr');
+                    row.className = 'border-b';
+                    row.innerHTML = `
+                <td class="p-3">${rankDisplay}</td>
+                <td class="p-3 flex items-center space-x-2">
+                    <a href="player_detail.html?id=${player.id}" class="text-black underline hover:text-blue p-3 flex items-center space-x-2">
+                        <div class="relative w-12 h-16" style="aspect-ratio: 3/4;">
+                            <img src="${imageSrc}" alt="${player.name}" class="absolute inset-0 w-full h-full object-cover rounded">
+                        </div>
+                        <span>${player.name}</span>
+                    </a>
+                </td>
+                <td class="p-3">${player.points}</td>
+            `;
+                    tableBody.appendChild(row);
+                });
+
+                // Render Guests (Khách)
+                guests.forEach(player => {
+                    const imageSrc = (!player.images || player.images.trim() == '')
+                        ? '../images/default.jpg' : player.images;
+
+                    const row = document.createElement('tr');
+                    row.className = 'border-b bg-gray-200'; // Nền xám
+                    row.innerHTML = `
+                <td class="p-3 text-center">-</td>
+                <td class="p-3 flex items-center space-x-2">
+                    <a href="player_detail.html?id=${player.id}" class="text-black underline hover:text-blue p-3 flex items-center space-x-2">
+                        <div class="relative w-12 h-16" style="aspect-ratio: 3/4;">
+                            <img src="${imageSrc}" alt="${player.name}" class="absolute inset-0 w-full h-full object-cover rounded">
+                        </div>
+                        <span>${player.name}</span>
+                    </a>
+                </td>
+                <td class="p-3">${player.points}</td>
+            `;
+                    tableBody.appendChild(row);
+                });
+
             } finally {
                 // loading.classList.add('hidden');
             }
         }
+
 
         // Gọi hàm render khi tải trang
         renderRankings();
@@ -181,8 +257,13 @@
 
         // Xử lý lưu người chơi mới
         document.getElementById('save-player').addEventListener('click', () => {
-            const name = document.getElementById('player-name').value;
+            let name = document.getElementById('player-name').value;
             const image = document.getElementById('player-image').value;
+            const playerType = document.querySelector('input[name="player-type"]:checked').value;
+
+            if (playerType == "guest") {
+                name = "(Khách)" + name;
+            }
 
             // Kiểm tra dữ liệu hợp lệ
             if (!name) {
