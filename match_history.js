@@ -118,7 +118,10 @@ function renderMatchHistory(page = 1) {
         player1Class = match.winnerId == match.player1Id ? 'text-green-600' : 'text-red-600';
         player2Class = match.winnerId == match.player2Id ? 'text-green-600' : 'text-red-600';
 
-        const tournamentName = poolData.tournaments.find(t => t.id == match.tournamentId)?.name || match.tournamentId || 'Bàn nước';
+        const tournament = poolData.tournaments.find(t => t.id == match.tournamentId);
+        const tournamentCell = tournament
+            ? `<a href="tournament_details.html?id=${tournament.id}" class="text-blue-400 underline">Giải ${tournament.name} <img src="https://cdn-icons-png.freepik.com/512/16853/16853146.png" alt="Cup" style="width:24px;display:inline-block;margin-left:5px;vertical-align:middle;"></a>`
+            : match.tournamentId;
 
         let matchDisplay = `
     <span class="${player1Class}">${player1Display}</span> ${match.score1} - ${match.score2} <span class="${player2Class}">${player2Display}</span>
@@ -138,7 +141,7 @@ function renderMatchHistory(page = 1) {
         row.innerHTML = `
     <td class="p-3">${matchDisplay}</td>
     <td class="p-3">${match.date}</td>
-    <td class="p-3">${tournamentName}</td>
+    <td class="p-3">${tournamentCell}</td>
 `;
         tableBody.appendChild(row);
     });
