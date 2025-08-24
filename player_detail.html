@@ -32,7 +32,32 @@
     table.min-w-full tr {
         display: block;
         border-bottom: 1px solid #e5e7eb;
-        /* Tailwind gray-200 */
+    }
+
+    /* Giữ mobile view dọc */
+    table.min-w-full td:first-child {
+        display: block;
+        font-weight: bold;
+        background: transparent !important;
+        border: none;
+        padding-bottom: 0;
+    }
+
+    table.min-w-full td:last-child {
+        display: block;
+        padding-top: 0;
+    }
+
+    table.min-w-full tr {
+        display: block;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    /* Giúp grid chia 2 cột khi màn hình rộng, còn mobile thì dọc */
+    @media (min-width: 640px) {
+        table.min-w-full td:last-child .grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
     }
 </style>
 
@@ -67,41 +92,80 @@
             </div>
             <table class="min-w-full border border-gray-300 rounded-lg shadow-sm">
                 <tbody class="divide-y divide-gray-200">
+                    <!-- Matches + Win Rate -->
                     <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-2 font-semibold bg-gray-100">Matches Played: <span
-                                id="player-matches-count"></span></td>
+                        <td class="px-4 py-2 font-semibold bg-gray-100"></td>
                         <td class="px-4 py-2">
-                            Win Rate:
-                            <span id="player-winrate"></span>
+                            <div class="grid grid-cols-2 gap-4">
+                                <!-- Matches Played -->
+                                <div>
+                                    <div class="font-medium">Matches Played</div>
+                                    <ul class="space-y-1">
+                                        <li>Tổng: <span id="player-matches-count"></span></li>
+                                        <li>Đơn: <span id="player-singles-count"></span></li>
+                                        <li>Đôi: <span id="player-doubles-count"></span></li>
+                                    </ul>
+                                </div>
+                                <!-- Win Rate -->
+                                <div>
+                                    <div class="font-medium">Win Rate</div>
+                                    <ul class="space-y-1">
+                                        <li><span id="player-winrate"></span></li>
+                                        <li><span id="player-singles-winrate"></span></li>
+                                        <li><span id="player-doubles-winrate"></span></li>
+                                    </ul>
+                                </div>
+                            </div>
                         </td>
                     </tr>
+
+                    <!-- Racks + Rack Win Rate -->
                     <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-2 font-semibold bg-gray-100">Racks Played: <span
-                                id="player-racks-count"></span></td>
+                        <td class="px-4 py-2 font-semibold bg-gray-100"></td>
                         <td class="px-4 py-2">
-                            Win Rate:
-                            <span id="player-racks"></span>
+                            <div class="grid grid-cols-2 gap-4">
+                                <!-- Racks Played -->
+                                <div>
+                                    <div class="font-medium">Racks Played</div>
+                                    <ul class="space-y-1">
+                                        <li>Tổng: <span id="player-racks-count"></span></li>
+                                        <li>Đơn: <span id="player-racks-singles-count"></span></li>
+                                        <li>Đôi: <span id="player-racks-doubles-count"></span></li>
+                                    </ul>
+                                </div>
+                                <!-- Rack Win Rate -->
+                                <div>
+                                    <div class="font-medium">Win Rate</div>
+                                    <ul class="space-y-1">
+                                        <li><span id="player-racks-winrate"></span></li>
+                                        <li><span id="player-racks-singles-winrate"></span></li>
+                                        <li><span id="player-racks-doubles-winrate"></span></li>
+                                    </ul>
+                                </div>
+                            </div>
                         </td>
                     </tr>
+
+                    <!-- Chấm -->
                     <tr class="hover:bg-gray-50">
                         <td class="px-4 py-2 font-semibold bg-gray-100">Chấm</td>
                         <td class="px-4 py-2">
-                            <ul class="list-disc pl-5">
+                            <ul class="space-y-1">
                                 <li>Chấm đơn: <span id="cham-don"></span></li>
                                 <li>Chấm đôi: <span id="cham-doi"></span></li>
                             </ul>
                         </td>
-
                     </tr>
-                    <!-- <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-2 font-semibold bg-gray-100">Chấm đôi: <span id="cham-doi"></span></td>
-                    </tr> -->
+
+                    <!-- Achievements -->
                     <tr class="hover:bg-gray-50">
                         <td class="px-4 py-2 font-semibold bg-gray-100">Achievements</td>
                         <td class="px-4 py-2">
                             <ul id="achievements-list" class="list-disc pl-5"></ul>
                         </td>
                     </tr>
+
+                    <!-- Đền -->
                     <tr class="hover:bg-gray-50">
                         <td class="px-4 py-2 font-semibold bg-gray-100">Đền</td>
                         <td class="px-4 py-2">
@@ -110,8 +174,7 @@
                     </tr>
                 </tbody>
             </table>
-            <!-- <h4 class="text-lg font-bold mb-2">Achievements</h4> -->
-            <!-- <ul id="achievements-list" class="list-disc pl-5 mb-4"></ul> -->
+
         </section>
 
         <section id="matches-section" class="bg-white p-4 rounded shadow mb-6 hidden">
@@ -131,7 +194,10 @@
 
         <section id="points-chart-section" class="bg-white p-4 rounded shadow mb-6 hidden">
             <h4 class="text-lg font-bold mb-2">Elo Received History</h4>
-            <canvas id="points-chart" width="400" height="200"></canvas>
+            <!-- <canvas id="points-chart" width="400" height="200"></canvas> -->
+            <div class="bg-white p-4 rounded shadow" style="height: 450px;">
+                <canvas id="points-chart" width="400" height="200"></canvas>
+            </div>
         </section>
     </main>
 
@@ -177,6 +243,9 @@
 
         // Tính tỉ lệ thắng trận (không tính trận với "Chấm")
         let totalMatches = 0, wins = 0;
+        let totalSingles = 0, winsSingles = 0;
+        let totalDoubles = 0, winsDoubles = 0;
+
         poolData.matchHistory.forEach(m => {
             function getPlayerIds(teamId) {
                 const teamIdStr = String(teamId);
@@ -198,16 +267,36 @@
             if (opponentNames.includes('Chấm')) return;
 
             totalMatches++;
-            if ((team1Ids.includes(String(playerId)) && m.winnerId == m.player1Id) ||
-                (team2Ids.includes(String(playerId)) && m.winnerId == m.player2Id)) {
-                wins++;
+
+            const isWin = (team1Ids.includes(String(playerId)) && m.winnerId == m.player1Id) ||
+                (team2Ids.includes(String(playerId)) && m.winnerId == m.player2Id);
+
+            if (team1Ids.length === 1 && team2Ids.length === 1) {
+                // Trận đơn
+                totalSingles++;
+                if (isWin) winsSingles++;
+            } else {
+                // Trận đôi
+                totalDoubles++;
+                if (isWin) winsDoubles++;
             }
+
+            if (isWin) wins++;
         });
         const matchWinRate = totalMatches > 0 ? ((wins / totalMatches) * 100).toFixed(1) + "%" : "0%";
+        const singlesWinRate = totalSingles > 0 ? ((winsSingles / totalSingles) * 100).toFixed(1) + "%" : "0%";
+        const doublesWinRate = totalDoubles > 0 ? ((winsDoubles / totalDoubles) * 100).toFixed(1) + "%" : "0%";
         document.getElementById('player-winrate').textContent = `${wins}/${totalMatches} (${matchWinRate})`;
+        document.getElementById('player-singles-count').textContent = `${totalSingles}`;
+        document.getElementById('player-doubles-count').textContent = `${totalDoubles}`;
+        document.getElementById('player-singles-winrate').textContent = `${winsSingles}/${totalSingles} (${singlesWinRate})`;
+        document.getElementById('player-doubles-winrate').textContent = `${winsDoubles}/${totalDoubles} (${doublesWinRate})`;
 
         // Tính số rack
         let totalRacks = 0, wonRacks = 0;
+        let totalRacksSingles = 0, wonRacksSingles = 0;
+        let totalRacksDoubles = 0, wonRacksDoubles = 0;
+
         poolData.matchHistory.forEach(m => {
             const team1Ids = String(m.player1Id).length === 8
                 ? [String(parseInt(m.player1Id.substring(0, 4)) - 1000), String(parseInt(m.player1Id.substring(4, 8)) - 1000)]
@@ -227,16 +316,36 @@
             const racksThisMatch = (m.score1 || 0) + (m.score2 || 0);
             totalRacks += racksThisMatch;
 
+            let wonThisMatch = 0;
             if (team1Ids.includes(String(playerId))) {
-                wonRacks += (m.score1 || 0);
+                wonThisMatch = (m.score1 || 0);
+                wonRacks += wonThisMatch;
             } else {
-                wonRacks += (m.score2 || 0);
+                wonThisMatch = (m.score2 || 0);
+                wonRacks += wonThisMatch;
+            }
+
+            if (team1Ids.length === 1 && team2Ids.length === 1) {
+                // Rack đơn
+                totalRacksSingles += racksThisMatch;
+                wonRacksSingles += wonThisMatch;
+            } else {
+                // Rack đôi
+                totalRacksDoubles += racksThisMatch;
+                wonRacksDoubles += wonThisMatch;
             }
         });
-        const rackWinRate = totalRacks > 0 ? ((wonRacks / totalRacks) * 100).toFixed(1) + "%" : "0%";
-        document.getElementById('player-racks-count').textContent = `${totalRacks}`;
-        document.getElementById('player-racks').textContent = `${wonRacks}/${totalRacks} (${rackWinRate})`;
 
+        const rackWinRate = totalRacks > 0 ? ((wonRacks / totalRacks) * 100).toFixed(1) + "%" : "0%";
+        const rackWinRateSingles = totalRacksSingles > 0 ? ((wonRacksSingles / totalRacksSingles) * 100).toFixed(1) + "%" : "0%";
+        const rackWinRateDoubles = totalRacksDoubles > 0 ? ((wonRacksDoubles / totalRacksDoubles) * 100).toFixed(1) + "%" : "0%";
+
+        document.getElementById('player-racks-count').textContent = `${totalRacks}`;
+        document.getElementById('player-racks-winrate').textContent = `${wonRacks}/${totalRacks} (${rackWinRate})`;
+        document.getElementById('player-racks-singles-count').textContent = `${totalRacksSingles}`;
+        document.getElementById('player-racks-doubles-count').textContent = `${totalRacksDoubles}`;
+        document.getElementById('player-racks-singles-winrate').textContent = `${wonRacksSingles}/${totalRacksSingles} (${rackWinRateSingles})`;
+        document.getElementById('player-racks-doubles-winrate').textContent = `${wonRacksDoubles}/${totalRacksDoubles} (${rackWinRateDoubles})`;
 
         // Render trang sau khi data loaded
         async function renderPlayerDetails() {
@@ -403,30 +512,30 @@
             if (achievements.length === 0) {
                 achievementsList.innerHTML = '<li>Chưa có giải thưởng</li>';
             }
-            
+
             //Hiển thị giải đền
             const achievementsDen = [];
             poolData.tournaments.forEach(t => {
                 if (t.name != "Đền") {
                     return;
                 }
-                let type=""
+                let type = ""
                 if (t.top1Id == playerId) {
                     // achievementsDen.push({ type: 'Top1', name: t.name, date: t.date });
-                    type="Top1";
+                    type = "Top1";
                 } else if (t.top2Id == playerId) {
                     // achievementsDen.push({ type: 'Top2', name: t.name, date: t.date });
-                    type="Top2";
+                    type = "Top2";
                 }
-                if(type==""){
+                if (type == "") {
                     return;
                 }
                 const participantsNames = t.players.map(id => poolData.players.find(p => p.id == id)?.name || 'Unknown').join(', ');
                 achievementsDen.push({ type, name: t.name, date: t.date, participants: participantsNames });
-                
+
             });
-            console.log(achievementsDen);
-            
+            // console.log(achievementsDen);
+
             // Sort: Top1 trước, rồi Top2, theo date desc
             achievementsDen.sort((a, b) => {
                 if (a.type === 'Top1' && b.type !== 'Top2') return -1;
@@ -670,7 +779,7 @@
                     }]
                 },
                 options: {
-                    // maintainAspectRatio: false,
+                    maintainAspectRatio: false,
                     scales: {
                         y: { beginAtZero: true },
                         x: {
