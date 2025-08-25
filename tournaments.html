@@ -33,7 +33,7 @@
         </div>
     </nav>
 
-    <div class="container mx-auto py-8">
+    <div class="container mx-auto py-8 p-2">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-3xl font-bold">Tournaments</h2>
             <button id="add-tournament-btn"
@@ -49,6 +49,14 @@
         <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-md my-8">
             <h3 class="text-xl font-semibold mb-4">Create New Tournament</h3>
             <div class="space-y-4">
+                <!-- Thêm select chọn loại -->
+                <div>
+                    <!-- <label for="tournament-type" class="block text-gray-700">Loại Tournament</label> -->
+                    <select id="tournament-type" class="w-full p-2 border rounded">
+                        <option value="giaidau" selected>Giải đấu</option>
+                        <option value="banden">Bắn đền 3 người</option>
+                    </select>
+                </div>
                 <input id="tournament-name" type="text" class="w-full p-2 border rounded" placeholder="Tournament Name">
                 <input id="tournament-date" type="text" disabled class="w-full p-2 border rounded bg-gray-200">
                 <input id="tournament-location" type="text" class="w-full p-2 border rounded" placeholder="Location">
@@ -84,6 +92,29 @@
         </div>
     </footer>
     <script>
+        //js cho chọn loại giải đấu
+        const typeSelect = document.getElementById("tournament-type");
+        const nameInput = document.getElementById("tournament-name");
+        const prizeInput1 = document.getElementById("tournament-prize");
+        const selectedPlayers1 = document.getElementById("selected-players");
+
+        typeSelect.addEventListener("change", function () {
+            if (this.value === "banden") {
+                // Bắn đền
+                nameInput.value = "Đền";
+                nameInput.disabled = true;
+                prizeInput1.placeholder = "Bao tiền một điểm";
+                nameInput.classList.add("bg-gray-200");
+            } else {
+                // Giải đấu
+                nameInput.value = "";
+                nameInput.disabled = false;
+                prizeInput1.placeholder = "Prize";
+                nameInput.classList.remove("bg-gray-200");
+            }
+        });
+
+
         const prizeInput = document.getElementById("tournament-prize");
 
         function formatNumber(value) {
@@ -103,7 +134,7 @@
             this.value = formatNumber(raw) + "đ";
 
             // console.log(prizeInput.value);
-            
+
         });
 
         // Khi focus thì bỏ "đ" để dễ sửa
@@ -190,13 +221,13 @@
                     card.className = 'bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow';
                     const participants = tournament.players.length;
                     const winner = tournament.top1Id ? poolData.players.find(p => p.id === tournament.top1Id)?.name || 'Unknown' : 'TBD';
-
+                    const playerNames = tournament.players.map(id => poolData.players.find(p => p.id == id)?.name).join(', ');
                     card.innerHTML = `
                         <h3 class="text-xl font-semibold mb-2">
                         ${tournament.name} 
                         ${tournament.name !== 'Đền'
                             ? `<img src="https://cdn-icons-png.freepik.com/512/16853/16853146.png" alt="Cup" style="width:24px;display:inline-block;margin-left:5px;vertical-align:middle;">`
-                            : ''}
+                            : `(${playerNames})`}
 
                         <span style="${tournament.status === 'Đang diễn ra' ? 'color: green' : 'display:none'}">
                             ${tournament.status}
@@ -205,9 +236,15 @@
                         <p class="text-gray-600">Date: ${tournament.date}</p>
                         <p class="text-gray-600">Location: ${tournament.location}</p>
                         <p class="text-gray-600 truncate-150" title="${participants}">Participants: ${participants}</p>
-                        <p class="text-gray-600">Total Prize: ${tournament.prize}</p>
+                        <p class="text-gray-600">${(tournament.name === 'Đền')?'Một điểm:':'Total Prize:'} ${tournament.prize}</p>
                         <p class="text-gray-600">Winner: ${winner}</p>
-                        <a href="tournament_details.html?id=${tournament.id}" class="text-blue-600 hover:underline mt-2 inline-block">Details</a>
+                        <a href="${(tournament.name === 'Đền' && tournament.status === 'Đang diễn ra')
+                            ? `/Den/tourDen_ongoing.html?id=${tournament.id}`
+                            : `tournament_details.html?id=${tournament.id}`
+                        }" 
+                        class="text-blue-600 hover:underline mt-2 inline-block">
+                            Details
+                        </a>
                     `;
                     grid.appendChild(card);
                 });
@@ -244,6 +281,13 @@
         });
 
         document.getElementById('create-tournament').addEventListener('click', async () => {
+            if (typeSelect.value === "banden") {
+                const playerCount = selectedPlayers1.querySelectorAll("li").length;
+                if (playerCount !== 3) {
+                    alert("Bắn đền chỉ tạo khi có đúng 3 người chơi!");
+                    return;
+                }
+            }
             const name = document.getElementById('tournament-name').value;
             const date = document.getElementById('tournament-date').value;
             const location = document.getElementById('tournament-location').value;

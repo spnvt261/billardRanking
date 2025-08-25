@@ -29,7 +29,8 @@ const poolData = {
     players: [],
     tournaments: [],
     matchHistory: [],
-    history_point: []
+    history_point: [],
+    history_points_den: []
 };
 const adminKey = localStorage.getItem('adminKey');
 
@@ -57,6 +58,7 @@ const SESSION_STORAGE_KEYS = {
     tournaments: 'poolData_tournaments',
     matchHistory: 'poolData_matchHistory',
     history_point: 'poolData_historyPoint',
+    history_points_den: 'poolData_historyPointsDen',
     isInitialLoad: 'isInitialLoad'
 };
 
@@ -166,6 +168,7 @@ async function initializePoolData() {
         const storedTournaments = sessionStorage.getItem(SESSION_STORAGE_KEYS.tournaments);
         const storedMatchHistory = sessionStorage.getItem(SESSION_STORAGE_KEYS.matchHistory);
         const storedHistoryPoint = sessionStorage.getItem(SESSION_STORAGE_KEYS.history_point);
+        const storedHistoryPointsDen = sessionStorage.getItem(SESSION_STORAGE_KEYS.history_points_den);
 
 
         // Khởi tạo dữ liệu từ SessionStorage nếu không rỗng
@@ -173,6 +176,7 @@ async function initializePoolData() {
         let tournamentsData = storedTournaments ? JSON.parse(storedTournaments) : null;
         let matchHistoryData = storedMatchHistory ? JSON.parse(storedMatchHistory) : null;
         let historyPointData = storedHistoryPoint ? JSON.parse(storedHistoryPoint) : null;
+        let historyPointsDenData = storedHistoryPointsDen ? JSON.parse(storedHistoryPointsDen) : null;
 
 
         // Kiểm tra dữ liệu rỗng và gọi API nếu cần
@@ -201,6 +205,12 @@ async function initializePoolData() {
                 sessionStorage.setItem(SESSION_STORAGE_KEYS.history_point, JSON.stringify(data));
             }));
         }
+        if (!historyPointsDenData || historyPointsDenData.length === 0) {
+            fetchPromises.push(fetchData('history_points_den').then(data => {
+                historyPointsDenData = data;
+                sessionStorage.setItem(SESSION_STORAGE_KEYS.history_points_den, JSON.stringify(data));
+            }));
+        }
         // Chờ tất cả API hoàn tất (nếu có)
         if (fetchPromises.length > 0) {
             await Promise.all(fetchPromises);
@@ -210,7 +220,8 @@ async function initializePoolData() {
         poolData.players = playersData || [];
         poolData.tournaments = tournamentsData || [];
         poolData.matchHistory = matchHistoryData || [];
-        poolData.history_point = historyPointData || []
+        poolData.history_point = historyPointData || [];
+        poolData.history_points_den = historyPointsDenData || [];
         if (poolData.players) {
             
             // Duyệt qua từng người chơi trong poolData.players
@@ -308,6 +319,11 @@ function checkAdminAccess() {
         document.getElementById('add-match-btn')?.classList.remove('hidden');
         document.getElementById('add-player-btn')?.classList.remove('hidden');
         document.getElementById('add-tournament-btn')?.classList.remove('hidden');
+
+        //tourDen_ongoing
+        document.getElementById('add-action-section')?.classList.remove('hidden');
+        document.getElementById('edit-point')?.classList.remove('hidden');
+        document.getElementById('finish-rack')?.classList.remove('hidden');
     }
 }
 

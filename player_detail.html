@@ -24,6 +24,14 @@
         padding-bottom: 0;
     }
 
+    .text-tr{
+        display: block;
+        font-weight: bold;
+        background: transparent !important;
+        border: none;
+        padding-bottom: 0;
+    }
+
     table.min-w-full td:last-child {
         display: block;
         padding-top: 0;
@@ -99,7 +107,7 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <!-- Matches Played -->
                                 <div>
-                                    <div class="font-medium">Matches Played</div>
+                                    <div class=" text-tr">Matches Played</div>
                                     <ul class="space-y-1">
                                         <li>Tổng: <span id="player-matches-count"></span></li>
                                         <li>Đơn: <span id="player-singles-count"></span></li>
@@ -108,7 +116,7 @@
                                 </div>
                                 <!-- Win Rate -->
                                 <div>
-                                    <div class="font-medium">Win Rate</div>
+                                    <div class=" text-tr">Win Rate</div>
                                     <ul class="space-y-1">
                                         <li><span id="player-winrate"></span></li>
                                         <li><span id="player-singles-winrate"></span></li>
@@ -126,7 +134,7 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <!-- Racks Played -->
                                 <div>
-                                    <div class="font-medium">Racks Played</div>
+                                    <div class=" text-tr">Racks Played</div>
                                     <ul class="space-y-1">
                                         <li>Tổng: <span id="player-racks-count"></span></li>
                                         <li>Đơn: <span id="player-racks-singles-count"></span></li>
@@ -135,7 +143,7 @@
                                 </div>
                                 <!-- Rack Win Rate -->
                                 <div>
-                                    <div class="font-medium">Win Rate</div>
+                                    <div class=" text-tr">Win Rate</div>
                                     <ul class="space-y-1">
                                         <li><span id="player-racks-winrate"></span></li>
                                         <li><span id="player-racks-singles-winrate"></span></li>
@@ -622,7 +630,10 @@
                 const player2Display = getPlayerDisplay(match.player2Id);
                 const player1Class = match.winnerId == match.player1Id ? 'text-green-600' : 'text-red-600';
                 const player2Class = match.winnerId == match.player2Id ? 'text-green-600' : 'text-red-600';
-                const tournamentName = poolData.tournaments.find(t => t.id == match.tournamentId)?.name ? poolData.tournaments.find(t => t.id == match.tournamentId)?.name : match.tournamentId;
+                const tournament = poolData.tournaments.find(t => t.id == match.tournamentId);
+        const tournamentCell = tournament
+            ? `<a href="tournament_details.html?id=${tournament.id}" class="text-blue-400 underline">Giải ${tournament.name} <img src="https://cdn-icons-png.freepik.com/512/16853/16853146.png" alt="Cup" style="width:24px;display:inline-block;margin-left:5px;vertical-align:middle;"></a>`
+            : match.tournamentId;
                 const row = document.createElement('tr');
 
                 // Kiểm tra xem đối thủ có phải "Chấm"
@@ -661,7 +672,7 @@
                 row.innerHTML = `
                     <td class="p-3">${matchDisplay}</td>
                     <td class="p-3">${match.date}</td>
-                    <td class="p-3">${tournamentName}</td>
+                    <td class="p-3">${tournamentCell}</td>
                 `;
                 tableBody.appendChild(row);
 

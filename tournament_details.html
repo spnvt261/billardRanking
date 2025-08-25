@@ -7,6 +7,7 @@
     <title>Tournament Details - Pool</title>
     <link rel="icon" type="image/png" href="images/icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="data.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -42,7 +43,7 @@
             </ul>
         </div>
     </nav>
-    <div class="container mx-auto py-8">
+    <div class="container mx-auto py-8 p-2">
         <div id="end-tournament-section" class="mb-4">
             <button id="end-tournament-btn" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 hidden">End
                 Tournament</button>
@@ -54,7 +55,7 @@
             <p><strong>Date:</strong> <span id="tournament-date"></span></p>
             <p><strong>Location:</strong> <span id="tournament-location"></span></p>
             <p><strong>Participants:</strong> <span id="tournament-participants"></span></p>
-            <p><strong>Prize:</strong> <span id="tournament-prize"></span></p>
+            <p><strong id="label-tounament-type">Prize:</strong> <span id="tournament-prize"></span></p>
             <p><strong>Top 1 elo recevied:</strong> <span id="tournament-top1-points"></span></p>
             <p><strong>Top 2 elo recevied:</strong> <span id="tournament-top2-points"></span></p>
             <p><strong>Other Players elo recevied:</strong> <span id="tournament-other-points"></span></p>
@@ -120,6 +121,11 @@
                 </table>
             </div>
         </div>
+        <!-- Biểu đồ lịch sử theo rack -->
+        <div id="div-rack-history-chart" class="bg-white shadow-md rounded-lg mt-6 mb-6 p-4 h-96 hidden">
+            <h2 class="font-bold">Biểu đồ lịch sử điểm bắn đền</h2>
+            <canvas id="rack-history-chart"></canvas>
+        </div>
         <div id="rankings-section" class="bg-white p-6 rounded-lg shadow-md">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-semibold">Player Rankings</h3>
@@ -161,6 +167,16 @@
                 <p id="no-results" class="text-center text-gray-600 hidden">Chưa có kết quả</p>
             </div>
         </div>
+        <!-- Bảng lịch sử racks -->
+        <div id="all-racks-history" class="bg-white shadow-md rounded-lg overflow-hidden mt-6 hidden">
+            <h3 id="history-title" class="text-xl font-bold p-3 bg-gray-200">Lịch sử các Racks</h3>
+            <table class="w-full">
+                <thead class="bg-blue-800 text-white" id="history-head"></thead>
+                <tbody id="history-body"></tbody>
+            </table>
+            <div id="history-pagination" class="flex justify-center gap-2 p-3"></div>
+
+        </div>
     </div>
     <footer class="bg-blue-900 text-white p-4 mt-8">
         <div class="container mx-auto text-center">
@@ -196,8 +212,20 @@
             document.getElementById('tournament-top2-points').textContent = '0';
             document.getElementById('tournament-other-points').textContent = '0';
             document.getElementById('tournament-status').textContent = 'N/A';
-        } else {
+            alert("Sai id tournament");
+            window.location.href = "tournaments.html";
+        } 
+        else {
             // Hiển thị thông tin giải đấu
+            if(tournament.name =="Đền"){
+                document.getElementById('label-tounament-type').textContent = "Một điểm:";
+                document.getElementById('matches-section').classList.add("hidden");
+                document.getElementById('div-rack-history-chart').classList.remove("hidden");
+                document.getElementById('all-racks-history').classList.remove("hidden");
+                if(tournament.status=="Đang diễn ra"){
+                    window.location.href = `Den/tourDen_ongoing.html?id=${tournament.id}`;
+                }
+            }
             document.getElementById('tournament-title').textContent = tournament.name;
             document.getElementById('tournament-name').textContent = tournament.name;
             document.getElementById('tournament-date').textContent = tournament.date;
@@ -642,6 +670,7 @@
         }
         checkAdminAccess();
     </script>
+    <script src="tournament_detail_more.js"></script>
 </body>
 
 </html>
