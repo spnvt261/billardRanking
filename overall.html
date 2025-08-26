@@ -57,6 +57,31 @@
             return date.toLocaleDateString('vi-VN');
         }
 
+        const defaultColors = [
+            "#2ECC71", // Xanh lá cây
+            "#9B59B6", // Tím
+            "#F1C40F", // Vàng
+            "#1ABC9C", // Xanh ngọc
+            "#FF5733", // Đỏ cam
+            "#33FF57", // Xanh lá sáng
+            "#34495E", // Xám xanh đậm
+
+            "#E74C3C", // Đỏ tươi
+            "#3498DB", // Xanh dương
+            "#E67E22", // Cam đất
+            "#16A085", // Xanh teal
+            "#8E44AD", // Tím đậm
+            "#D35400", // Cam đậm
+            "#27AE60", // Xanh lá đậm
+            "#2980B9", // Xanh biển
+            "#BDC3C7", // Xám sáng
+            "#7F8C8D", // Xám trung tính
+            "#F39C12", // Vàng cam
+            "#2C3E50", // Xanh navy đậm
+            "#C0392B"  // Đỏ rượu vang
+        ];
+
+
         function getRandomColor() {
             const r = Math.floor(Math.random() * 200);
             const g = Math.floor(Math.random() * 200);
@@ -130,7 +155,7 @@
                     return {
                         label: player.name,
                         data: dataPoints,
-                        borderColor: getRandomColor(),
+                        borderColor: defaultColors[player.id] ? defaultColors[player.id] : getRandomColor(),
                         spanGaps: true,
                         fill: false
                     };

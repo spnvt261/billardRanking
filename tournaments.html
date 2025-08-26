@@ -54,7 +54,7 @@
                     <!-- <label for="tournament-type" class="block text-gray-700">Loại Tournament</label> -->
                     <select id="tournament-type" class="w-full p-2 border rounded">
                         <option value="giaidau" selected>Giải đấu</option>
-                        <option value="banden">Bắn đền 3 người</option>
+                        <option value="banden">Mâm đền 3-6-9</option>
                     </select>
                 </div>
                 <input id="tournament-name" type="text" class="w-full p-2 border rounded" placeholder="Tournament Name">
@@ -281,13 +281,13 @@
         });
 
         document.getElementById('create-tournament').addEventListener('click', async () => {
-            if (typeSelect.value === "banden") {
-                const playerCount = selectedPlayers1.querySelectorAll("li").length;
-                if (playerCount !== 3) {
-                    alert("Bắn đền chỉ tạo khi có đúng 3 người chơi!");
-                    return;
-                }
-            }
+            // if (typeSelect.value === "banden") {
+            //     const playerCount = selectedPlayers1.querySelectorAll("li").length;
+            //     if (playerCount !== 3) {
+            //         alert("Bắn đền chỉ tạo khi có đúng 3 người chơi!");
+            //         return;
+            //     }
+            // }
             const name = document.getElementById('tournament-name').value;
             const date = document.getElementById('tournament-date').value;
             const location = document.getElementById('tournament-location').value;

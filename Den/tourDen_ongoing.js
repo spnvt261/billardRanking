@@ -11,7 +11,7 @@ if (!tournament || tournament.name != "Đền") {
     alert("Sai id tournament");
     window.location.href = "../tournaments.html";
 }
-if (tournament.name == "Đền" && tournament.status!="Đang diễn ra") {
+if (tournament.name == "Đền" && tournament.status != "Đang diễn ra") {
     alert("Sai id tournament");
     window.location.href = "../tournaments.html";
 }
@@ -20,7 +20,15 @@ document.getElementById("tournament-title").innerText = tournament.name;
 // Lấy danh sách player
 let listPlayers = poolData.players.filter(p => tournament.players.includes(p.id));
 
-const defaultColors = ["#cce5ff", "#ffe5b4", "#e5ccff"];
+const defaultColors = [
+    "#FF5733", // Đỏ cam
+    "#2ECC71", // Xanh lá cây
+    "#9B59B6", // Tím
+    "#F1C40F", // Vàng
+    "#1ABC9C", // Xanh ngọc
+    "#33FF57", // Xanh lá sáng
+    "#34495E"  // Xám xanh đậm
+];
 
 // Khởi tạo bảng điểm
 let scores = listPlayers.map((p, index) => {
@@ -158,7 +166,7 @@ function renderTableInitial() {
     scores.forEach(s => {
         const row = document.createElement("tr");
         row.dataset.id = s.id;
-        row.style.backgroundColor = s.color;
+        row.style.backgroundColor = s.color + "80";
 
         const tdName = document.createElement("td");
         tdName.className = "p-3";
@@ -422,6 +430,12 @@ function renderPagination(totalPages) {
         container.appendChild(btn);
     }
 }
+function getRandomColor() {
+    const r = Math.floor(Math.random() * 200);
+    const g = Math.floor(Math.random() * 200);
+    const b = Math.floor(Math.random() * 200);
+    return `rgb(${r}, ${g}, ${b})`;
+}
 function renderRackHistoryChart(tournamentId) {
     // Lọc history theo tournament
     const history = history_points_den
@@ -449,7 +463,7 @@ function renderRackHistoryChart(tournamentId) {
 
         // Lấy màu từ scores (hoặc defaultColors nếu chưa có)
         const scoreObj = scores.find(s => s.id === player.id);
-        const color = scoreObj ? scoreObj.color : defaultColors[0];
+        const color = scoreObj ? scoreObj.color : getRandomColor();
 
         return {
             label: player.name,
@@ -493,10 +507,10 @@ function renderRackHistoryChart(tournamentId) {
     });
 }
 document.getElementById('end-tournament-btn').addEventListener('click', async () => {
-// Sắp xếp copy của mảng scores theo current giảm dần
+    // Sắp xếp copy của mảng scores theo current giảm dần
     const ranking = [...scores].sort((a, b) => b.current - a.current);
-    let champion=ranking[0];
-    let runnerUp=ranking[1];
+    let champion = ranking[0];
+    let runnerUp = ranking[1];
     // console.log(champion,runnerUp);
     // Hiển thị thông báo xác nhận
     if (!confirm(`Bạn có chắc chắn muốn kết thúc mâm đền này với người vô địch là ${champion.name}(${champion.current} điểm) và á quân là ${runnerUp.name}(${runnerUp.current} điểm)?`)) {
@@ -505,11 +519,11 @@ document.getElementById('end-tournament-btn').addEventListener('click', async ()
     const newTournament = {
         ...tournament,
         top1Id: champion.id,
-        top2Id:runnerUp.id,
-        status:"Đã kết thúc"
+        top2Id: runnerUp.id,
+        status: "Đã kết thúc"
     }
     // console.log(newTournament);
-    
+
     try {
         // Cập nhật dữ liệu giải đấu
         await updateData('tournaments', tournament.id, newTournament);
@@ -535,7 +549,7 @@ document.getElementById('end-tournament-btn').addEventListener('click', async ()
         console.error('Error ending tournament:', error);
         alert('Failed to end tournament. Please try again.');
     }
-    
+
 });
 
 
