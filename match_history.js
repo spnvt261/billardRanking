@@ -327,7 +327,7 @@ document.getElementById('save-match-singles').addEventListener('click', () => {
             return;
         }
         tournamentName = "Kèo " + convertPrize(prizeSingles);
-        addPlayerPoints(winnerId, parseInt(pointReceiveSingles));
+        addPlayerPoints(winnerId, parseInt(pointReceiveSingles),null,maxId);
     }
 
     const newMatch = {
@@ -343,9 +343,9 @@ document.getElementById('save-match-singles').addEventListener('click', () => {
         matchType: '',
     };
     createData('match-history', newMatch);
-    addPlayerPoints(player1Id, parseInt(score1));
+    addPlayerPoints(player1Id, parseInt(score1),null,maxId);
     if (player2name != "Chấm") {
-        addPlayerPoints(player2Id, parseInt(score2));
+        addPlayerPoints(player2Id, parseInt(score2),null,maxId);
     }
     // console.log(poolData.matchHistory);
 
@@ -648,15 +648,15 @@ document.getElementById('save-match-doubles').addEventListener('click', () => {
     createData('match-history', newMatch);
 
     // Cập nhật điểm cho Blue team
-    addPlayerPoints(bluePlayer1Id, parseInt(blueScore));
-    addPlayerPoints(bluePlayer2Id, parseInt(blueScore));
+    addPlayerPoints(bluePlayer1Id, parseInt(blueScore),null,maxId);
+    addPlayerPoints(bluePlayer2Id, parseInt(blueScore),null,maxId);
     // console.log(newMatch);
 
 
     // Cập nhật điểm cho Red team
     if (redPlayer2Name != "Chấm" && redPlayer1Name != "Chấm") {
-        addPlayerPoints(redPlayer1Id, parseInt(redScore));
-        addPlayerPoints(redPlayer2Id, parseInt(redScore));
+        addPlayerPoints(redPlayer1Id, parseInt(redScore),null,maxId);
+        addPlayerPoints(redPlayer2Id, parseInt(redScore),null,maxId);
     }
 
     sessionStorage.removeItem('poolData_matchHistory');
@@ -692,8 +692,8 @@ singlesMatchTypeSelect.addEventListener('change', () => {
         keoTienFields.classList.remove('hidden');
     } else {
         keoTienFields.classList.add('hidden');
-        document.getElementById('prize').value = '';
-        document.getElementById('pointReceive').value = '';
+        document.getElementById('prize-singles').value = '';
+        document.getElementById('point-receive-singles').value = '';
     }
 });
 
@@ -706,8 +706,8 @@ doublesMatchTypeSelect.addEventListener('change', () => {
         keoTienDoubles.classList.remove('hidden');
     } else {
         keoTienDoubles.classList.add('hidden');
-        document.getElementById('prize').value = '';
-        document.getElementById('pointReceive').value = '';
+        document.getElementById('prize-doubles').value = '';
+        // document.getElementById('point-receive-doubles').value = '';
     }
 });
 

@@ -43,14 +43,14 @@ const adminKey = localStorage.getItem('adminKey');
 //     isInitialLoad: 'isInitialLoad'
 // };
 
-const API_BASE_URL = 'https://tabfpepqvdcecwnewpfx.supabase.co/rest/v1/';
-const PUBLISHABLE_KEY = 'sb_publishable__7iV7NXURl8Jo9GKORvoFg_3N1Mvs4G';
-const SECRET_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhYmZwZXBxdmRjZWN3bmV3cGZ4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDY4NDg0MywiZXhwIjoyMDcwMjYwODQzfQ.bIsr5yGL7DEbBoDHxDeuZssIv1FKVDcHvVGxK9peODs';
+// const API_BASE_URL = 'https://tabfpepqvdcecwnewpfx.supabase.co/rest/v1/';
+// const PUBLISHABLE_KEY = 'sb_publishable__7iV7NXURl8Jo9GKORvoFg_3N1Mvs4G';
+// const SECRET_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhYmZwZXBxdmRjZWN3bmV3cGZ4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDY4NDg0MywiZXhwIjoyMDcwMjYwODQzfQ.bIsr5yGL7DEbBoDHxDeuZssIv1FKVDcHvVGxK9peODs';
 
 // test sever
-// const API_BASE_URL = 'https://sjrexafyojloinbbraye.supabase.co/rest/v1/';
-// const PUBLISHABLE_KEY = 'sb_publishable_f_OIbYVcEvNY2AbbmuArGg_onyUF8aR';
-// const SECRET_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcmV4YWZ5b2psb2luYmJyYXllIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDczMDQ1NywiZXhwIjoyMDcwMzA2NDU3fQ.tvWitEsTEAArKFT1byvNZ7wiO4j8TfHTl58ou_j042w';
+const API_BASE_URL = 'https://sjrexafyojloinbbraye.supabase.co/rest/v1/';
+const PUBLISHABLE_KEY = 'sb_publishable_f_OIbYVcEvNY2AbbmuArGg_onyUF8aR';
+const SECRET_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcmV4YWZ5b2psb2luYmJyYXllIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDczMDQ1NywiZXhwIjoyMDcwMzA2NDU3fQ.tvWitEsTEAArKFT1byvNZ7wiO4j8TfHTl58ou_j042w';
 
 
 const SESSION_STORAGE_KEYS = {
@@ -309,6 +309,44 @@ async function addPlayerPoints(playerId, score) {
         throw new Error(`Failed to update points for player ${playerId}: ${error.message}`);
     }
 }
+async function addPlayerPoints(playerId, score,tournamentId, matchId) {
+    if (!playerId || typeof score !== 'number' || isNaN(score) || score < 0) {
+        throw new Error('Invalid playerId or score. Score must be a non-negative number.');
+    }
+
+    // await initializePoolData(); // Đảm bảo poolData được khởi tạo
+
+    const player = poolData.players.find(p => p.id === playerId);
+    if (!player) {
+        throw new Error(`Player with ID ${playerId} not found.`);
+    }
+    const maxId = poolData.history_point.length > 0
+        ? Math.max(...poolData.history_point.map(item => parseInt(item.id, 10))) + 1
+        : 3; // Nếu mảng rỗng, bắt đầu từ 1
+    // console.log(Math.max(...poolData.history_point.map(item => parseInt(item.id, 10))));
+
+    const newDataHistoryPoint = {
+        id: maxId,
+        playerId: parseInt(player.id, 10),
+        point: score,
+        tournamentId:tournamentId,
+        matchId:matchId,
+        date: new Date().toLocaleDateString('vi-VN')
+    }
+    // console.log(newDataHistoryPoint);
+    poolData.history_point.push(newDataHistoryPoint);
+
+    const newPoints = player.points + score;
+    try {
+        // await updateData('players', playerId, { points: newPoints });
+        await createData('history_point', newDataHistoryPoint);
+        player.points = newPoints; // Cập nhật poolData.players cục bộ
+        return { playerId, newPoints };
+    } catch (error) {
+        throw new Error(`Failed to update points for player ${playerId}: ${error.message}`);
+    }
+}
+
 function checkAdminAccess() {
     // const adminKey = localStorage.getItem('adminKey');
     // console.log(adminKey);

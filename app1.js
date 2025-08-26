@@ -1,11 +1,10 @@
 let playersData1 = [];
-initializePoolData();
-function initPlayersData(players) {
+function initPlayersData() {
   // Reset mảng playersData
   playersData1.length = 0;
 
   // Lọc và gán id + name
-  players
+  poolData.players
     .filter(p => p.name !== "Chấm" && !p.name.includes("Khách"))
     .forEach(p => {
       playersData1.push({
@@ -15,9 +14,7 @@ function initPlayersData(players) {
     });
 }
 
-// Gọi hàm
-initPlayersData(poolData.players);
-// console.log(playersData);
+
 
 function updatePlayersElo(playersData, history_point) {
   // Tính tổng điểm của từng playerId từ history_point
@@ -89,17 +86,17 @@ function updatePlayersRacks(playersData, poolData) {
       // Lấy team1
       const team1Ids = String(m.player1Id).length === 8
         ? [
-            String(parseInt(m.player1Id.substring(0, 4)) - 1000),
-            String(parseInt(m.player1Id.substring(4, 8)) - 1000)
-          ]
+          String(parseInt(m.player1Id.substring(0, 4)) - 1000),
+          String(parseInt(m.player1Id.substring(4, 8)) - 1000)
+        ]
         : [String(m.player1Id)];
 
       // Lấy team2
       const team2Ids = String(m.player2Id).length === 8
         ? [
-            String(parseInt(m.player2Id.substring(0, 4)) - 1000),
-            String(parseInt(m.player2Id.substring(4, 8)) - 1000)
-          ]
+          String(parseInt(m.player2Id.substring(0, 4)) - 1000),
+          String(parseInt(m.player2Id.substring(4, 8)) - 1000)
+        ]
         : [String(m.player2Id)];
 
       // Player có trong trận không?
@@ -209,14 +206,21 @@ function updatePlayersSoCham(playersData, poolData) {
     player.soCham = ChamDon + ChamDoi;
   });
 }
+// console.log(poolData.players);
 
 // Gọi hàm
-updatePlayersElo(playersData1, poolData.history_point);
-updatePlayersMatches(
-  playersData1,
-  { matchHistory: poolData.matchHistory, players: poolData.players }
-);
-updatePlayersRacks(playersData1, { matchHistory: poolData.matchHistory, players: poolData.players });
-updatePlayersTournamentStats(playersData1, { tournaments:poolData.tournaments });
-updatePlayersSoCham(playersData1, { matchHistory:poolData.matchHistory, players:poolData.players });
-// console.log(playersData);
+initializePoolData().then(() => {
+  // console.log(poolData.players);
+  initPlayersData();
+  updatePlayersElo(playersData1, poolData.history_point);
+  updatePlayersMatches(
+    playersData1,
+    { matchHistory: poolData.matchHistory, players: poolData.players }
+  );
+  updatePlayersRacks(playersData1, { matchHistory: poolData.matchHistory, players: poolData.players });
+  updatePlayersTournamentStats(playersData1, { tournaments: poolData.tournaments });
+  updatePlayersSoCham(playersData1, { matchHistory: poolData.matchHistory, players: poolData.players });
+})
+
+
+// console.log(playersData1);

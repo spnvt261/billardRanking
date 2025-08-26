@@ -326,7 +326,7 @@ document.getElementById("finish-rack").addEventListener("click", () => {
 
     if (nineActions.length > 0) {
         nineActions.map(nineAction => {
-            addPlayerPoints(nineAction.player1Id, 1)
+            addPlayerPoints(nineAction.player1Id, 1, tournament.id, null)
         })
     }
 
@@ -529,20 +529,24 @@ document.getElementById('end-tournament-btn').addEventListener('click', async ()
         await updateData('tournaments', tournament.id, newTournament);
 
         // Cập nhật điểm cho nhà vô địch và á quân
-        await addPlayerPoints(champion.id, tournament.top1_point);
-        await addPlayerPoints(runnerUp.id, tournament.top2_point);
+        await addPlayerPoints(champion.id, tournament.top1_point, tournament.id, "Vô địch");
+        await addPlayerPoints(runnerUp.id, tournament.top2_point, tournament.id, "Á quân");
 
         // Cập nhật điểm cho các người chơi khác tham gia giải
-        const otherPlayers = poolData.players.filter(player =>
+        
+        if (tournament.other_point > 0) {
+            const otherPlayers = poolData.players.filter(player =>
 
-            tournament.players.includes(player.id) &&
-            player.id !== tournament.top1Id &&
-            player.id !== tournament.top2Id
-        );
-        for (const player of otherPlayers) {
-            await addPlayerPoints(player.id, tournament.other_point || 0);
+                tournament.players.includes(player.id) &&
+                player.id !== champion.id &&
+                player.id !== runnerUp.id
+            );
+            // console.log(otherPlayers);
+            
+            for (const player of otherPlayers) {
+                await addPlayerPoints(player.id, tournament.other_point, tournament.id, null);
+            }
         }
-
         // Làm mới dữ liệu
         window.location.href = `../tournament_details.html?id=${tournament.id}`;
     } catch (error) {

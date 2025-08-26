@@ -43,7 +43,7 @@ function renderHistoryTable() {
 
     let rackNumbers = Object.keys(grouped)
         .map(r => parseInt(r))
-        .sort((a, b) => b - a); // sắp xếp giảm dần (rack mới nhất trước)
+        .sort((a, b) => a - b); // sắp xếp tăng dần (rack mới nhất trước)
 
     // Tính số trang
     const totalPages = Math.ceil(rackNumbers.length / rowsPerPage);

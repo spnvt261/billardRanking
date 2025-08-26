@@ -1,5 +1,5 @@
-let playersData = [];
 
+let playersData = [];
 function filterQualifiedPlayers(playersData1) {
   playersData = playersData1.filter(p => p.racks >= 30 && p.matches >= 5);
 }
@@ -16,7 +16,8 @@ function getSlides(playersData) {
   const topFinals = [...playersData].sort((a, b) => (b.finals / b.attends) - (a.finals / a.attends))[0];
   const topChampions = [...playersData].sort((a, b) => b.champions - a.champions)[0];
   const topSoCham = [...playersData].filter(p => p.soCham > 0).sort((a, b) => b.soCham - a.soCham)[0];
-
+  // console.log(2);
+  
   return [
     {
       kicker: "Người có Elo cao nhất",
@@ -77,6 +78,11 @@ function getSlides(playersData) {
   ];
 }
 
+if(playersData.length==0){
+  initializePoolData().then(() => {
+    location.reload();
+  })
+}
 const stats = getSlides(playersData);
 // console.log(stats);
 
@@ -306,7 +312,8 @@ function renderResults() {
   `;
 }
 
-function startAutoPlay() {
+async function startAutoPlay() {
+  
   next();
   autoPlay = setInterval(next, SLIDE_DURATION);
 }
