@@ -396,9 +396,4 @@ function loadData() {
   linkIcon.href = "images/icon.png"; // dùng luôn icon bạn đã có
   document.head.appendChild(linkIcon);
 
-  // manifest.json (cho Android/Chrome)
-  const linkManifest = document.createElement("link");
-  linkManifest.rel = "manifest";
-  linkManifest.href = "/manifest.json";
-  document.head.appendChild(linkManifest);
 })();
