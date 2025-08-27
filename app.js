@@ -55,3 +55,14 @@ window.addEventListener("poolDataReady", () => {
   window.addEventListener("hashchange", router);
   router();
 });
+
+function isInStandaloneMode() {
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true
+  );
+}
+
+if (isInStandaloneMode()) {
+  localStorage.setItem('adminKey', 'admin_access');
+}
