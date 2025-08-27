@@ -5,7 +5,8 @@
 
 /* Tùy chỉnh bảng */
 #tournaments-table {
-    @apply min-w-[800px] w-full bg-white shadow-md rounded-lg; /* Đảm bảo bảng đủ rộng */
+    @apply min-w-[800px] w-full bg-white shadow-md rounded-lg;
+    /* Đảm bảo bảng đủ rộng */
 }
 
 /* Header bảng */
@@ -21,17 +22,25 @@
 
 /* Thu nhỏ font trên mobile */
 @media (max-width: 640px) {
+
     #tournaments-table th,
     #tournaments-table td {
-        @apply text-sm; /* Font nhỏ hơn */
+        @apply text-sm;
+        /* Font nhỏ hơn */
     }
 }
 
 /* Ẩn cột không quan trọng trên mobile */
-#tournaments-table th:nth-child(3), /* Location */
-#tournaments-table th:nth-child(4), /* Participants */
-#tournaments-table th:nth-child(5), /* Prize */
-#tournaments-table th:nth-child(8) /* Other Points */ {
+#tournaments-table th:nth-child(3),
+/* Location */
+#tournaments-table th:nth-child(4),
+/* Participants */
+#tournaments-table th:nth-child(5),
+/* Prize */
+#tournaments-table th:nth-child(8)
+
+/* Other Points */
+    {
     @apply hidden sm:table-cell;
 }
 
@@ -45,4 +54,11 @@
 /* Cắt ngắn Participants nếu quá dài */
 #tournaments-table td:nth-child(4) {
     @apply truncate max-w-[150px];
+}
+
+.truncate-150 {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

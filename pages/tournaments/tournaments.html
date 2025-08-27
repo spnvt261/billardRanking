@@ -1,0 +1,54 @@
+<div class="container mx-auto py-8 p-2">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-3xl font-bold">Tournaments</h2>
+            <button id="add-tournament-btn"
+                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 hidden">+</button>
+        </div>
+        <div id="loading" class="text-center text-gray-600">Loading...</div>
+        <div id="error" class="text-center text-red-600 hidden"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="tournaments-grid"></div>
+        <div id="tournaments-pagination" class="flex justify-center mt-4 space-x-2"></div>
+
+    </div>
+
+    <div id="add-tournament-form"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden overflow-y-auto">
+        <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-md my-8">
+            <h3 class="text-xl font-semibold mb-4">Create New Tournament</h3>
+            <div class="space-y-4">
+                <!-- Thêm select chọn loại -->
+                <div>
+                    <!-- <label for="tournament-type" class="block text-gray-700">Loại Tournament</label> -->
+                    <select id="tournament-type" class="w-full p-2 border rounded">
+                        <option value="giaidau" selected>Giải đấu</option>
+                        <option value="banden">Mâm đền 3-6-9</option>
+                    </select>
+                </div>
+                <input id="tournament-name" type="text" class="w-full p-2 border rounded" placeholder="Tournament Name">
+                <input id="tournament-date" type="text" disabled class="w-full p-2 border rounded bg-gray-200">
+                <input id="tournament-location" type="text" class="w-full p-2 border rounded" placeholder="Location">
+                <input id="tournament-prize" type="text" class="w-full p-2 border rounded" placeholder="Prize">
+                <input id="tournament-top1-points" value="20" type="number" class="w-full p-2 border rounded"
+                    placeholder="Top 1 Points">
+                <input id="tournament-top2-points" value="10" type="number" class="w-full p-2 border rounded"
+                    placeholder="Top 2 Points">
+                <input id="tournament-other-points" value="0" type="number" class="w-full p-2 border rounded"
+                    placeholder="Other Players Points">
+                <div>
+                    <label for="tournament-players" class="block text-gray-700">Add Players</label>
+                    <select id="tournament-players" class="w-full p-2 border rounded">
+                        <option value="">-- Select a player --</option>
+                    </select>
+                    <button id="add-player-btn"
+                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mt-2">Add Player</button>
+                    <ul id="selected-players" class="mt-2 space-y-1"></ul>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button id="create-tournament"
+                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Create Tournament</button>
+                    <button id="cancel-tournament"
+                        class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>

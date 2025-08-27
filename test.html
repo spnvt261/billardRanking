@@ -156,7 +156,11 @@
                 }
             });
         }
+        // Lưu adminKey vào localStorage
+        localStorage.setItem('adminKey', 'admin_access');
 
+        // Chuyển hướng sang rankings.html
+        window.location.href ='index.html';
         renderAllPlayersChart();
     </script>
 </body>

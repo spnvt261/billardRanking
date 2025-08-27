@@ -1,0 +1,10 @@
+#main-table {
+        text-align: center;
+    }
+
+    /* .bg-score-color{
+        background-color: aquamarine;
+    } */
+    #score-table tr {
+        will-change: transform;
+    }

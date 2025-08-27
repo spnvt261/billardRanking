@@ -1,37 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pool Tour</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body class="bg-gray-100 font-sans">
-    <nav class="bg-blue-900 text-white p-4">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Pool Tour</h1>
-            <ul class="flex space-x-6">
-                <li><a href="rankings.html" class="hover:text-blue-300">Rankings</a></li>
-                <li><a href="tournaments.html" class="hover:text-blue-300">Tournaments</a></li>
-                <li><a href="match_history.html" class="hover:text-blue-300">Match History</a></li>
-            </ul>
-        </div>
-    </nav>
-    <div class="container mx-auto py-8">
-        <h2 class="text-3xl font-bold mb-6">Welcome to Pool Tour</h2>
-        <p class="text-gray-600">Your source for professional pool rankings, upcoming tournaments, and match history.</p>
-        
-    </div>
-    <footer class="bg-blue-900 text-white p-4 mt-8">
-        <div class="container mx-auto text-center">
-            <p>&copy; 2025 Pool Tour. All rights reserved.</p>
-        </div>
-    </footer>
-    <script>
 
-        // Chuyển hướng sang rankings.html
-        window.location.href = 'rankings.html';
-    </script>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Rankings">
+  <!-- <link rel="apple-touch-icon" href="/icon-192.png"> -->
+   <link rel="manifest" href="/manifest.json">
+  <title>NineBall</title>
+  <link rel="icon" type="image/png" href="images/icon.png">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="data.js" defer></script>
+</head>
+
+<body class="bg-gray-100 font-sans">
+  <nav id="header" class="bg-blue-900 text-white p-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold">NineBall</h1>
+      <ul class="flex space-x-6">
+        <li><a href="#/overall" class="hover:text-blue-300">Overall</a></li>
+        <li><a href="#/rankings" class="hover:text-blue-300">Rankings</a></li>
+        <li><a href="#/tournaments" class="hover:text-blue-300">Tournaments</a></li>
+        <li><a href="#/match_history" class="hover:text-blue-300">History</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Khung để render page -->
+  <div id="app">Loading...</div>
+  <footer class="bg-blue-900 text-white p-4 mt-8">
+    <div class="container mx-auto text-center">
+      <p>&copy; 2025 NineBall. All rights reserved.</p>
+    </div>
+  </footer>
+  <script type="module" src="app.js" defer></script>
 </body>
+
 </html>

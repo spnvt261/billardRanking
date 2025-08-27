@@ -1,0 +1,18 @@
+/* CSS để định dạng thẻ div ở dưới cùng */
+    .rules-container {
+        position: relative;
+        bottom: 0;
+        width: 100%;
+        padding: 20px;
+        background-color: #f8f8f8;
+        border-top: 1px solid #ccc;
+        text-align: center;
+        font-family: Arial, sans-serif;
+        margin-top: 20px;
+    }
+
+    @media (max-width: 600px) {
+        .rules-container {
+            text-align: left;
+        }
+    }

@@ -1,0 +1,137 @@
+<div class="container mx-auto py-8 p-2">
+        <div id="end-tournament-section" class="mb-4">
+            <button id="end-tournament-btn" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 hidden">End
+                Tournament</button>
+        </div>
+        <h2 class="text-3xl font-bold mb-6" id="tournament-title">Tournament Details</h2>
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h3 class="text-xl font-semibold mb-4">Tournament Information</h3>
+            <p><strong>Name:</strong> <span id="tournament-name"></span></p>
+            <p><strong>Date:</strong> <span id="tournament-date"></span></p>
+            <p><strong>Location:</strong> <span id="tournament-location"></span></p>
+            <p><strong>Participants:</strong> <span id="tournament-participants"></span></p>
+            <p><strong id="label-tounament-type">Prize:</strong> <span id="tournament-prize"></span></p>
+            <p><strong>Top 1 elo recevied:</strong> <span id="tournament-top1-points"></span></p>
+            <p><strong>Top 2 elo recevied:</strong> <span id="tournament-top2-points"></span></p>
+            <p><strong>Other Players elo recevied:</strong> <span id="tournament-other-points"></span></p>
+            <p><strong>Status:</strong> <span id="tournament-status"></span></p>
+        </div>
+        <div id="matches-section" class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Matches</h3>
+                <button id="add-match-btn-in-tour"
+                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 hidden">+</button>
+            </div>
+            <div id="add-match-form" class="bg-gray-50 p-4 rounded-lg shadow-md mb-4 hidden">
+                <h3 class="text-lg font-semibold mb-4">Add New Match</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700">Player 1</label>
+                        <select id="match-player1" class="w-full p-2 border rounded">
+                            <option value="">Select Player 1</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">Score Player 1</label>
+                        <input id="match-score1" type="number" min="0" class="w-full p-2 border rounded">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">Player 2</label>
+                        <select id="match-player2" class="w-full p-2 border rounded">
+                            <option value="">Select Player 2</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label id="score2-label" class="block text-gray-700">Score Player 2</label>
+                        <input id="match-score2" type="number" min="0" class="w-full p-2 border rounded">
+                    </div>
+                    <div id="match-type-label">
+                        <label class="block text-gray-700">Match Type</label>
+                        <select id="match-type" class="w-full p-2 border rounded">
+                            <option value="">-- Select match type --</option>
+                            <option value="Vòng bảng">Vòng bảng</option>
+                            <option value="Tứ kết">Tứ kết</option>
+                            <option value="Bán kết">Bán kết</option>
+                            <option value="Chung kết">Chung kết</option>
+                            <option value="Tranh hạng 3">Tranh hạng 3</option>
+                        </select>
+                    </div>
+                    <button id="save-match" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save
+                        Match</button>
+                    <button id="cancel-match"
+                        class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-blue-800 text-white">
+                        <tr>
+                            <th class="p-3 text-left ">#</th>
+                            <th class="p-3 text-left ">Match Type</th>
+                            <th class="p-3 text-left w-50">Match</th>
+                        </tr>
+                    </thead>
+                    <tbody id="matches-table"></tbody>
+
+                </table>
+            </div>
+        </div>
+        <!-- Biểu đồ lịch sử theo rack -->
+        <div id="div-rack-history-chart" class="bg-white shadow-md rounded-lg mt-6 mb-6 p-4 h-96 hidden">
+            <h2 class="font-bold">Biểu đồ lịch sử điểm bắn đền</h2>
+            <canvas id="rack-history-chart"></canvas>
+        </div>
+        <div id="rankings-section" class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Player Rankings</h3>
+                <button id="select-player-btn"
+                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 hidden">Add Results</button>
+            </div>
+            <div id="add-player-form" class="bg-gray-50 p-4 rounded-lg shadow-md mb-4 hidden">
+                <h3 class="text-lg font-semibold mb-4">Add Player to Tournament</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700">Player</label>
+                        <select id="new-player" class="w-full p-2 border rounded">
+                            <option value="">Chọn player</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">Role</label>
+                        <select id="player-role" class="w-full p-2 border rounded">
+                            <option value="">-- Select role --</option>
+                            <option value="Vô địch">Vô địch</option>
+                            <option value="Á quân">Á quân</option>
+                        </select>
+                    </div>
+                    <button id="save-player" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save
+                        Player</button>
+                    <button id="cancel-player"
+                        class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
+                </div>
+            </div>
+            <div id="rankings-content" class="overflow-x-auto">
+                <table id="rankings-table" class="w-full">
+                    <thead class="bg-blue-800 text-white">
+                        <tr>
+                            <th class="p-3 text-left">Rank</th>
+                            <th class="p-3 text-left">Player</th>
+                            <th class="p-3 text-left">Elo Received</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rankings-table-body"></tbody>
+                </table>
+                <p id="no-results" class="text-center text-gray-600 hidden">Chưa có kết quả</p>
+            </div>
+        </div>
+        <!-- Bảng lịch sử racks -->
+        <div id="all-racks-history" class="bg-white shadow-md rounded-lg overflow-hidden mt-6 hidden">
+            <h3 id="history-title" class="text-xl font-bold p-3 bg-gray-200">Lịch sử các Racks</h3>
+            <table class="w-full">
+                <thead class="bg-blue-800 text-white" id="history-head"></thead>
+                <tbody id="history-body"></tbody>
+            </table>
+            <div id="history-pagination" class="flex justify-center gap-2 p-3"></div>
+
+        </div>
+    </div>

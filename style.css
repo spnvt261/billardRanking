@@ -1,11 +1,12 @@
-@media (max-width: 600px){
-        nav{
-            h1{
-                display: none;
-                margin: 0 auto;
-            }
-            .container{
-                justify-content: center;
-            }
+@media (max-width: 600px) {
+    nav {
+        h1 {
+            display: none;
+            margin: 0 auto;
         }
-      }
+
+        .container {
+            justify-content: center;
+        }
+    }
+}

@@ -1,0 +1,65 @@
+<div class="container mx-auto py-8 p-2">
+        <h2 class="text-3xl font-bold mb-6">Friend Rankings</h2>
+        <div>
+            <button id="add-player-btn"
+                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4 hidden">+</button>
+        </div>
+        <div id="add-player-form" class="bg-white p-6 rounded-lg shadow-md mb-4 hidden">
+            <h3 class="text-xl font-semibold mb-4">Add New Player</h3>
+            <div class="space-y-4">
+                <!-- Chọn loại Friend / Guest -->
+                <div>
+                    <label class="block text-gray-700 mb-2">Type</label>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center">
+                            <input type="radio" name="player-type" value="friend" checked class="mr-2">
+                            Friend
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="player-type" value="guest" class="mr-2">
+                            Khách
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700">Name</label>
+                    <input id="player-name" type="text" class="w-full p-2 border rounded">
+                </div>
+
+                <!-- Image URL (chỉ hiện khi chọn Friend) -->
+                <div id="image-input-container">
+                    <label class="block text-gray-700">Image URL (leave blank for default)</label>
+                    <input id="player-image" type="text" class="w-full p-2 border rounded">
+                </div>
+
+                <button id="save-player"
+                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save</button>
+                <button id="cancel-player"
+                    class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
+            </div>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-blue-800 text-white">
+                    <tr>
+                        <th class="p-3 text-left">Rank</th>
+                        <th class="p-3 text-left">Player</th>
+                        <th class="p-3 text-left">Elo</th>
+                    </tr>
+                </thead>
+                <tbody id="rankings-table"></tbody>
+            </table>
+        </div>
+    </div>
+    <div id="loading" class="text-center text-gray-600 hidden">Loading...</div>
+    <div class="rules-container">
+        <ul>Tính Elo</ul>
+        <p>
+            <!-- Các cách tăng điểm:<br> -->
+            - Thắng 1 rack: +1 Elo<br>
+            - Vô địch hoặc Á quân<br>
+            - Điểm bổ sung: chấm<br>
+        </p>
+    </div>

@@ -1,0 +1,53 @@
+ /* Mobile stacked table */
+
+    table.min-w-full td:first-child {
+        display: block;
+        font-weight: bold;
+        background: transparent !important;
+        border: none;
+        padding-bottom: 0;
+    }
+
+    .text-tr{
+        display: block;
+        font-weight: bold;
+        background: transparent !important;
+        border: none;
+        padding-bottom: 0;
+    }
+
+    table.min-w-full td:last-child {
+        display: block;
+        padding-top: 0;
+    }
+
+    table.min-w-full tr {
+        display: block;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    /* Giữ mobile view dọc */
+    table.min-w-full td:first-child {
+        display: block;
+        font-weight: bold;
+        background: transparent !important;
+        border: none;
+        padding-bottom: 0;
+    }
+
+    table.min-w-full td:last-child {
+        display: block;
+        padding-top: 0;
+    }
+
+    table.min-w-full tr {
+        display: block;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    /* Giúp grid chia 2 cột khi màn hình rộng, còn mobile thì dọc */
+    @media (min-width: 640px) {
+        table.min-w-full td:last-child .grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
