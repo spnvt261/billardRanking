@@ -223,7 +223,7 @@ async function initializePoolData() {
         poolData.history_point = historyPointData || [];
         poolData.history_points_den = historyPointsDenData || [];
         if (poolData.players) {
-            
+
             // Duyệt qua từng người chơi trong poolData.players
             for (const player of poolData.players) {
                 // Tính tổng điểm từ history_point cho playerId tương ứng
@@ -232,10 +232,10 @@ async function initializePoolData() {
                     .reduce((sum, history) => sum + parseInt(history.point), 0);
                 // console.log(totalPoints);
                 // console.log(player);
-                
+
                 player.points = totalPoints;
                 // console.log(player);
-                
+
             }
         }
         // Phát sự kiện hoàn tất tải dữ liệu
@@ -309,7 +309,7 @@ async function addPlayerPoints(playerId, score) {
         throw new Error(`Failed to update points for player ${playerId}: ${error.message}`);
     }
 }
-async function addPlayerPoints(playerId, score,tournamentId, matchId) {
+async function addPlayerPoints(playerId, score, tournamentId, matchId) {
     if (!playerId || typeof score !== 'number' || isNaN(score) || score < 0) {
         throw new Error('Invalid playerId or score. Score must be a non-negative number.');
     }
@@ -329,8 +329,8 @@ async function addPlayerPoints(playerId, score,tournamentId, matchId) {
         id: maxId,
         playerId: parseInt(player.id, 10),
         point: score,
-        tournamentId:tournamentId,
-        matchId:matchId,
+        tournamentId: tournamentId,
+        matchId: matchId,
         date: new Date().toLocaleDateString('vi-VN')
     }
     // console.log(newDataHistoryPoint);
@@ -353,7 +353,7 @@ function checkAdminAccess() {
 
     if (adminKey) {
         // console.log(1);
-        
+
         document.getElementById('add-match-btn')?.classList.remove('hidden');
         document.getElementById('add-player-btn')?.classList.remove('hidden');
         document.getElementById('add-tournament-btn')?.classList.remove('hidden');
@@ -370,30 +370,50 @@ function loadData() {
     initializePoolData();
 }
 
-// Inject meta & link cho PWA / iOS fullscreen
+// ✅ Đăng ký Service Worker
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker
+            .register("/service-worker.js")
+            .then((reg) => console.log("Service worker registered:", reg.scope))
+            .catch((err) => console.log("Service worker error:", err));
+    });
+}
+
+// ✅ Inject meta cho iOS + Android PWA
 (function injectMeta() {
-  // apple-mobile-web-app-capable
-  const metaCapable = document.createElement("meta");
-  metaCapable.name = "apple-mobile-web-app-capable";
-  metaCapable.content = "yes";
-  document.head.appendChild(metaCapable);
+    const head = document.head;
 
-  // status bar style
-  const metaStatus = document.createElement("meta");
-  metaStatus.name = "apple-mobile-web-app-status-bar-style";
-  metaStatus.content = "black-translucent";
-  document.head.appendChild(metaStatus);
+    // manifest.json
+    const linkManifest = document.createElement("link");
+    linkManifest.rel = "manifest";
+    linkManifest.href = "/manifest.json";
+    head.appendChild(linkManifest);
 
-  // app title
-  const metaTitle = document.createElement("meta");
-  metaTitle.name = "apple-mobile-web-app-title";
-  metaTitle.content = "NineBall"; // bạn đổi tên app ở đây
-  document.head.appendChild(metaTitle);
+    // theme-color
+    const metaTheme = document.createElement("meta");
+    metaTheme.name = "theme-color";
+    metaTheme.content = "#1e3a8a";
+    head.appendChild(metaTheme);
 
-  // icon cho Home Screen
-  const linkIcon = document.createElement("link");
-  linkIcon.rel = "apple-touch-icon";
-  linkIcon.href = "images/icon.png"; // dùng luôn icon bạn đã có
-  document.head.appendChild(linkIcon);
+    // iOS standalone
+    const metaCapable = document.createElement("meta");
+    metaCapable.name = "apple-mobile-web-app-capable";
+    metaCapable.content = "yes";
+    head.appendChild(metaCapable);
 
+    const metaStatus = document.createElement("meta");
+    metaStatus.name = "apple-mobile-web-app-status-bar-style";
+    metaStatus.content = "black-translucent";
+    head.appendChild(metaStatus);
+
+    const metaTitle = document.createElement("meta");
+    metaTitle.name = "apple-mobile-web-app-title";
+    metaTitle.content = "NineBall";
+    head.appendChild(metaTitle);
+
+    const linkIcon = document.createElement("link");
+    linkIcon.rel = "apple-touch-icon";
+    linkIcon.href = "images/icon-192.png";
+    head.appendChild(linkIcon);
 })();
