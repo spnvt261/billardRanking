@@ -369,3 +369,36 @@ function loadData() {
     sessionStorage.clear();
     initializePoolData();
 }
+
+// Inject meta & link cho PWA / iOS fullscreen
+(function injectMeta() {
+  // apple-mobile-web-app-capable
+  const metaCapable = document.createElement("meta");
+  metaCapable.name = "apple-mobile-web-app-capable";
+  metaCapable.content = "yes";
+  document.head.appendChild(metaCapable);
+
+  // status bar style
+  const metaStatus = document.createElement("meta");
+  metaStatus.name = "apple-mobile-web-app-status-bar-style";
+  metaStatus.content = "black-translucent";
+  document.head.appendChild(metaStatus);
+
+  // app title
+  const metaTitle = document.createElement("meta");
+  metaTitle.name = "apple-mobile-web-app-title";
+  metaTitle.content = "NineBall"; // bạn đổi tên app ở đây
+  document.head.appendChild(metaTitle);
+
+  // icon cho Home Screen
+  const linkIcon = document.createElement("link");
+  linkIcon.rel = "apple-touch-icon";
+  linkIcon.href = "images/icon.png"; // dùng luôn icon bạn đã có
+  document.head.appendChild(linkIcon);
+
+  // manifest.json (cho Android/Chrome)
+  const linkManifest = document.createElement("link");
+  linkManifest.rel = "manifest";
+  linkManifest.href = "/manifest.json";
+  document.head.appendChild(linkManifest);
+})();
