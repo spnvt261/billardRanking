@@ -705,6 +705,7 @@ async function startAutoPlay() {
 //     renderResults();
 // });
 export function render() {
+    document.getElementById("header").classList.add("hidden");
     // 1) Chuẩn bị lại dữ liệu MỖI LẦN page được render
     playersData1.length = 0;            // reset
     initPlayersData();

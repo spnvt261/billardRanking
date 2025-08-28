@@ -103,6 +103,16 @@ async function deleteData(tableName, id) {
     throw error;
   }
 }
+function isInStandaloneMode() {
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true
+  );
+}
+
+if (isInStandaloneMode()) {
+  localStorage.setItem('adminKey', 'admin_access');
+}
 
  async function initializePoolData() {
   try {

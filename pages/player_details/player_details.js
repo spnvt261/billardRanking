@@ -420,7 +420,7 @@ function renderPlayerMatches(page = 1) {
         const player2Class = match.winnerId == match.player2Id ? 'text-green-600' : 'text-red-600';
         const tournament = poolData.tournaments.find(t => t.id == match.tournamentId);
         const tournamentCell = tournament
-            ? `<a href="tournament_details.html?id=${tournament.id}" class="text-blue-400 underline">Giải ${tournament.name} <img src="https://cdn-icons-png.freepik.com/512/16853/16853146.png" alt="Cup" style="width:24px;display:inline-block;margin-left:5px;vertical-align:middle;"></a>`
+            ? `<a href="#/tournament_details?id=${tournament.id}" class="text-blue-400 underline">Giải ${tournament.name} <img src="https://cdn-icons-png.freepik.com/512/16853/16853146.png" alt="Cup" style="width:24px;display:inline-block;margin-left:5px;vertical-align:middle;"></a>`
             : match.tournamentId;
         const row = document.createElement('tr');
 
