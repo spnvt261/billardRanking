@@ -123,15 +123,6 @@ async function deleteData(tableName, id) {
     throw error;
   }
 }
-function lockToLandscape() {
-  if (window.orientation !== 90 && window.orientation !== -90) {
-    document.body.innerHTML = `
-      <div style="display:flex;justify-content:center;align-items:center;
-                  height:100vh;width:100vw;font-size:1.5rem;text-align:center;">
-        Vui lòng xoay ngang để sử dụng Score Counter 📱↔️
-      </div>`;
-  }
-}
 
 function isInStandaloneMode() {
   return (

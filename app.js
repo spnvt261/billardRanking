@@ -1,10 +1,4 @@
-// app.js
-function isInStandaloneMode() {
-  return (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true
-  );
-}
+
 // app.js (sửa lại phần loadPage)
 async function loadPage(page, queryString) {
   const app = document.getElementById("app");
@@ -24,11 +18,6 @@ async function loadPage(page, queryString) {
       if (header) header.style.display = "none";
       if (footer) footer.style.display = "none";
       app.classList.remove("mt-20");
-      if (isInStandaloneMode()) {
-        // chỉ check orientation khi ở standalone
-        window.addEventListener("orientationchange", lockToLandscape);
-        lockToLandscape();
-      }
       // ✅ Thêm class ép landscape
       document.body.classList.add("landscape-only");
     } else {
