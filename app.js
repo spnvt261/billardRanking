@@ -1,5 +1,10 @@
 // app.js
-
+function isInStandaloneMode() {
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true
+  );
+}
 // app.js (sửa lại phần loadPage)
 async function loadPage(page, queryString) {
   const app = document.getElementById("app");
