@@ -11,22 +11,27 @@ async function loadPage(page, queryString) {
     const res = await fetch(`pages/${page}/${page}.html`);
     if (!res.ok) throw new Error("Page not found");
     app.innerHTML = await res.text();
-    
+
     // ✅ Xử lý full screen cho score_counter
     const header = document.getElementById("header");
     const footer = document.getElementById("footer");
     if (page === "score_counter") {
-       if (header) header.style.display = "none";
-       if (footer) footer.style.display = "none";
+      if (header) header.style.display = "none";
+      if (footer) footer.style.display = "none";
       app.classList.remove("mt-20");
+      if (isInStandaloneMode()) {
+        // chỉ check orientation khi ở standalone
+        window.addEventListener("orientationchange", lockToLandscape);
+        lockToLandscape();
+      }
       // ✅ Thêm class ép landscape
-   document.body.classList.add("landscape-only");
+      document.body.classList.add("landscape-only");
     } else {
       if (header) header.style.display = "block";
       if (footer) footer.style.display = "block";
       app.classList.add("mt-20");
-       // ✅ Xóa class khi ra khỏi score_counter
-   document.body.classList.remove("landscape-only");
+      // ✅ Xóa class khi ra khỏi score_counter
+      document.body.classList.remove("landscape-only");
     }
 
     // Load CSS
@@ -75,7 +80,7 @@ window.addEventListener("poolDataReady", () => {
 });
 
 let score_counter_url = JSON.parse(localStorage.getItem("score_counter_url"))
-if(score_counter_url){
-  window.location.hash=`#/score_counter?id=${score_counter_url}`;
+if (score_counter_url) {
+  window.location.hash = `#/score_counter?id=${score_counter_url}`;
   // console.log(score_counter_url);
 }
