@@ -10,6 +10,50 @@
         }
     }
 }
-.hidden-important{
+
+.hidden-important {
     display: none !important;
+}
+
+body.landscape-only {
+    overflow: hidden;
+    /* ngăn cuộn */
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+}
+
+
+/* Nếu người dùng đang xoay dọc thì hiển thị nhắc xoay ngang */
+@media screen and (orientation: portrait) {
+    body.landscape-only #app {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+
+    }
+    
+
+    /* body.landscape-only #app>* {
+        display: none;
+    }
+
+    body.landscape-only::after {
+        content: "Vui lòng xoay ngang để sử dụng Score Counter 📱↔️";
+        display: block;
+        text-align: center;
+        padding: 2rem;
+    } */
+}
+
+@media screen and (orientation: landscape) and (max-width: 900px) {
+    body.landscape-only #header-inner {
+        padding-bottom: 0;
+        padding-top: 0;
+    }
+    #players-div{
+        flex-direction: row;
+    }
 }

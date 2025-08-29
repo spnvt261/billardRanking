@@ -19,10 +19,14 @@ async function loadPage(page, queryString) {
        if (header) header.style.display = "none";
        if (footer) footer.style.display = "none";
       app.classList.remove("mt-20");
+      // ✅ Thêm class ép landscape
+   document.body.classList.add("landscape-only");
     } else {
       if (header) header.style.display = "block";
       if (footer) footer.style.display = "block";
       app.classList.add("mt-20");
+       // ✅ Xóa class khi ra khỏi score_counter
+   document.body.classList.remove("landscape-only");
     }
 
     // Load CSS

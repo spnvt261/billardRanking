@@ -232,10 +232,10 @@ export async function render({ id }) {
 
     // --- Cooldown 30s ---
     function startCooldown() {
-        // cooldown = true;
-        // setTimeout(() => {
-        //     cooldown = false;
-        // }, 30000);
+        cooldown = true;
+        setTimeout(() => {
+            cooldown = false;
+        }, 30000);
     }
     //View racks history
     document.getElementById("historyBtn").addEventListener("click", () => {
@@ -363,11 +363,10 @@ export async function render({ id }) {
                 window.location.hash = `#/match_history`;
                 return
             }
-
+            endMatch()
+        }else{
+            return
         }
-        endMatch()
-        return
-
     })
     // Nút đóng modal
     document.getElementById("closeResultBtn").addEventListener("click", () => {
