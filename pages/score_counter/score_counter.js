@@ -80,7 +80,7 @@ export async function render({ id }) {
     if (listId.tournamentIdToSave) {
         const tournamentToSave = poolData.tournaments.find(t => t.id === listId.tournamentIdToSave)
         document.getElementById("tournament-name").textContent = tournamentToSave.name;
-        document.getElementById("match-type").classList.remove('hidden') = tournament.name;
+        document.getElementById("match-type").classList.remove('hidden');
         document.getElementById("match-type").textContent = " - " + tournament.name;
     }
     if (!tournament) {
