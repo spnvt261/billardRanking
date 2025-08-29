@@ -16,12 +16,12 @@ async function loadPage(page, queryString) {
     const header = document.getElementById("header");
     const footer = document.getElementById("footer");
     if (page === "score_counter") {
-      header.style.display = "none";
-      footer.style.display = "none";
+       if (header) header.style.display = "none";
+       if (footer) footer.style.display = "none";
       app.classList.remove("mt-20");
     } else {
-      header.style.display = "block";
-      footer.style.display = "block";
+      if (header) header.style.display = "block";
+      if (footer) footer.style.display = "block";
       app.classList.add("mt-20");
     }
 
