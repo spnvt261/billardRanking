@@ -14,7 +14,7 @@ async function loadPage(page, queryString) {
     
     // ✅ Xử lý full screen cho score_counter
     const header = document.getElementById("header");
-    const footer = document.querySelector("footer");
+    const footer = document.getElementById("footer");
     if (page === "score_counter") {
       header.style.display = "none";
       footer.style.display = "none";
