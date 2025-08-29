@@ -1,234 +1,264 @@
 <div class="container mx-auto py-8 p-2">
-        <h2 class="text-3xl font-bold mb-6">Match History</h2>
-        <div class="flex space-x-4 mb-4">
-            <button id="add-match-btn"
-                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 hidden" style="margin-right: .75rem;">+</button>
-            <button id="filter-btn"
-                class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 flex items-center" style="margin-left: 0;">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707v3.586a1 1 0 01-.293.707l-2 2A1 1 0 0110 21v-5.586a1 1 0 00-.293-.707L3.293 8.293A1 1 0 013 7.586V4z">
-                    </path>
-                </svg>
-                Filter
-            </button>
+    <h2 class="text-3xl font-bold mb-6">Match History</h2>
+    <div class="flex space-x-4 mb-4">
+        <button id="add-match-btn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 hidden"
+            style="margin-right: .75rem;">+</button>
+        <button id="filter-btn" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 flex items-center"
+            style="margin-left: 0;">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707v3.586a1 1 0 01-.293.707l-2 2A1 1 0 0110 21v-5.586a1 1 0 00-.293-.707L3.293 8.293A1 1 0 013 7.586V4z">
+                </path>
+            </svg>
+            Filter
+        </button>
+        <button id="score-counter-btn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 hidden"
+            style="margin-left: .75rem;">Score Counter</button>
+    </div>
+    <div id="add-match-form" class="bg-white p-6 rounded-lg shadow-md mb-4 hidden">
+        <h3 id="add-match-form-title" class="text-xl font-semibold mb-4">Add New Match</h3>
+        <div>
+            <!-- <label class="block text-gray-700 mb-2">Loại trận</label> -->
+            <div class="flex space-x-4">
+                <label class="inline-flex items-center">
+                    <input type="radio" name="match-type" id="match-type-singles" value="singles"
+                        class="form-radio text-blue-600" checked>
+                    <span class="ml-2">Đơn</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="radio" name="match-type" id="match-type-doubles" value="doubles"
+                        class="form-radio text-blue-600">
+                    <span class="ml-2">Đôi</span>
+                </label>
+            </div>
         </div>
-        <div id="add-match-form" class="bg-white p-6 rounded-lg shadow-md mb-4 hidden">
-            <h3 class="text-xl font-semibold mb-4">Add New Match</h3>
-            <div>
-                <!-- <label class="block text-gray-700 mb-2">Loại trận</label> -->
-                <div class="flex space-x-4">
-                    <label class="inline-flex items-center">
-                        <input type="radio" name="match-type" id="match-type-singles" value="singles"
-                            class="form-radio text-blue-600" checked>
-                        <span class="ml-2">Đơn</span>
-                    </label>
-                    <label class="inline-flex items-center">
-                        <input type="radio" name="match-type" id="match-type-doubles" value="doubles"
-                            class="form-radio text-blue-600">
-                        <span class="ml-2">Đôi</span>
-                    </label>
-                </div>
-            </div>
-            <div id="singles-form">
-                <div class="space-y-4">
-                    <!-- Chọn loại trận -->
-                    <div>
-                        <label class="block text-gray-700">Loại trận</label>
-                        <select id="singles-match-type" class="w-full p-2 border rounded">
-                            <option value="ban-nuoc" selected>Bàn nước</option>
-                            <option value="keo-tien">Kèo tiền</option>
-                        </select>
-                    </div>
-
-                    <!-- Prize + Point (ẩn mặc định) -->
-                    <div id="keo-tien-fields" class="hidden space-y-4 mb-4 p-4 border border-yellow-500 rounded">
-                        <div>
-                            <div>
-                                <label class="block text-gray-700">Prize</label>
-                                <input id="prize-singles" type="text" min="0" class="w-full p-2 border rounded">
-                            </div>
-                            <div>
-                                <label class="block text-gray-700">Point Receive</label>
-                                <input id="point-receive-singles" type="number" min="0" class="w-full p-2 border rounded">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-gray-700">Player 1</label>
-                        <select id="player1-id" class="w-full p-2 border rounded">
-                            <option value="">Select Player 1</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700">Score 1</label>
-                        <input id="score1" type="number" min="0" class="w-full p-2 border rounded">
-                    </div>
-                    <div>
-                        <label class="block text-gray-700">Player 2</label>
-                        <select id="player2-id" class="w-full p-2 border rounded">
-                            <option value="">Select Player 2</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label id="score2-label" class="block text-gray-700">Score 2</label>
-                        <input id="score2" type="number" min="0" class="w-full p-2 border rounded">
-                    </div>
-                    <button id="save-match-singles"
-                        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save</button>
-                    <button id="cancel-match"
-                        class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
-                </div>
-            </div>
-            <!-- Doubles Form (ẩn ban đầu) -->
-            <div id="doubles-form" class="hidden">
+        <div id="singles-form">
+            <div class="space-y-4">
                 <!-- Chọn loại trận -->
-                    <div class="mb-4">
-                        <label class="block text-gray-700">Loại trận</label>
-                        <select id="doubles-match-type" class="w-full p-2 border rounded">
-                            <option value="ban-nuoc" selected>Bàn nước</option>
-                            <option value="keo-tien">Kèo tiền</option>
-                        </select>
-                    </div>
+                <div>
+                    <label class="block text-gray-700">Loại trận</label>
+                    <select id="singles-match-type" class="w-full p-2 border rounded">
+                        <option value="ban-nuoc" selected>Bàn nước</option>
+                        <option value="keo-tien">Kèo tiền</option>
+                    </select>
+                </div>
 
-                    <!-- Prize + Point (ẩn mặc định) -->
-                    <div id="keo-tien-doubles" class="hidden space-y-4 mb-4 p-4 border border-yellow-500 rounded">
+                <!-- Prize + Point (ẩn mặc định) -->
+                <div id="keo-tien-fields" class="hidden space-y-4 mb-4 p-4 border border-yellow-500 rounded">
+                    <div>
                         <div>
-                            <div>
-                                <label class="block text-gray-700">Prize</label>
-                                <input id="prize-doubles" type="text" min="0" class="w-full p-2 border rounded">
-                            </div>
-                            <!-- <div>
-                                <label class="block text-gray-700">Point Receive</label>
-                                <input id="point-receive-doubles" type="number" min="0" class="w-full p-2 border rounded">
-                            </div> -->
-                        </div>
-                    </div>
-                <div class="mb-4 p-4 border border-blue-500 rounded">
-                    <h4 class="text-lg font-semibold text-blue-600 mb-2">Đội Xanh</h4>
-                    <div class="space-y-2">
-                        <div>
-                            <label class="block text-gray-700">Người chơi 1 (Xanh)</label>
-                            <select id="blue-player1" class="w-full p-2 border rounded">
-                                <option value="">Chọn người chơi</option>
-                            </select>
+                            <label class="block text-gray-700">Prize</label>
+                            <input id="prize-singles" type="text" min="0" class="w-full p-2 border rounded">
                         </div>
                         <div>
-                            <label class="block text-gray-700">Người chơi 2 (Xanh)</label>
-                            <select id="blue-player2" class="w-full p-2 border rounded">
-                                <option value="">Chọn người chơi</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-gray-700">Điểm đội Xanh</label>
-                            <input id="blue-score" type="number" min="0" class="w-full p-2 border rounded">
+                            <label class="block text-gray-700">Point Receive</label>
+                            <input id="point-receive-singles" type="number" min="0" class="w-full p-2 border rounded">
                         </div>
                     </div>
                 </div>
-                <div class="mb-4 p-4 border border-red-500 rounded">
-                    <h4 class="text-lg font-semibold text-red-600 mb-2">Đội Đỏ</h4>
-                    <div class="space-y-2">
-                        <div>
-                            <label class="block text-gray-700">Người chơi 1 (Đỏ)</label>
-                            <select id="red-player1" class="w-full p-2 border rounded">
-                                <option value="">Chọn người chơi</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-gray-700">Người chơi 2 (Đỏ)</label>
-                            <select id="red-player2" class="w-full p-2 border rounded">
-                                <option value="">Chọn người chơi</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label id="red-score-label" class="block text-gray-700">Điểm đội Đỏ</label>
-                            <input id="red-score" type="number" min="0" class="w-full p-2 border rounded">
-                        </div>
-                    </div>
+
+                <div>
+                    <label class="block text-gray-700">Player 1</label>
+                    <select id="player1-id" class="w-full p-2 border rounded">
+                        <option value="">Select Player 1</option>
+                    </select>
                 </div>
-                <button id="save-match-doubles"
-                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save</button>
-                <button id="cancel-match-doubles"
+                <div id="score1-label">
+                    <label class="block text-gray-700">Score 1</label>
+                    <input id="score1" type="number" min="0" class="w-full p-2 border rounded">
+                </div>
+                <div>
+                    <label class="block text-gray-700">Player 2</label>
+                    <select id="player2-id" class="w-full p-2 border rounded">
+                        <option value="">Select Player 2</option>
+                    </select>
+                </div>
+                <div>
+                    <label id="score2-label" class="block text-gray-700">Score 2</label>
+                    <input id="score2" type="number" min="0" class="w-full p-2 border rounded">
+                </div>
+                <button id="save-match-singles"
+                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save</button>
+                <button id="create-counter-singles"
+                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 hidden">Create</button>
+                <button id="cancel-match"
                     class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
             </div>
         </div>
-
-        <div id="filter-form" class="bg-white p-6 rounded-lg shadow-md mb-4 hidden">
-            <h3 class="text-xl font-semibold mb-4">Filter Matches</h3>
-            <div class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-gray-700">Player 1</label>
-                        <select id="filter-player1" class="w-full p-2 border rounded">
-                            <option value="">Any Player</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700">Player 2</label>
-                        <select id="filter-player2" class="w-full p-2 border rounded">
-                            <option value="">Any Player</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-gray-700">Month</label>
-                        <select id="filter-month" class="w-full p-2 border rounded">
-                            <option value="">Any Month</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                            <option value="11">11</option>
-                            <option value="12">12</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700">Year</label>
-                        <select id="filter-year" class="w-full p-2 border rounded">
-                            <option value="">Any Year</option>
-                            <option value="2020">2020</option>
-                            <option value="2021">2021</option>
-                            <option value="2022">2022</option>
-                            <option value="2023">2023</option>
-                            <option value="2024">2024</option>
-                            <option value="2025">2025</option>
-                        </select>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-gray-700">Tournament</label>
-                    <select id="filter-tournament" class="w-full p-2 border rounded">
-                        <option value="">Any Tournament</option>
-                        <option value="Bàn nước">Bàn nước</option>
-                    </select>
-                </div>
-                <button id="apply-filter" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Apply
-                    Filter</button>
-                <button id="clear-filter" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Clear
-                    Filter</button>
+        <!-- Doubles Form (ẩn ban đầu) -->
+        <div id="doubles-form" class="hidden">
+            <!-- Chọn loại trận -->
+            <div class="mb-4">
+                <label class="block text-gray-700">Loại trận</label>
+                <select id="doubles-match-type" class="w-full p-2 border rounded">
+                    <option value="ban-nuoc" selected>Bàn nước</option>
+                    <option value="keo-tien">Kèo tiền</option>
+                </select>
             </div>
-        </div>
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-            <table class="w-full">
-                <thead class="bg-blue-800 text-white">
-                    <tr>
-                        <th class="p-3 text-left">Match</th>
-                        <th class="p-3 text-left">Date</th>
-                        <th class="p-3 text-left">Details</th>
-                    </tr>
-                </thead>
-                <tbody id="history-table"></tbody>
-            </table>
-            <div class="p-3 flex justify-center space-x-2" id="pagination"></div>
+
+            <!-- Prize + Point (ẩn mặc định) -->
+            <div id="keo-tien-doubles" class="hidden space-y-4 mb-4 p-4 border border-yellow-500 rounded">
+                <div>
+                    <div>
+                        <label class="block text-gray-700">Prize</label>
+                        <input id="prize-doubles" type="text" min="0" class="w-full p-2 border rounded">
+                    </div>
+                    <!-- <div>
+                                <label class="block text-gray-700">Point Receive</label>
+                                <input id="point-receive-doubles" type="number" min="0" class="w-full p-2 border rounded">
+                            </div> -->
+                </div>
+            </div>
+            <div class="mb-4 p-4 border border-blue-500 rounded">
+                <h4 class="text-lg font-semibold text-blue-600 mb-2">Đội Xanh</h4>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-gray-700">Người chơi 1 (Xanh)</label>
+                        <select id="blue-player1" class="w-full p-2 border rounded">
+                            <option value="">Chọn người chơi</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">Người chơi 2 (Xanh)</label>
+                        <select id="blue-player2" class="w-full p-2 border rounded">
+                            <option value="">Chọn người chơi</option>
+                        </select>
+                    </div>
+                    <div id="blue-score-label">
+                        <label class="block text-gray-700">Điểm đội Xanh</label>
+                        <input id="blue-score" type="number" min="0" class="w-full p-2 border rounded">
+                    </div>
+                </div>
+            </div>
+            <div class="mb-4 p-4 border border-red-500 rounded">
+                <h4 class="text-lg font-semibold text-red-600 mb-2">Đội Đỏ</h4>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-gray-700">Người chơi 1 (Đỏ)</label>
+                        <select id="red-player1" class="w-full p-2 border rounded">
+                            <option value="">Chọn người chơi</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">Người chơi 2 (Đỏ)</label>
+                        <select id="red-player2" class="w-full p-2 border rounded">
+                            <option value="">Chọn người chơi</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label id="red-score-label" class="block text-gray-700">Điểm đội Đỏ</label>
+                        <input id="red-score" type="number" min="0" class="w-full p-2 border rounded">
+                    </div>
+                </div>
+            </div>
+            <button id="save-match-doubles"
+                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save</button>
+            <button id="create-counter-doubles"
+                class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Create</button>
+            <button id="cancel-match-doubles"
+                class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
         </div>
     </div>
-    <div id="loading" class="text-center text-gray-600 hidden">Loading...</div>
+
+    <div id="filter-form" class="bg-white p-6 rounded-lg shadow-md mb-4 hidden">
+        <h3 class="text-xl font-semibold mb-4">Filter Matches</h3>
+        <div class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700">Player 1</label>
+                    <select id="filter-player1" class="w-full p-2 border rounded">
+                        <option value="">Any Player</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Player 2</label>
+                    <select id="filter-player2" class="w-full p-2 border rounded">
+                        <option value="">Any Player</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700">Month</label>
+                    <select id="filter-month" class="w-full p-2 border rounded">
+                        <option value="">Any Month</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Year</label>
+                    <select id="filter-year" class="w-full p-2 border rounded">
+                        <option value="">Any Year</option>
+                        <option value="2020">2020</option>
+                        <option value="2021">2021</option>
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-gray-700">Tournament</label>
+                <select id="filter-tournament" class="w-full p-2 border rounded">
+                    <option value="">Any Tournament</option>
+                    <option value="Bàn nước">Bàn nước</option>
+                </select>
+            </div>
+            <button id="apply-filter" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Apply
+                Filter</button>
+            <button id="clear-filter" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Clear
+                Filter</button>
+        </div>
+    </div>
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="w-full">
+            <thead class="bg-blue-800 text-white">
+                <tr>
+                    <th class="p-3 text-left">Match</th>
+                    <th class="p-3 text-left">Date</th>
+                    <th class="p-3 text-left">Details</th>
+                </tr>
+            </thead>
+            <tbody id="history-table"></tbody>
+        </table>
+        <div class="p-3 flex justify-center space-x-2" id="pagination"></div>
+    </div>
+</div>
+<div id="loading" class="text-center text-gray-600 hidden">Loading...</div>
+<!-- Popup History -->
+<div id="historyModal"
+    class="racks-result-history fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg shadow-lg w-96 max-h-[80vh] overflow-y-auto">
+        <div class="flex justify-between items-center border-b px-4 py-2">
+            <h2 class="text-lg font-bold">History</h2>
+            <button id="closeHistory" class="text-gray-500 hover:text-gray-700">&times;</button>
+        </div>
+        <div class="p-4">
+            <table class="w-full border text-sm text-center">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="border px-2 py-1">Rack</th>
+                        <th class="border px-2 py-1">Winner</th>
+                        <th class="border px-2 py-1">Note</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <!-- Render JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -11,7 +11,7 @@ export function render({ id }) {
 
     // Lấy ID giải đấu từ URL
     // const urlParams = new URLSearchParams(window.location.search);
-    
+
     // console.log(poolData);
 
     const adminKey = localStorage.getItem("adminKey");
@@ -75,20 +75,10 @@ export function render({ id }) {
             }
         }
 
-        // Xử lý nút kết thúc giải
-        document.getElementById('end-tournament-btn').addEventListener('click', async () => {
-            if (!tournament.top1Id || !tournament.top2Id) {
-                alert('Cannot end tournament: Both Top 1 and Top 2 players must be selected.');
-                return;
-            }
-            const champion = poolData.players.find(player => player.id === tournament.top1Id) || 'Chưa chọn';
-            const runnerUp = poolData.players.find(player => player.id === tournament.top2Id) || 'Chưa chọn';
-
-            // Hiển thị thông báo xác nhận
-            if (!confirm(`Bạn có chắc chắn muốn kết thúc giải đấu với người vô địch là ${champion.name} và á quân là ${runnerUp.name}?`)) {
-                return;
-            }
+        async function endTournament(champion,runnerUp){
             tournament.status = 'Đã kết thúc';
+            document.getElementById('tournament-status').classList.remove('ongoing');
+            document.getElementById('tournament-status').classList.add('finished');
             document.getElementById('tournament-status').textContent = tournament.status;
             addMatchBtn.classList.add('hidden');
             addPlayerBtn.classList.add('hidden');
@@ -124,11 +114,27 @@ export function render({ id }) {
 
 
                 // Làm mới dữ liệu
-                await initializePoolData();
+                // await initializePoolData();
             } catch (error) {
                 console.error('Error ending tournament:', error);
                 alert('Failed to end tournament. Please try again.');
             }
+        }
+
+        // Xử lý nút kết thúc giải
+        document.getElementById('end-tournament-btn').addEventListener('click', async () => {
+            if (!tournament.top1Id || !tournament.top2Id) {
+                alert('Cannot end tournament: Both Top 1 and Top 2 players must be selected.');
+                return;
+            }
+            const champion = poolData.players.find(player => player.id === tournament.top1Id) || 'Chưa chọn';
+            const runnerUp = poolData.players.find(player => player.id === tournament.top2Id) || 'Chưa chọn';
+
+            // Hiển thị thông báo xác nhận
+            if (!confirm(`Bạn có chắc chắn muốn kết thúc giải đấu với người vô địch là ${champion.name} và á quân là ${runnerUp.name}?`)) {
+                return;
+            }
+            endTournament(champion,runnerUp)
 
         });
 
@@ -332,8 +338,22 @@ export function render({ id }) {
                 alert('Scores cannot be equal. Please ensure one player has a higher score.');
                 return;
             }
-            if (!confirm(`Bạn có chắc chắn kết quả là [ ${player1name} ${score1} - ${score2} ${player2name} ]là chính xác?`)) {
-                return;
+            const winnerId = parseInt(score1) > parseInt(score2) ? player1Id : player2Id;
+            tournament.top1Id = winnerId;
+            tournament.top2Id = player1Id == winnerId?player2Id :player1Id 
+            const championUp = poolData.players.find(u => u.id === tournament.top1Id);
+            const runnerUp = poolData.players.find(u => u.id === tournament.top1Id);
+            // console.log(winnerId,player1Id,player2Id);
+            if (matchType == "Chung kết") {
+                if (confirm(`Chung kết tỉ số [ ${player1name} ${score1} - ${score2} ${player2name} ] và người vô địch là ${championUp.name} ?`)) {
+                    // console.log(tournament);
+                    renderPlayerRankings(tournament);
+                    endTournament(championUp,runnerUp);
+                }
+            } else {
+                if (!confirm(`Bạn có chắc chắn kết quả là [ ${player1name} ${score1} - ${score2} ${player2name} ]là chính xác?`)) {
+                    return;
+                }
             }
 
 
@@ -346,7 +366,6 @@ export function render({ id }) {
             // }
 
             // Xác định winnerId dựa trên tỉ số
-            const winnerId = parseInt(score1) > parseInt(score2) ? player1Id : player2Id;
             const maxId = poolData.matchHistory.length > 0
                 ? Math.max(...poolData.matchHistory.map(item => parseInt(item.id, 10))) + 1
                 : 1; // Nếu mảng rỗng, bắt đầu từ 1

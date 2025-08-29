@@ -1,0 +1,150 @@
+ /* ---------------- Fire Background Animations ---------------- */
+ @keyframes fireBackground {
+     0% {
+         background: linear-gradient(180deg, #ff4500, #ffa500, #ffff00, #ffffff);
+         background-size: 100% 300%;
+         background-position: 0% 0%;
+     }
+
+     50% {
+         background: linear-gradient(180deg, #ff0000, #ff4500, #ffa500, #ffff00);
+         background-size: 100% 400%;
+         background-position: 0% 50%;
+     }
+
+     100% {
+         background: linear-gradient(180deg, #ffffff, #ffff00, #ffa500, #ff4500);
+         background-size: 100% 300%;
+         background-position: 0% 100%;
+     }
+ }
+
+ @keyframes fireBackgroundRed {
+     0% {
+         background: linear-gradient(180deg, #ff0000, #ff3333, #ff6666, #ffffff);
+         background-size: 100% 300%;
+         background-position: 0% 0%;
+     }
+
+     50% {
+         background: linear-gradient(180deg, #cc0000, #ff1a1a, #ff4d4d, #ff9999);
+         background-size: 100% 400%;
+         background-position: 0% 50%;
+     }
+
+     100% {
+         background: linear-gradient(180deg, #ffffff, #ff6666, #ff3333, #cc0000);
+         background-size: 100% 300%;
+         background-position: 0% 100%;
+     }
+ }
+
+
+
+ @keyframes fireBackgroundBlue {
+     0% {
+         background: linear-gradient(180deg, #1e3a8a, #2563eb, #3b82f6, #93c5fd);
+         background-size: 100% 300%;
+         background-position: 0% 0%;
+     }
+
+     50% {
+         background: linear-gradient(180deg, #1e40af, #1d4ed8, #2563eb, #60a5fa);
+         background-size: 100% 400%;
+         background-position: 0% 50%;
+     }
+
+     100% {
+         background: linear-gradient(180deg, #93c5fd, #60a5fa, #2563eb, #1e3a8a);
+         background-size: 100% 300%;
+         background-position: 0% 100%;
+     }
+ }
+
+ /* ---------------- FIRE ANIMATIONS ---------------- */
+ @keyframes fireGlowBlue {
+     0% {
+         box-shadow: 0 0 10px #3b82f6, 0 0 20px #60a5fa, 0 0 30px #93c5fd;
+     }
+
+     50% {
+         box-shadow: 0 0 15px #2563eb, 0 0 25px #3b82f6, 0 0 40px #60a5fa;
+     }
+
+     100% {
+         box-shadow: 0 0 10px #3b82f6, 0 0 20px #60a5fa, 0 0 30px #93c5fd;
+     }
+ }
+
+ @keyframes fireGlowRed {
+     0% {
+         box-shadow: 0 0 10px #ef4444, 0 0 20px #f87171, 0 0 30px #fca5a5;
+     }
+
+     50% {
+         box-shadow: 0 0 15px #dc2626, 0 0 25px #ef4444, 0 0 40px #f87171;
+     }
+
+     100% {
+         box-shadow: 0 0 10px #ef4444, 0 0 20px #f87171, 0 0 30px #fca5a5;
+     }
+ }
+
+ @keyframes smoke {
+     0% {
+         transform: translateY(0) scale(1);
+         opacity: 0.3;
+     }
+
+     100% {
+         transform: translateY(-20px) scale(1.3);
+         opacity: 0;
+     }
+ }
+
+ /* ---------------- FIRE CLASSES ---------------- */
+ .fire-blue {
+     animation: fireBackgroundBlue 2s ease-in-out infinite, fireGlowBlue 1.5s ease-in-out infinite;
+ }
+
+ .fire-red {
+     animation: fireBackgroundRed 2s ease-in-out infinite, fireGlowRed 1.5s ease-in-out infinite;
+ }
+
+ .fire {
+     animation: fireBackground 2s ease-in-out infinite, fireGlowRed 1.5s ease-in-out infinite;
+ }
+
+ /* Glow xanh cho chữ */
+ .text-fire-blue {
+     text-shadow:
+         0 0 6px #1e40af,
+         /* blue-800 */
+         0 0 12px #1e3a8a,
+         /* blue-900 */
+         0 0 18px #1d4ed8 !important;
+     color: #4d7cff;
+ }
+
+ /* Glow đỏ cho chữ */
+ .text-fire-red {
+     text-shadow:
+         0 0 6px #991b1b,
+         /* red-900 */
+         0 0 12px #7f1d1d,
+         /* red-800 */
+         0 0 18px #dc2626 !important;
+     /* red-700 */
+     color: rgb(250, 65, 65);
+ }
+
+ .player-content {
+     position: relative;
+     z-index: 1;
+ }
+
+ @media (max-width: 600px) {
+     .span-text-hide-moblie {
+         display: none;
+     }
+ }

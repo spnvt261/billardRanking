@@ -10,14 +10,14 @@
 const adminKey = localStorage.getItem("adminKey");
 
 // API config
-const API_BASE_URL = "https://tabfpepqvdcecwnewpfx.supabase.co/rest/v1/";
-const PUBLISHABLE_KEY = "sb_publishable__7iV7NXURl8Jo9GKORvoFg_3N1Mvs4G";
-const SECRET_KEY ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhYmZwZXBxdmRjZWN3bmV3cGZ4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDY4NDg0MywiZXhwIjoyMDcwMjYwODQzfQ.bIsr5yGL7DEbBoDHxDeuZssIv1FKVDcHvVGxK9peODs";
+// const API_BASE_URL = "https://tabfpepqvdcecwnewpfx.supabase.co/rest/v1/";
+// const PUBLISHABLE_KEY = "sb_publishable__7iV7NXURl8Jo9GKORvoFg_3N1Mvs4G";
+// const SECRET_KEY ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhYmZwZXBxdmRjZWN3bmV3cGZ4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDY4NDg0MywiZXhwIjoyMDcwMjYwODQzfQ.bIsr5yGL7DEbBoDHxDeuZssIv1FKVDcHvVGxK9peODs";
 
 // test sever
-// const API_BASE_URL = 'https://sjrexafyojloinbbraye.supabase.co/rest/v1/';
-// const PUBLISHABLE_KEY = 'sb_publishable_f_OIbYVcEvNY2AbbmuArGg_onyUF8aR';
-// const SECRET_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcmV4YWZ5b2psb2luYmJyYXllIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDczMDQ1NywiZXhwIjoyMDcwMzA2NDU3fQ.tvWitEsTEAArKFT1byvNZ7wiO4j8TfHTl58ou_j042w';
+const API_BASE_URL = 'https://sjrexafyojloinbbraye.supabase.co/rest/v1/';
+const PUBLISHABLE_KEY = 'sb_publishable_f_OIbYVcEvNY2AbbmuArGg_onyUF8aR';
+const SECRET_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcmV4YWZ5b2psb2luYmJyYXllIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDczMDQ1NywiZXhwIjoyMDcwMzA2NDU3fQ.tvWitEsTEAArKFT1byvNZ7wiO4j8TfHTl58ou_j042w';
 
 // ---------- API helpers ----------
 async function fetchData(tableName) {
@@ -41,7 +41,9 @@ async function fetchData(tableName) {
 }
 
 async function createData(tableName, data) {
-  try {
+  let attempt = 0;
+  let maxRetries = 20;
+  while (attempt < maxRetries) {
     const response = await fetch(`${API_BASE_URL}${tableName}`, {
       method: "POST",
       headers: {
@@ -52,15 +54,33 @@ async function createData(tableName, data) {
       },
       body: JSON.stringify(data),
     });
-    if (!response.ok) {
-      throw new Error(`Failed to create ${tableName}: ${response.statusText}`);
+
+    if (response.ok) {
+      return await response.json(); // thành công
     }
-    return await response.json();
-  } catch (error) {
-    console.error(`Error creating ${tableName}:`, error);
-    throw error;
+
+    if (response.status === 409) {
+      // Lỗi trùng khóa chính → tăng id rồi thử lại
+      console.warn(
+        `Conflict detected for id=${data.id}, trying with id=${parseInt(data.id, 10) + 1}`
+      );
+      data.id = String(parseInt(data.id, 10) + 1);
+      attempt++;
+      continue;
+    }
+
+    // Nếu là lỗi khác (không phải 409) thì dừng luôn
+    const errorText = await response.text();
+    throw new Error(
+      `Failed to create ${tableName}: ${response.status} ${response.statusText} - ${errorText}`
+    );
   }
+
+  throw new Error(
+    `Failed to create ${tableName} after ${maxRetries} retries due to conflicts.`
+  );
 }
+
 
 async function updateData(tableName, id, data) {
   try {
@@ -191,8 +211,10 @@ async function addPlayerPoints(playerId, score, tournamentId, matchId) {
 function checkAdminAccess() {
   if (adminKey) {
     document.getElementById("add-match-btn")?.classList.remove("hidden");
+    document.getElementById("score-counter-btn")?.classList.remove("hidden");
     document.getElementById("add-player-btn")?.classList.remove("hidden");
     document.getElementById("add-tournament-btn")?.classList.remove("hidden");
+
     document.getElementById("add-action-section")?.classList.remove("hidden");
     document.getElementById("edit-point")?.classList.remove("hidden");
     document.getElementById("finish-rack")?.classList.remove("hidden");

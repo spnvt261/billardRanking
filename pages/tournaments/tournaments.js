@@ -90,8 +90,10 @@ async function renderTournaments() {
             return;
         }
 
-        // Sắp xếp giải mới nhất trước
-        const sortedTournaments = [...poolData.tournaments].sort((a, b) => b.id - a.id);
+        // Lọc chỉ lấy id < 1000 rồi sắp xếp giải mới nhất trước
+        const sortedTournaments = poolData.tournaments
+            .filter(t => parseInt(t.id, 10) < 1000)
+            .sort((a, b) => b.id - a.id);
 
         // Tính phân trang
         const totalPages = Math.ceil(sortedTournaments.length / pageSize);
@@ -116,8 +118,8 @@ async function renderTournaments() {
                 <h3 class="text-xl font-semibold mb-2">
                     ${tournament.name} 
                     ${tournament.name !== 'Đền'
-                        ? `<img src="https://cdn-icons-png.freepik.com/512/16853/16853146.png" alt="Cup" style="width:24px;display:inline-block;margin-left:5px;vertical-align:middle;">`
-                        : `(${playerNames})`}
+                    ? `<img src="https://cdn-icons-png.freepik.com/512/16853/16853146.png" alt="Cup" style="width:24px;display:inline-block;margin-left:5px;vertical-align:middle;">`
+                    : `(${playerNames})`}
                     <span style="${tournament.status === 'Đang diễn ra' ? 'color: green' : 'display:none'}">
                         ${tournament.status}
                     </span>
@@ -144,10 +146,9 @@ async function renderTournaments() {
             const btn = document.createElement('button');
             btn.textContent = i;
             btn.className =
-                `px-3 py-1 border rounded mx-1 ${
-                    i === currentPage
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-200 hover:bg-gray-300'
+                `px-3 py-1 border rounded mx-1 ${i === currentPage
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 hover:bg-gray-300'
                 }`;
             btn.addEventListener('click', () => {
                 currentPage = i;
@@ -261,9 +262,13 @@ export function render() {
         }
 
         // Tạo giải đấu mới
-        const maxId = poolData.tournaments.length > 0
-            ? Math.max(...poolData.tournaments.map(item => parseInt(item.id, 10))) + 1
-            : 1; // Nếu mảng rỗng, bắt đầu từ 1
+        const validIds = poolData.tournaments
+            .map(item => parseInt(item.id, 10))
+            .filter(id => !isNaN(id) && id < 1000);
+
+        const maxId = validIds.length > 0
+            ? Math.max(...validIds) + 1
+            : 1; // Nếu mảng rỗng thì bắt đầu từ 1
         const newTournament = {
             id: String(maxId),
             name,

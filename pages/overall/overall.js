@@ -280,7 +280,7 @@ function updatePlayersTournamentStats(playersData, poolData) {
         let finals = 0;
         let champions = 0;
 
-        poolData.tournaments.forEach(t => {
+        poolData.tournaments.filter(t => t.tournamentId > 0 && t.tournamentId < 1000).forEach(t => {
             // Bỏ qua giải có tên chứa "Đền"
             if (t.name.includes("Đền")) return;
 
@@ -522,7 +522,7 @@ function renderResults() {
     // Xóa slideshow + skip button
     document.getElementById("slideshow").remove();
     document.getElementById("skip-btn").remove();
-    document.getElementById("header").classList.remove("hidden");
+    document.getElementById("header").classList.remove("hidden-important");
 
     document.getElementById("chart").classList.remove("hidden");
     renderAllPlayersChart();
@@ -695,7 +695,7 @@ function renderResults() {
 
 async function startAutoPlay() {
 
-    document.getElementById("header").classList.add("hidden");
+    document.getElementById("header").classList.add("hidden-important");
     next();
     autoPlay = setInterval(next, SLIDE_DURATION);
 }
@@ -705,7 +705,7 @@ async function startAutoPlay() {
 //     renderResults();
 // });
 export function render() {
-    document.getElementById("header").classList.add("hidden");
+    document.getElementById("header").classList.add("hidden-important");
     // 1) Chuẩn bị lại dữ liệu MỖI LẦN page được render
     playersData1.length = 0;            // reset
     initPlayersData();
