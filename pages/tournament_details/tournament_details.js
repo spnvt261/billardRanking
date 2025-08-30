@@ -716,10 +716,11 @@ export function render({ id }) {
     }
     function renderRackHistoryChart(tournamentId) {
         // Lọc history theo tournament
-        const history = history_points_den
+        const history = poolData.history_points_den
             .filter(h => h.tournamentId === tournamentId)
             .sort((a, b) => a.racks - b.racks);
-
+        // console.log(poolData.history_points_den);
+        
         if (history.length === 0) {
             document.getElementById("div-rack-history-chart").classList.add("hidden")
             return;

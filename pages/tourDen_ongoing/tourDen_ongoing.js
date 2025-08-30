@@ -19,7 +19,7 @@ export function render({ id }) {
     }
     document.getElementById("tournament-title").innerText = tournament.name + " - " + tournament.date;
     // document.getElementById("date-span").textContent = toString(tournament.date);
-    
+
 
     // Lấy danh sách player
     let listPlayers = poolData.players.filter(p => tournament.players.includes(p.id));
@@ -33,6 +33,39 @@ export function render({ id }) {
         "#33FF57", // Xanh lá sáng
         "#34495E"  // Xám xanh đậm
     ];
+
+    const btn = document.getElementById('point-config-btn');
+    const cfg = document.getElementById('point-config');
+    const icon = document.getElementById('point-config-icon');
+    const editPoint = document.getElementById('edit-point');
+
+    if (!btn || !cfg) return;
+
+    btn.addEventListener('click', () => {
+        const isHidden = cfg.classList.toggle('hidden'); // true nếu ẩn sau toggle
+        // Trạng thái aria
+        btn.setAttribute('aria-expanded', String(!isHidden));
+        cfg.setAttribute('aria-hidden', String(isHidden));
+
+        // Xoay icon khi mở
+        if (!isHidden) {
+            icon.classList.add('rotate-90');
+            // hiển thị phần edit-point khi mở (nếu muốn show luôn)
+            editPoint.classList.remove('hidden');
+        } else {
+            icon.classList.remove('rotate-90');
+            // ẩn phần edit-point khi đóng (giữ hành vi ban đầu)
+            editPoint.classList.add('hidden');
+        }
+    });
+
+    // Tắt form lúc load (đảm bảo trạng thái đồng bộ nếu JS chạy sau server-side)
+    window.addEventListener('DOMContentLoaded', () => {
+        cfg.classList.add('hidden');
+        btn.setAttribute('aria-expanded', 'false');
+        cfg.setAttribute('aria-hidden', 'true');
+        editPoint.classList.add('hidden');
+    });
 
     // Khởi tạo bảng điểm
     let scores = listPlayers.map((p, index) => {
@@ -249,6 +282,9 @@ export function render({ id }) {
         updateTableValues();
         renderCurrentActions();
     }
+    // Gắn global để onclick gọi được
+    window.renderCurrentActions = renderCurrentActions;
+    window.removeAction = removeAction;
     renderCurrentActions();
 
     // Nút thêm hành động
@@ -286,9 +322,9 @@ export function render({ id }) {
 
         updateTableValues();
         renderCurrentActions();
-        document.getElementById("player1").value = "";
-        document.getElementById("player2").value = "";
-        document.getElementById("ball-type").value = "3";
+        document.getElementById("player1").value = player1Id;
+        document.getElementById("player2").value = player2Id;
+        document.getElementById("ball-type").value = ball;
     });
 
     let maxRack = history_points_den
@@ -531,7 +567,7 @@ export function render({ id }) {
         try {
             // Cập nhật dữ liệu giải đấu
             await updateData('tournaments', tournament.id, newTournament);
-            tournament.status="Đã kết thúc"
+            tournament.status = "Đã kết thúc"
             // poolData.tournaments[tournament.id-1].status = "Đã kết thúc";
             // console.log(poolData.tournaments[tournament.id-1].status);
 
@@ -556,7 +592,7 @@ export function render({ id }) {
             }
             // Làm mới dữ liệu
             // console.log(1);
-            
+
             window.location.hash = `#/tournament_details?id=${tournament.id}`;
         } catch (error) {
             console.error('Error ending tournament:', error);

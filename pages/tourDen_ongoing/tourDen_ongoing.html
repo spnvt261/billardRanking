@@ -1,111 +1,126 @@
 <!-- Nội dung -->
-    <div class="container mx-auto py-8 p-2">
-        <div class="flex items-center gap-4">
-            <h2 id="tournament-title" class="text-3xl font-bold mb-6">Đền <span id="date-span"></span></h2>
-            <div id="end-tournament-section" class="mb-4">
-                <button id="end-tournament-btn"
-                    class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">End
+<div class="container mx-auto py-8 p-2 ">
+    <div class="flex items-center justify-between gap-4 mb-4">
+        <h2 id="tournament-title" class="text-3xl font-bold">Đền <span id="date-span"></span></h2>
+        <!-- Nút settings (đặt ở nơi bạn muốn xuất hiện) -->
+        <div class="flex items-center ">
+            <button id="point-config-btn" aria-controls="point-config" aria-expanded="false" title="Cấu hình điểm"
+                class="flex items-center  prounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <!-- SVG gear -->
+                <svg id="point-config-icon" xmlns="http://www.w3.org/2000/svg"
+                    class="h-8 w-8 transition-transform duration-200" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                    aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.89 3.38.947 2.49 2.49a1.724 1.724 0 0 0 1.065 2.573c1.757.426 1.757 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.89 1.543-.947 3.38-2.49 2.49a1.724 1.724 0 0 0-2.573 1.065c-.426 1.757-2.924 1.757-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.89-3.38-.947-2.49-2.49a1.724 1.724 0 0 0-1.065-2.573c-1.757-.426-1.757-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.89-1.543.947-3.38 2.49-2.49.996.574 2.237.096 2.573-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                </svg>
+
+            </button>
+        </div>
+    </div>
+
+
+    <!-- Config điểm (ẩn mặc định) -->
+    <div id="point-config" class="shadow-md rounded-lg p-4 mb-6 hidden" aria-hidden="true">
+        <h3 class="text-xl font-bold mb-4">Cấu hình điểm</h3>
+        <div class="grid grid-cols-3 gap-4 mb-4">
+            <div>
+                <label for="point-3" class="block mb-1 font-medium">Điểm con 3:</label>
+                <input id="point-3" type="number" value="1" class="p-2 border rounded w-full">
+            </div>
+            <div>
+                <label for="point-6" class="block mb-1 font-medium">Điểm con 6:</label>
+                <input id="point-6" type="number" value="2" class="p-2 border rounded w-full">
+            </div>
+            <div>
+                <label for="point-9" class="block mb-1 font-medium">Điểm con 9:</label>
+                <input id="point-9" type="number" value="3" class="p-2 border rounded w-full">
+            </div>
+        </div>
+        <div id="edit-point" class="flex gap-4 hidden">
+            <button id="save-config" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save</button>
+            <button id="edit-config"
+                class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 hidden">Edit</button>
+            <div id="end-tournament-section" class="">
+                <button id="end-tournament-btn" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">End
                     Tournament</button>
             </div>
         </div>
+    </div>
+    <!-- Bảng điểm -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden mb-6">
+        <table id="main-table" class="w-full">
+            <thead class="bg-blue-800 text-white">
+                <tr>
+                    <th class="p-3 ">Player</th>
+                    <th class="p-3 ">Điểm Cũ</th>
+                    <th class="p-3 ">Điểm trận này (Rack <span id="current-rack"></span>)</th>
+                    <th id="sort-current" class="p-3 cursor-pointer">
+                        Hiện tại
+                        <span id="sort-icon" class="inline-block ml-1">↓</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="score-table"></tbody>
+        </table>
+    </div>
 
-        <!-- Config điểm -->
-        <div id="point-config" class=" shadow-md rounded-lg p-4 mb-6">
-            <h3 class="text-xl font-bold mb-4">Cấu hình điểm</h3>
-            <div class="grid grid-cols-3 gap-4 mb-4">
-                <div>
-                    <label for="point-3" class="block mb-1 font-medium">Điểm con 3:</label>
-                    <input id="point-3" type="number" value="1" class="p-2 border rounded w-full">
-                </div>
-                <div>
-                    <label for="point-6" class="block mb-1 font-medium">Điểm con 6:</label>
-                    <input id="point-6" type="number" value="2" class="p-2 border rounded w-full">
-                </div>
-                <div>
-                    <label for="point-9" class="block mb-1 font-medium">Điểm con 9:</label>
-                    <input id="point-9" type="number" value="3" class="p-2 border rounded w-full">
-                </div>
-            </div>
-            <div id="edit-point" class="flex gap-4 hidden">
-                <button id="save-config"
-                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save</button>
-                <button id="edit-config"
-                    class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 hidden">Edit</button>
-            </div>
+    <!-- Chọn ai ăn -->
+    <div id="add-action-section" class="bg-white shadow-md rounded-lg p-6 mb-6 hidden">
+        <div class="flex flex-wrap gap-4 mb-4">
+            <select id="player1" class="p-2 border rounded">
+                <option value="">Player1</option>
+            </select>
+            <select id="ball-type" class="p-2 border rounded">
+                <option value="3">Ăn 3 của</option>
+                <option value="6">Ăn 6 của</option>
+                <option value="9">Ăn 9 của</option>
+            </select>
+            <select id="player2" class="p-2 border rounded">
+                <option value="">Player2</option>
+            </select>
+            <button id="add-action" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                Xác nhận
+            </button>
         </div>
-        <!-- Bảng điểm -->
-        <div class="bg-white shadow-md rounded-lg overflow-hidden mb-6">
-            <table id="main-table" class="w-full">
-                <thead class="bg-blue-800 text-white">
-                    <tr>
-                        <th class="p-3 ">Player</th>
-                        <th class="p-3 ">Điểm Cũ</th>
-                        <th class="p-3 ">Điểm trận này (Rack <span id="current-rack"></span>)</th>
-                        <th id="sort-current" class="p-3 cursor-pointer">
-                            Hiện tại
-                            <span id="sort-icon" class="inline-block ml-1">↓</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody id="score-table"></tbody>
-            </table>
-        </div>
+    </div>
 
-        <!-- Chọn ai ăn -->
-        <div id="add-action-section" class="bg-white shadow-md rounded-lg p-6 mb-6 hidden">
-            <div class="flex flex-wrap gap-4 mb-4">
-                <select id="player1" class="p-2 border rounded">
-                    <option value="">Player1</option>
-                </select>
-                <select id="ball-type" class="p-2 border rounded">
-                    <option value="3">Ăn 3 của</option>
-                    <option value="6">Ăn 6 của</option>
-                    <option value="9">Ăn 9 của</option>
-                </select>
-                <select id="player2" class="p-2 border rounded">
-                    <option value="">Player2</option>
-                </select>
-                <button id="add-action" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-                    Xác nhận
-                </button>
-            </div>
-        </div>
-
-        <!-- Lịch sử trong ván -->
-        <div class="bg-white shadow-md rounded-lg overflow-hidden mb-6">
-            <h3 id="history-title" class="text-xl font-bold p-3 bg-gray-200">Các hành động trong ván này (Rack <span
-                    id="current-rack-2"></span>)</h3>
-            <table class="w-full">
-                <thead class="bg-blue-800 text-white">
-                    <tr>
-                        <th class="p-2 text-left">#</th>
-                        <!-- <th class="p-2 text-left">Racks</th>
+    <!-- Lịch sử trong ván -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden mb-6">
+        <h3 id="history-title" class="text-xl font-bold p-3 bg-gray-200">Các hành động trong ván này (Rack <span
+                id="current-rack-2"></span>)</h3>
+        <table class="w-full">
+            <thead class="bg-blue-800 text-white">
+                <tr>
+                    <th class="p-2 text-left">#</th>
+                    <!-- <th class="p-2 text-left">Racks</th>
                         <th class="p-2 text-left">Người bị ăn</th> -->
-                        <th class="p-2 text-left">Mô tả</th>
-                        <th class="p-2 text-left">Edit</th>
-                    </tr>
-                </thead>
-                <tbody id="current-actions"></tbody>
-            </table>
-        </div>
+                    <th class="p-2 text-left">Mô tả</th>
+                    <th class="p-2 text-left">Edit</th>
+                </tr>
+            </thead>
+            <tbody id="current-actions"></tbody>
+        </table>
+    </div>
 
-        <!-- Nút kết thúc rack -->
-        <button id="finish-rack" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 hidden">Kết thúc
-            Rack</button>
-        <!-- Biểu đồ lịch sử theo rack -->
-        <div id="div-rack-history-chart" class="bg-white shadow-md rounded-lg mt-6 p-4 h-96">
-            <canvas id="rack-history-chart"></canvas>
-        </div>
+    <!-- Nút kết thúc rack -->
+    <button id="finish-rack" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 hidden">Kết thúc
+        Rack</button>
+    <!-- Biểu đồ lịch sử theo rack -->
+    <div id="div-rack-history-chart" class="bg-white shadow-md rounded-lg mt-6 p-4 h-96">
+        <canvas id="rack-history-chart"></canvas>
+    </div>
 
-        <!-- Bảng lịch sử racks -->
-        <div class="bg-white shadow-md rounded-lg overflow-hidden mt-6">
-            <h3 id="history-title" class="text-xl font-bold p-3 bg-gray-200">Lịch sử các Racks</h3>
-            <table class="w-full">
-                <thead class="bg-blue-800 text-white" id="history-head"></thead>
-                <tbody id="history-body"></tbody>
-            </table>
-            <div id="history-pagination" class="flex justify-center gap-2 p-3"></div>
-
-        </div>
+    <!-- Bảng lịch sử racks -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden mt-6">
+        <h3 id="history-title" class="text-xl font-bold p-3 bg-gray-200">Lịch sử các Racks</h3>
+        <table class="w-full">
+            <thead class="bg-blue-800 text-white" id="history-head"></thead>
+            <tbody id="history-body"></tbody>
+        </table>
+        <div id="history-pagination" class="flex justify-center gap-2 p-3"></div>
 
     </div>
+
+</div>

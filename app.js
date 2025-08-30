@@ -1,17 +1,3 @@
-
-function animateApp() {
-  const app = document.getElementById("app");
-  if (!app) return;
-
-  // Reset animation
-  app.classList.remove("fade-in");
-
-  // Ép browser reflow để reset (trick)
-  void app.offsetWidth;
-
-  // Thêm lại class cho animation chạy
-  app.classList.add("fade-in");
-}
 // app.js (sửa lại phần loadPage)
 async function loadPage(page, queryString) {
   const app = document.getElementById("app");
@@ -20,11 +6,21 @@ async function loadPage(page, queryString) {
 
   try {
     // Load HTML
+    app.innerHTML = `
+      <div class="flex flex-col items-center justify-center py-12">
+        <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <p class="mt-4 text-gray-600 font-medium">Loading...</p>
+      </div>
+    `;
+
+    // Chờ 0.5s để spinner hiển thị rõ ràng
+    const delay = Math.floor(Math.random() * 300) + 1;
+    await new Promise(resolve => setTimeout(resolve, delay));
     const res = await fetch(`pages/${page}/${page}.html`);
     if (!res.ok) throw new Error("Page not found");
     app.innerHTML = await res.text();
 
-    
+
 
 
     // ✅ Xử lý full screen cho score_counter
@@ -161,3 +157,4 @@ if (score_counter_url) {
   window.location.hash = `#/score_counter?id=${score_counter_url}`;
   // console.log(score_counter_url);
 }
+

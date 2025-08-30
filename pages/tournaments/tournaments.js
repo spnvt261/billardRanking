@@ -221,6 +221,7 @@ export function render() {
         document.getElementById('selected-players').innerHTML = '';
         populatePlayerSelect();
         document.getElementById('add-tournament-form').classList.remove('hidden');
+        document.body.classList.add('overflow-hidden'); // chặn scroll
     });
 
     document.getElementById('add-player-btn')?.addEventListener('click', () => {
@@ -314,6 +315,7 @@ export function render() {
         document.getElementById('tournament-top2-points').value = '';
         document.getElementById('tournament-other-points').value = '';
         document.getElementById('selected-players').innerHTML = '';
+        document.body.classList.remove('overflow-hidden');
         selectedPlayers = [];
     });
 }
