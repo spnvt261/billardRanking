@@ -56,7 +56,10 @@ async function createData(tableName, data) {
     });
 
     if (response.ok) {
-      return await response.json(); // thành công
+      const result = await response.json();
+      // console.log(Array.isArray(result) && result.length > 0 ? result[0].id : null);
+      
+      return Array.isArray(result) && result.length > 0 ? result[0].id : null;
     }
 
     if (response.status === 409) {
@@ -228,5 +231,6 @@ export {
   updateData,
   initializePoolData,
   checkAdminAccess,
-  addPlayerPoints
+  addPlayerPoints,
+  fetchData
 }

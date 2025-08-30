@@ -53,7 +53,7 @@ async function loadPage(page, queryString) {
 
   } catch (err) {
     app.innerHTML = "<h2>Page not found</h2>";
-    alert(err);
+    // alert(err);
     console.error(err);
   }
 }

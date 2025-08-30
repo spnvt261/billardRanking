@@ -380,6 +380,11 @@ filterQualifiedPlayers(playersData1);
 // console.log(playersData);
 
 function getSlides(playersData) {
+    if(playersData.length==0){
+        alert("Chưa đủ dữ kiện để tính toán ( Điều kiện: racks > 30, matchs >5");
+        window.location.hash = `#/rankings`;
+        return;
+    }
     const topElo = [...playersData].sort((a, b) => b.elo - a.elo)[0];
     const topMatches = [...playersData].sort((a, b) => b.matches - a.matches)[0];
     const topRacks = [...playersData].sort((a, b) => b.racks - a.racks)[0];

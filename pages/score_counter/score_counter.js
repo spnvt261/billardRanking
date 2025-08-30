@@ -8,7 +8,8 @@ export async function render({ id }) {
     //     3000: player1TeamateId
     //     4000: player2Id
     //     5000: player2TeamateId
-    //     60000: tournamentId
+    //     6000: tournamentIdToSave,
+    //     90000: tournamentId
     // }
     function parseIdsFromUrl(rawId) {
         if (!rawId) {
@@ -77,8 +78,9 @@ export async function render({ id }) {
     const tournamentId = listId.tournamentId;
     const tournament = poolData.tournaments.find(t => t.id === tournamentId);
     document.getElementById("tournament-name").textContent = tournament.name;
+    let tournamentToSave = null;
     if (listId.tournamentIdToSave) {
-        const tournamentToSave = poolData.tournaments.find(t => t.id === listId.tournamentIdToSave)
+        tournamentToSave = poolData.tournaments.find(t => t.id === listId.tournamentIdToSave)
         document.getElementById("tournament-name").textContent = tournamentToSave.name;
         document.getElementById("match-type").classList.remove('hidden');
         document.getElementById("match-type").textContent = " - " + tournament.name;
@@ -313,10 +315,18 @@ export async function render({ id }) {
             team1Id = `${1000 + Number(listId.player1Id)}` + `${1000 + Number(listId.player1TeamateId)}`;
             team2Id = `${1000 + Number(listId.player2Id)}` + `${1000 + Number(listId.player2TeamateId)}`;
         }
-        const maxId = poolData.matchHistory.length > 0
+        let maxId = poolData.matchHistory.length > 0
             ? Math.max(...poolData.matchHistory.map(item => parseInt(item.id, 10))) + 1
             : 1; // Nếu mảng rỗng, bắt đầu từ 1
         const winnerId = parseInt(score1) > parseInt(score2) ? team1Id : (parseInt(score2) > parseInt(score1) ? team2Id : null);
+        let tournamentIdToSave = tournament.name
+        let tour = null;
+        let matchTypeToSave = '';
+        if (listId.tournamentIdToSave) {
+            tournamentIdToSave = listId.tournamentIdToSave;
+            tour = listId.tournamentIdToSave
+            matchTypeToSave = tournament.name;
+        }
         const newMatch = {
             id: String(maxId),
             player1Id: team1Id,
@@ -325,32 +335,60 @@ export async function render({ id }) {
             score2: parseInt(score2),
             winnerId,
             date: new Date().toLocaleDateString('vi-VN'),
-            tournamentId: tournament.name,
+            tournamentId: tournamentIdToSave,
             tournamentMatchId: '',
-            matchType: '',
+            matchType: matchTypeToSave,
             details: tournamentId
         }
         try {
             poolData.matchHistory.push(newMatch);
-            createData('match-history', newMatch);
-            addPlayerPoints(listId.player1Id, score1, null, maxId);
-            addPlayerPoints(listId.player2Id, score2, null, maxId);
+            maxId = await createData('match-history', newMatch);
+            // console.log(maxId);
+            
+            if(score1>0) addPlayerPoints(listId.player1Id, score1, tour, maxId);
+            if (score2>0) addPlayerPoints(listId.player2Id, score2, tour, maxId);
+            if (matchTypeToSave == "Chung kết") {
+                // console.log(tournamentToSave);
+                const updatedTournament = {
+                    ...tournamentToSave,
+                    status: 'Đã kết thúc',
+                    top1Id: winnerId,
+                    top2Id: team1Id == winnerId ? team2Id : team1Id,
+                }
+                
+                // console.log(updatedTournament);
+                await updateData('tournaments', tournamentIdToSave, updatedTournament);
+                addPlayerPoints(updatedTournament.top1Id, updatedTournament.top1_point, tournamentIdToSave, null)
+                addPlayerPoints(updatedTournament.top2Id, updatedTournament.top2_point, tournamentIdToSave, null)
+                // Cập nhật điểm cho các người chơi khác tham gia giải
+                if (updatedTournament.other_point > 0) {
+                    const otherPlayers = poolData.players.filter(player =>
+
+                        updatedTournament.players.includes(player.id) &&
+                        player.id !== updatedTournament.top1Id &&
+                        player.id !== updatedTournament.top2Id
+                    );
+                    for (const player of otherPlayers) {
+                        await addPlayerPoints(player.id, Number(updatedTournament.other_point), tournamentIdToSave, null);
+                    }
+                }
+
+            }
             if (player1Teamate && player2Teamate) {
-                addPlayerPoints(listId.player1TeamateId, score1, null, maxId);
-                addPlayerPoints(listId.player2TeamateId, score2, null, maxId);
+                addPlayerPoints(listId.player1TeamateId, score1, tour, maxId);
+                addPlayerPoints(listId.player2TeamateId, score2, tour, maxId);
             }
             // console.log(score_counter_data_local);
-            
+
             for (const item of score_counter_data_local) {
-                // console.log(item);
-                await createData("history_points_den", item);
+                createData("history_points_den", item);
             }
-             console.log("✅ Lưu thành công toàn bộ score_counter_data_local!");
+            console.log("✅ Lưu thành công toàn bộ score_counter_data_local!");
             showResultModal()
             deleteScoreDataLocalStorage()
         } catch (err) {
             console.log(err);
-            console.error("❌ Lỗi khi lưu:", error);
+            console.error("❌ Lỗi khi lưu:", err);
 
         }
     }
@@ -360,11 +398,17 @@ export async function render({ id }) {
         if (confirm("Xác nhận hủy trận đấu sớm ?")) {
             if (score_counter_data_local.length === 0) {
                 deleteScoreDataLocalStorage();
-                window.location.hash = `#/match_history`;
+                if (listId.tournamentIdToSave) {
+                    window.location.hash = `#/tournament_details?id=${listId.tournamentIdToSave}`;
+                    window.location.reload();
+                } else {
+                    window.location.hash = `#/match_history`;
+                    window.location.reload();
+                }
                 return
             }
             endMatch()
-        }else{
+        } else {
             return
         }
     })
@@ -372,8 +416,14 @@ export async function render({ id }) {
     document.getElementById("closeResultBtn").addEventListener("click", () => {
         document.getElementById("resultModal").classList.add("hidden");
         //  window.location.reload();
-        window.location.hash = `#/match_history`;
-        window.location.reload();
+        if (listId.tournamentIdToSave) {
+            window.location.hash = `#/tournament_details?id=${listId.tournamentIdToSave}`;
+            window.location.reload();
+        } else {
+            window.location.hash = `#/match_history`;
+            window.location.reload();
+        }
+
     });
 
     // --- Bật hiệu ứng lửa cho player1 ---

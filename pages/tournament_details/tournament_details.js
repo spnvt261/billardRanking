@@ -63,10 +63,12 @@ export function render({ id }) {
         const isOngoing = tournament.status == 'Đang diễn ra';
         const endTournamentSection = document.getElementById('end-tournament-section');
         const addMatchBtn = document.getElementById('add-match-btn-in-tour');
+        const openCreateScoreCounterFormBtn = document.getElementById('create-score-counter-in-tour');
         const addPlayerBtn = document.getElementById('select-player-btn');
         const endTournamentBtn = document.getElementById('end-tournament-btn');
         if (isOngoing && adminKey) {
             addMatchBtn.classList.remove('hidden');
+            openCreateScoreCounterFormBtn.classList.remove('hidden');
             addPlayerBtn.classList.remove('hidden');
             endTournamentBtn.classList.remove('hidden')
             // Chỉ hiển thị nút Kết thúc giải khi có cả top1Id và top2Id
@@ -75,7 +77,7 @@ export function render({ id }) {
             }
         }
 
-        async function endTournament(champion,runnerUp){
+        async function endTournament(champion, runnerUp) {
             tournament.status = 'Đã kết thúc';
             document.getElementById('tournament-status').classList.remove('ongoing');
             document.getElementById('tournament-status').classList.add('finished');
@@ -112,7 +114,7 @@ export function render({ id }) {
                     }
                 }
 
-
+                window.location.reload();
                 // Làm mới dữ liệu
                 // await initializePoolData();
             } catch (error) {
@@ -134,7 +136,7 @@ export function render({ id }) {
             if (!confirm(`Bạn có chắc chắn muốn kết thúc giải đấu với người vô địch là ${champion.name} và á quân là ${runnerUp.name}?`)) {
                 return;
             }
-            endTournament(champion,runnerUp)
+            endTournament(champion, runnerUp)
 
         });
 
@@ -310,7 +312,40 @@ export function render({ id }) {
         // Xử lý hiển thị/ẩn form thêm trận đấu
         const addMatchForm = document.getElementById('add-match-form');
         addMatchBtn.addEventListener('click', () => {
-            addMatchForm.classList.toggle('hidden');
+            addMatchForm.classList.remove('hidden');
+            document.getElementById('save-match').classList.remove('hidden');
+            document.getElementById('create-counter').classList.add('hidden');
+
+            document.getElementById('score-player1').classList.remove('hidden');
+            document.getElementById('score2-label').textContent = "Score Player 2";
+            //
+            document.getElementById('add-match-form-title').textContent = "Thêm trận đấu mới";
+            document.getElementById('add-match-form-title').classList.add("text-blue-600")
+            document.getElementById('add-match-form-title').classList.remove("text-green-600")
+
+            document.getElementById('overlay').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden'); // chặn scroll
+            // Reset form khi mở
+            document.getElementById('match-player1').value = '';
+            document.getElementById('match-score1').value = '';
+            document.getElementById('match-player2').value = '';
+            document.getElementById('match-score2').value = '';
+            document.getElementById('match-type').value = '';
+        });
+        openCreateScoreCounterFormBtn.addEventListener('click', () => {
+            addMatchForm.classList.remove('hidden');
+            document.getElementById('save-match').classList.add('hidden');
+            document.getElementById('create-counter').classList.remove('hidden');
+
+            document.getElementById('score-player1').classList.add('hidden');
+            document.getElementById('score2-label').textContent = "Race to";
+            //
+            document.getElementById('add-match-form-title').textContent = "Bảng đếm tỉ số";
+            document.getElementById('add-match-form-title').classList.add("text-green-600")
+            document.getElementById('add-match-form-title').classList.remove("text-blue-600")
+
+            document.getElementById('overlay').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden'); // chặn scroll
             // Reset form khi mở
             document.getElementById('match-player1').value = '';
             document.getElementById('match-score1').value = '';
@@ -340,7 +375,7 @@ export function render({ id }) {
             }
             const winnerId = parseInt(score1) > parseInt(score2) ? player1Id : player2Id;
             tournament.top1Id = winnerId;
-            tournament.top2Id = player1Id == winnerId?player2Id :player1Id 
+            tournament.top2Id = player1Id == winnerId ? player2Id : player1Id
             const championUp = poolData.players.find(u => u.id === tournament.top1Id);
             const runnerUp = poolData.players.find(u => u.id === tournament.top1Id);
             // console.log(winnerId,player1Id,player2Id);
@@ -348,7 +383,7 @@ export function render({ id }) {
                 if (confirm(`Chung kết tỉ số [ ${player1name} ${score1} - ${score2} ${player2name} ] và người vô địch là ${championUp.name} ?`)) {
                     // console.log(tournament);
                     renderPlayerRankings(tournament);
-                    endTournament(championUp,runnerUp);
+                    endTournament(championUp, runnerUp);
                 }
             } else {
                 if (!confirm(`Bạn có chắc chắn kết quả là [ ${player1name} ${score1} - ${score2} ${player2name} ]là chính xác?`)) {
@@ -385,8 +420,6 @@ export function render({ id }) {
             createData('match-history', newMatch);
             addPlayerPoints(player1Id, parseInt(score1), tournament.id, maxId);
             addPlayerPoints(player2Id, parseInt(score2), tournament.id, maxId);
-            sessionStorage.removeItem('poolData_matchHistory');
-            sessionStorage.removeItem('isInitialLoad');
             poolData.matchHistory.push(newMatch);
             renderMatchsTable()
             // Thêm hàng mới vào bảng
@@ -423,8 +456,78 @@ export function render({ id }) {
             document.getElementById('match-player2').value = '';
             document.getElementById('match-score2').value = '';
             document.getElementById('match-type').value = '';
+            document.getElementById('overlay').classList.add('hidden');
             // initializePoolData();
         });
+        // Xử lý lưu tạo score_counter
+        document.getElementById('create-counter').addEventListener('click', async () => {
+            const player1Id = document.getElementById('match-player1').value;
+            const player2Id = document.getElementById('match-player2').value;
+            const raceTo = document.getElementById('match-score2').value;
+            const matchType = document.getElementById('match-type').value;
+            const player1name = poolData.players.find(u => u.id === player1Id)?.name || 'Unknown';
+            const player2name = poolData.players.find(u => u.id === player2Id)?.name || 'Unknown';
+
+            // Kiểm tra dữ liệu hợp lệ
+            if (!player1Id || !player2Id || player1Id == player2Id || player2name == "CHẤM") {
+                alert('Please select different players and enter valid scores.');
+                return;
+            }
+            if (raceTo > 999) {
+                alert(`Race to ${raceTo} thì đánh đến bao giờ ?`);
+                return;
+            }
+
+            if (!confirm(`Tạo trận đấu ${player1name} var ${player2name} ( Race to ${raceTo} ) ? `)) {
+                return;
+            }
+            // Tạo giải đấu mới
+            const validTournamentIds = poolData.tournaments
+                .map(item => parseInt(item.id, 10))
+                .filter(id => !isNaN(id) && id > 1000 && id < 9000);
+
+            let tournamentIdNew = validTournamentIds.length > 0
+                ? Math.max(...validTournamentIds) + 1
+                : 1000; // Nếu mảng rỗng thì bắt đầu từ 1
+
+            const newTournament = {
+                id: tournamentIdNew.toString(),
+                name: matchType
+            }
+
+
+            try {
+                // console.log(tournamentId);
+
+                // gọi API hoặc hàm async để tạo dữ liệu
+                poolData.tournaments.push(newTournament);
+                tournamentIdNew = await createData("tournaments", newTournament);
+                // console.log(tournamentId);
+
+                //Link {
+                //     1000: race to ...
+                //     2000: player1Id
+                //     3000: player1TeamateId
+                //     4000: player2Id
+                //     5000: player2TeamateId
+                //     6000: tournamentIdToSave,
+                //     9000000: tournamentId
+                // }
+                const idStr =
+                    `${1000 + Number(raceTo)}` +
+                    `${2000 + Number(player1Id)}` +
+                    `${4000 + Number(player2Id)}` +
+                    `${6000 + Number(tournamentId)}` +
+                    `${9000000 + Number(tournamentIdNew)}`;
+                // console.log(idStr);
+                localStorage.setItem("score_counter_url", JSON.stringify(idStr))
+                window.location.reload();
+
+            } catch (error) {
+                console.error("❌ Lỗi khi tạo tournament:", error);
+            }
+
+        })
 
         // Xử lý hủy form thêm trận đấu
         document.getElementById('cancel-match').addEventListener('click', () => {
@@ -434,6 +537,8 @@ export function render({ id }) {
             document.getElementById('match-player2').value = '';
             document.getElementById('match-score2').value = '';
             document.getElementById('match-type').value = '';
+            document.getElementById('overlay').classList.add('hidden');
+            document.body.classList.remove('overflow-hidden'); // chặn scroll
         });
 
         // Xử lý hiển thị/ẩn form thêm người chơi
