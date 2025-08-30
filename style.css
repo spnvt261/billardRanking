@@ -24,6 +24,17 @@ body.landscape-only {
     width: 100vw;
 }
 
+/* #app {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+#app.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+} */
+
 
 /* Nếu người dùng đang xoay dọc thì hiển thị nhắc xoay ngang */
 @media screen and (orientation: portrait) {
