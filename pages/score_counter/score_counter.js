@@ -85,6 +85,7 @@ export async function render({ id }) {
         document.getElementById("match-type").classList.remove('hidden');
         document.getElementById("match-type").textContent = " - " + tournament.name;
     }
+
     if (!tournament) {
         alert("Không tìm thấy giải đấu!");
     }
@@ -96,13 +97,17 @@ export async function render({ id }) {
     const player2 = poolData.players.find(p => p.id === listId.player2Id);
     let player1Teamate;
     let player2Teamate
-    let team1Name = player1.name.toUpperCase();
-    let team2Name = player2.name.toUpperCase();
-    if (listId.player1TeamateId && listId.player1TeamateId) {
+    let cleanName = (name) => name.replace("(Khách)", "").toUpperCase();
+
+    let team1Name = cleanName(player1.name);
+    let team2Name = cleanName(player2.name);
+
+    if (listId.player1TeamateId && listId.player2TeamateId) {
         player1Teamate = poolData.players.find(p => p.id === listId.player1TeamateId);
         player2Teamate = poolData.players.find(p => p.id === listId.player2TeamateId);
-        team1Name = player1.name.toUpperCase() + " & " + player1Teamate.name.toUpperCase();
-        team2Name = player2.name.toUpperCase() + " & " + player2Teamate.name.toUpperCase();
+
+        team1Name = cleanName(player1.name) + " & " + cleanName(player1Teamate.name);
+        team2Name = cleanName(player2.name) + " & " + cleanName(player2Teamate.name);
     }
     // console.log(player1Teamate);
     // --- Gán tên ra UI ---
@@ -344,9 +349,9 @@ export async function render({ id }) {
             poolData.matchHistory.push(newMatch);
             maxId = await createData('match-history', newMatch);
             // console.log(maxId);
-            
-            if(score1>0) addPlayerPoints(listId.player1Id, score1, tour, maxId);
-            if (score2>0) addPlayerPoints(listId.player2Id, score2, tour, maxId);
+
+            if (score1 > 0) addPlayerPoints(listId.player1Id, score1, tour, maxId);
+            if (score2 > 0) addPlayerPoints(listId.player2Id, score2, tour, maxId);
             if (matchTypeToSave == "Chung kết") {
                 // console.log(tournamentToSave);
                 const updatedTournament = {
@@ -355,7 +360,7 @@ export async function render({ id }) {
                     top1Id: winnerId,
                     top2Id: team1Id == winnerId ? team2Id : team1Id,
                 }
-                
+
                 // console.log(updatedTournament);
                 await updateData('tournaments', tournamentIdToSave, updatedTournament);
                 addPlayerPoints(updatedTournament.top1Id, updatedTournament.top1_point, tournamentIdToSave, null)
@@ -384,6 +389,11 @@ export async function render({ id }) {
                 createData("history_points_den", item);
             }
             console.log("✅ Lưu thành công toàn bộ score_counter_data_local!");
+            if (matchTypeToSave == "Chung kết") {
+                startConfettiChaimpion()
+            }else{
+                startConfetti()
+            }
             showResultModal()
             deleteScoreDataLocalStorage()
         } catch (err) {
@@ -394,7 +404,10 @@ export async function render({ id }) {
     }
     //End Match soon
     document.getElementById("endMatchBtn").addEventListener("click", () => {
-
+        if (tournament.name == "Chung kết") {
+            alert("Không thể hủy trận đấu sớm ở trận chung kết !")
+            return;
+        }
         if (confirm("Xác nhận hủy trận đấu sớm ?")) {
             if (score_counter_data_local.length === 0) {
                 deleteScoreDataLocalStorage();
@@ -412,8 +425,8 @@ export async function render({ id }) {
             return
         }
     })
-    // Nút đóng modal
-    document.getElementById("closeResultBtn").addEventListener("click", () => {
+    //thoát khỏi pages
+    function outOfPage() {
         document.getElementById("resultModal").classList.add("hidden");
         //  window.location.reload();
         if (listId.tournamentIdToSave) {
@@ -423,8 +436,18 @@ export async function render({ id }) {
             window.location.hash = `#/match_history`;
             window.location.reload();
         }
+    }
+    // Nút đóng modal
+    document.getElementById("closeResultBtn").addEventListener("click", () => {
+        outOfPage();
 
     });
+
+    //local kiểm tra nếu không có url sẽ bị out
+    let score_counter_url = JSON.parse(localStorage.getItem("score_counter_url"))
+    if (!score_counter_url) {
+        outOfPage()
+    }
 
     // --- Bật hiệu ứng lửa cho player1 ---
     function player1Hill() {
@@ -478,4 +501,263 @@ export async function render({ id }) {
         }
     }
     checkHill()
+    function startConfetti() {
+        const canvas = document.getElementById('confettiCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Resize canvas on window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Confetti particle class
+        class Confetti {
+            constructor() {
+                this.x = canvas.width / 2;
+                this.y = canvas.height / 2;
+                this.angle = Math.random() * Math.PI * 2;
+                this.speed = Math.random() * 5 + 2;
+                this.size = Math.random() * 8 + 4;
+                this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                this.vx = Math.cos(this.angle) * this.speed;
+                this.vy = Math.sin(this.angle) * this.speed;
+                this.gravity = 0.05;
+                this.rotation = Math.random() * 360;
+                this.spin = (Math.random() - 0.5) * 0.2;
+                this.opacity = 1;
+                this.life = 100;
+            }
+            update() {
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.rotation += this.spin;
+                this.life--;
+                this.opacity = this.life / 100;
+                if (this.life <= 0) {
+                    this.x = canvas.width / 2;
+                    this.y = canvas.height / 2;
+                    this.angle = Math.random() * Math.PI * 2;
+                    this.speed = Math.random() * 5 + 2;
+                    this.size = Math.random() * 8 + 4;
+                    this.vx = Math.cos(this.angle) * this.speed;
+                    this.vy = Math.sin(this.angle) * this.speed;
+                    this.rotation = Math.random() * 360;
+                    this.spin = (Math.random() - 0.5) * 0.2;
+                    this.opacity = 1;
+                    this.life = 100;
+                }
+            }
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation * Math.PI / 180);
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+                ctx.restore();
+            }
+        }
+
+        // Create confetti particles
+        const confettiCount = 100;
+        const confetti = Array.from({ length: confettiCount }, () => new Confetti());
+
+        // Animation loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            confetti.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    }
+    function startConfettiChaimpion() {
+        const canvas = document.getElementById('confettiCanvas');
+        const ctx = canvas.getContext('2d');
+        const celebrationText = document.getElementById('celebrationText');
+
+        // Show celebration text
+        celebrationText.classList.remove('hidden');
+
+        // Set canvas size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Resize canvas on window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Confetti particle class
+        class Confetti {
+            constructor(isSide = false) {
+                this.isSide = isSide;
+                if (isSide) {
+                    // Side confetti (falling from left/right edges)
+                    this.x = Math.random() < 0.5 ? 0 : canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.vx = this.x === 0 ? Math.random() * 2 + 1 : -(Math.random() * 2 + 1);
+                    this.vy = Math.random() * 2 + 2;
+                } else {
+                    // Center confetti (fireworks from center)
+                    this.x = canvas.width / 2;
+                    this.y = canvas.height / 2;
+                    this.angle = Math.random() * Math.PI * 2;
+                    this.speed = Math.random() * 7 + 4;
+                    this.vx = Math.cos(this.angle) * this.speed;
+                    this.vy = Math.sin(this.angle) * this.speed;
+                }
+                this.size = Math.random() * 12 + 6;
+                this.color = Math.random() < 0.7 ? '#ffd700' : `hsl(${Math.random() * 360}, 100%, 50%)`;
+                this.gravity = isSide ? 0.15 : 0.1;
+                this.rotation = Math.random() * 360;
+                this.spin = (Math.random() - 0.5) * 0.4;
+                this.opacity = 1;
+                this.life = isSide ? 150 : 120;
+                this.shape = Math.random() > 0.5 ? 'square' : 'circle';
+            }
+            update() {
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.rotation += this.spin;
+                this.life -= 0.8;
+                this.opacity = this.life / (this.isSide ? 150 : 120);
+                if (this.life <= 0 || this.y > canvas.height || this.x < 0 || this.x > canvas.width) {
+                    if (this.isSide) {
+                        this.x = Math.random() < 0.5 ? 0 : canvas.width;
+                        this.y = -this.size;
+                        this.vx = this.x === 0 ? Math.random() * 2 + 1 : -(Math.random() * 2 + 1);
+                        this.vy = Math.random() * 2 + 2;
+                    } else {
+                        this.x = canvas.width / 2;
+                        this.y = canvas.height / 2;
+                        this.angle = Math.random() * Math.PI * 2;
+                        this.speed = Math.random() * 7 + 4;
+                        this.vx = Math.cos(this.angle) * this.speed;
+                        this.vy = Math.sin(this.angle) * this.speed;
+                    }
+                    this.size = Math.random() * 12 + 6;
+                    this.color = Math.random() < 0.7 ? '#ffd700' : `hsl(${Math.random() * 360}, 100%, 50%)`;
+                    this.rotation = Math.random() * 360;
+                    this.spin = (Math.random() - 0.5) * 0.4;
+                    this.opacity = 1;
+                    this.life = this.isSide ? 150 : 120;
+                    this.shape = Math.random() > 0.5 ? 'square' : 'circle';
+                }
+            }
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation * Math.PI / 180);
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                if (this.shape === 'square') {
+                    ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+        }
+
+        // Trophy class
+        class Trophy {
+            constructor() {
+                const edge = Math.floor(Math.random() * 4); // 0: top, 1: right, 2: bottom, 3: left
+                const margin = 50;
+                if (edge === 0) {
+                    this.x = Math.random() * (canvas.width - 2 * margin) + margin;
+                    this.y = margin;
+                } else if (edge === 1) {
+                    this.x = canvas.width - margin;
+                    this.y = Math.random() * (canvas.height - 2 * margin) + margin;
+                } else if (edge === 2) {
+                    this.x = Math.random() * (canvas.width - 2 * margin) + margin;
+                    this.y = canvas.height - margin;
+                } else {
+                    this.x = margin;
+                    this.y = Math.random() * (canvas.height - 2 * margin) + margin;
+                }
+                this.size = 30 + Math.random() * 20;
+                this.opacity = 1;
+                this.life = 200;
+                this.rotation = Math.random() * 360;
+                this.spin = (Math.random() - 0.5) * 0.1;
+            }
+            update() {
+                this.life -= 0.5;
+                this.opacity = this.life / 200;
+                this.rotation += this.spin;
+                if (this.life <= 0) {
+                    const edge = Math.floor(Math.random() * 4);
+                    const margin = 50;
+                    if (edge === 0) {
+                        this.x = Math.random() * (canvas.width - 2 * margin) + margin;
+                        this.y = margin;
+                    } else if (edge === 1) {
+                        this.x = canvas.width - margin;
+                        this.y = Math.random() * (canvas.height - 2 * margin) + margin;
+                    } else if (edge === 2) {
+                        this.x = Math.random() * (canvas.width - 2 * margin) + margin;
+                        this.y = canvas.height - margin;
+                    } else {
+                        this.x = margin;
+                        this.y = Math.random() * (canvas.height - 2 * margin) + margin;
+                    }
+                    this.size = 30 + Math.random() * 20;
+                    this.opacity = 1;
+                    this.life = 200;
+                    this.rotation = Math.random() * 360;
+                    this.spin = (Math.random() - 0.5) * 0.1;
+                }
+            }
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation * Math.PI / 180);
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = '#ffd700';
+                ctx.font = `${this.size}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('🏆', 0, 0);
+                ctx.restore();
+            }
+        }
+
+        // Create particles
+        const confettiCount = 200;
+        const sideConfettiCount = 50;
+        const trophyCount = 8;
+        const confetti = [
+            ...Array.from({ length: confettiCount }, () => new Confetti(false)),
+            ...Array.from({ length: sideConfettiCount }, () => new Confetti(true)),
+            ...Array.from({ length: trophyCount }, () => new Trophy())
+        ];
+
+        // Animation loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            confetti.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    }
 }

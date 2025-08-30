@@ -478,7 +478,7 @@ export function render({ id }) {
                 return;
             }
 
-            if (!confirm(`Tạo trận đấu ${player1name} var ${player2name} ( Race to ${raceTo} ) ? `)) {
+            if (!confirm(`${matchType} | ${player1name} var ${player2name} | Race to ${raceTo}  ? `)) {
                 return;
             }
             // Tạo giải đấu mới

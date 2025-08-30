@@ -167,10 +167,6 @@ export function render() {
             const image = document.getElementById('player-image').value;
             const playerType = document.querySelector('input[name="player-type"]:checked').value;
 
-            if (playerType == "guest") {
-                name = "(Khách)" + name;
-            }
-
             // Kiểm tra dữ liệu hợp lệ
             if (!name) {
                 alert('Please fill in the Name field.');
@@ -178,9 +174,17 @@ export function render() {
             }
 
             // Tạo người chơi mới
-            const maxId = poolData.players.length > 0
-                ? Math.max(...poolData.players.map(item => parseInt(item.id, 10))) + 1
-                : 1; // Nếu mảng rỗng, bắt đầu từ 1
+            const validIds = poolData.players
+                .map(item => parseInt(item.id, 10))
+                .filter(id => id < 1000); // chỉ lấy id < 1000
+
+            let maxId = validIds.length > 0
+                ? Math.max(...validIds) + 1
+                : 1; // nếu không có id hợp lệ thì bắt đầu từ 1
+
+             if (playerType == "guest") {
+                name = "(Khách)" + name;
+            }
             const newPlayer = {
                 id: String(maxId),
                 name,

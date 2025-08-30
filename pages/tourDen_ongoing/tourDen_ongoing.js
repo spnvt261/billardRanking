@@ -599,6 +599,7 @@ export function render({ id }) {
             alert('Failed to end tournament. Please try again.');
         }
     });
+    
 
 
     showCurrentRack()
