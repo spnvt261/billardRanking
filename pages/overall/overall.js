@@ -280,7 +280,7 @@ function updatePlayersTournamentStats(playersData, poolData) {
         let finals = 0;
         let champions = 0;
 
-        poolData.tournaments.filter(t => t.tournamentId > 0 && t.tournamentId < 1000).forEach(t => {
+        poolData.tournaments.filter(t => t.id > 0 && t.id < 1000).forEach(t => {
             // Bỏ qua giải có tên chứa "Đền"
             if (t.name.includes("Đền")) return;
 
@@ -299,6 +299,7 @@ function updatePlayersTournamentStats(playersData, poolData) {
                 }
             }
         });
+        
 
         player.attends = attends;
         player.finals = finals;
@@ -556,6 +557,8 @@ function renderResults() {
         .filter(p => p.attends > 0 && p.finals > 0)
         .sort((a, b) => (b.finals / b.attends) - (a.finals / a.attends))
         .slice(0, 5);
+    // console.log(playersData);
+    
 
     // Bảng 5: Điểm (số chấm)
     let table5 = [...playersData]

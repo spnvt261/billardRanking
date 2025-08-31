@@ -71,6 +71,14 @@ export async function render({ id }) {
         return ids;
     }
 
+    function noEndFinal(){
+        if (tournament.name == "Chung kết" && score_counter_data_local.length!=0) {
+            const endBtn = document.getElementById("endMatchBtn");
+            endBtn.disabled = true;
+            endBtn.classList.remove("bg-red-400", "hover:bg-red-600");
+            endBtn.classList.add("bg-gray-400", "cursor-not-allowed");
+        }
+    }
     // let rawId = "100320043002400150039000005"
     const listId = parseIdsFromUrl(id)
     // console.log(listId);
@@ -188,7 +196,8 @@ export async function render({ id }) {
 
         // Xác định rack hiện tại
         const rack = score_counter_data_local.filter(h => h.tournamentId === tournamentId).length + 1;
-        const pointsReceived = desc == "Chấm" ? 2 : 1
+        //Chỉnh điểm của chấm
+        const pointsReceived = desc == "Chấm" ? 1 : 1
 
         if (selectedPlayer === "p1") {
             score1 += pointsReceived;
@@ -218,7 +227,8 @@ export async function render({ id }) {
         closeModalCfm();
         startCooldown();
         checkHill();
-        checkEnd()
+        checkEnd();
+        noEndFinal();
     });
 
     function checkEnd() {
@@ -233,16 +243,16 @@ export async function render({ id }) {
     function closeModalCfm() {
         modalCfm.classList.add("hidden");
         customReason.value = "";
-        reasonSelect.value = "Ăn bi đẹp";
+        reasonSelect.value = "Win";
         customReason.classList.add("hidden");
     }
 
     // --- Cooldown 30s ---
     function startCooldown() {
-        cooldown = true;
-        setTimeout(() => {
-            cooldown = false;
-        }, 30000);
+        // cooldown = true;
+        // setTimeout(() => {
+        //     cooldown = false;
+        // }, 30000);
     }
     //View racks history
     document.getElementById("historyBtn").addEventListener("click", () => {
@@ -251,10 +261,10 @@ export async function render({ id }) {
 
         (score_counter_data_local || []).forEach((item, index) => {
             const tr = document.createElement("tr");
-
+            tr.className =`${item.description=="Chấm"? "bg-yellow-200": item.playerId == player1.id ? "bg-blue-300" :"bg-red-300"}`;
             // rack
             const tdRack = document.createElement("td");
-            tdRack.className = "border px-2 py-1";
+            tdRack.className = `border px-2 py-`;
             tdRack.textContent = index + 1; // hoặc item.rack nếu có
             tr.appendChild(tdRack);
 
@@ -404,10 +414,6 @@ export async function render({ id }) {
     }
     //End Match soon
     document.getElementById("endMatchBtn").addEventListener("click", () => {
-        if (tournament.name == "Chung kết") {
-            alert("Không thể hủy trận đấu sớm ở trận chung kết !")
-            return;
-        }
         if (confirm("Xác nhận hủy trận đấu sớm ?")) {
             if (score_counter_data_local.length === 0) {
                 deleteScoreDataLocalStorage();
@@ -501,6 +507,7 @@ export async function render({ id }) {
         }
     }
     checkHill()
+    noEndFinal()
     function startConfetti() {
         const canvas = document.getElementById('confettiCanvas');
         const ctx = canvas.getContext('2d');

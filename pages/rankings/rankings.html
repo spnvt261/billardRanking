@@ -12,12 +12,12 @@
                     <label class="block text-gray-700 mb-2">Type</label>
                     <div class="flex items-center space-x-4">
                         <label class="flex items-center">
-                            <input type="radio" name="player-type" value="friend" checked class="mr-2">
-                            Friend
-                        </label>
-                        <label class="flex items-center">
-                            <input type="radio" name="player-type" value="guest" class="mr-2">
+                            <input type="radio" name="player-type" value="guest" checked class="mr-2">
                             Khách
+                        </label>
+                        <label class="flex items-center hidden">
+                            <input type="radio" name="player-type" value="friend" class="mr-2">
+                            Friend
                         </label>
                     </div>
                 </div>
@@ -28,7 +28,7 @@
                 </div>
 
                 <!-- Image URL (chỉ hiện khi chọn Friend) -->
-                <div id="image-input-container">
+                <div id="image-input-container" class="hidden">
                     <label class="block text-gray-700">Image URL (leave blank for default)</label>
                     <input id="player-image" type="text" class="w-full p-2 border rounded">
                 </div>

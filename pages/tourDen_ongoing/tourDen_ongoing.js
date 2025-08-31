@@ -190,8 +190,8 @@ export function render({ id }) {
         p1.innerHTML = `<option value="">Player1</option>`;
         p2.innerHTML = `<option value="">Player2</option>`;
         listPlayers.forEach(pl => {
-            p1.innerHTML += `<option value="${pl.id}">${pl.name}</option>`;
-            p2.innerHTML += `<option value="${pl.id}">${pl.name}</option>`;
+            p1.innerHTML += `<option value="${pl.id}">${pl.name.replace("(Khách)", "")}</option>`;
+            p2.innerHTML += `<option value="${pl.id}">${pl.name.replace("(Khách)", "")}</option>`;
         });
     }
 
@@ -207,7 +207,7 @@ export function render({ id }) {
 
             const tdName = document.createElement("td");
             tdName.className = "p-3";
-            tdName.textContent = s.name;
+            tdName.textContent = s.name.replace("(Khách)", "");
 
             const tdOld = document.createElement("td");
             tdOld.className = "p-3";
@@ -316,7 +316,7 @@ export function render({ id }) {
             player1Id, player2Id, ball, pointAdd,
             p1Name: p1.name,
             p2Name: p2.name,
-            description: `${p1.name} ăn ${ball} của ${p2.name}`,
+            description: `${p1.name.replace("(Khách)", "")} ăn ${ball} của ${p2.name.replace("(Khách)", "")}`,
             ball: ball
         });
 

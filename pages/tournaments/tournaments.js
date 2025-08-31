@@ -111,7 +111,7 @@ async function renderTournaments() {
                 ? poolData.players.find(p => p.id === tournament.top1Id)?.name || 'Unknown'
                 : 'TBD';
             const playerNames = tournament.players
-                .map(id => poolData.players.find(p => p.id == id)?.name)
+                .map(id => poolData.players.find(p => p.id == id)?.name.replace("(Khách)", "K-"))
                 .join(', ');
 
             card.innerHTML = `
