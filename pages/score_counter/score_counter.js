@@ -71,8 +71,8 @@ export async function render({ id }) {
         return ids;
     }
 
-    function noEndFinal(){
-        if (tournament.name == "Chung kết" && score_counter_data_local.length!=0) {
+    function noEndFinal() {
+        if (tournament.name == "Chung kết" && score_counter_data_local.length != 0) {
             const endBtn = document.getElementById("endMatchBtn");
             endBtn.disabled = true;
             endBtn.classList.remove("bg-red-400", "hover:bg-red-600");
@@ -210,6 +210,7 @@ export async function render({ id }) {
                 pointsReceived: pointsReceived,
                 description: `${desc}`
             });
+            addMatchCham(selectedPlayer)
         } else {
             score2 += pointsReceived;
             document.getElementById("score2").textContent = score2;
@@ -221,6 +222,7 @@ export async function render({ id }) {
                 pointsReceived: pointsReceived,
                 description: `${desc}`
             });
+            addMatchCham(selectedPlayer)
         }
 
         saveScoreDataToLocalStorage()
@@ -230,6 +232,65 @@ export async function render({ id }) {
         checkEnd();
         noEndFinal();
     });
+
+    async function addMatchCham(selectedPlayerValue) {
+        // console.log(reasonSelect.value);
+        if (reasonSelect.value != "Chấm") {
+            return
+        }
+        let teamId;
+        if (selectedPlayerValue == "p1") {
+            teamId = listId.player1Id
+            if (listId.player1TeamateId) {
+                teamId = `${1000 + Number(listId.player1Id)}` + `${1000 + Number(listId.player1TeamateId)}`;
+            }
+        } else {
+            teamId = listId.player2Id
+            if (listId.player2TeamateId) {
+                teamId = `${1000 + Number(listId.player2Id)}` + `${1000 + Number(listId.player2TeamateId)}`;
+            }
+        }
+        let maxId = poolData.matchHistory.length > 0
+            ? Math.max(...poolData.matchHistory.map(item => parseInt(item.id, 10))) + 1
+            : 1; // Nếu mảng rỗng, bắt đầu từ 1
+        let tournamentIdToSave = tournament.name
+        let tour = null;
+        let matchTypeToSave = '';
+        if (listId.tournamentIdToSave) {
+            tournamentIdToSave = listId.tournamentIdToSave;
+            tour = listId.tournamentIdToSave
+            matchTypeToSave = tournament.name;
+        }
+        const newMatch = {
+            id: String(maxId),
+            player1Id: teamId,
+            score1: 10,
+            player2Id: 7,
+            score2: 0,
+            winnerId: teamId,
+            date: new Date().toLocaleDateString('vi-VN'),
+            tournamentId: tournamentIdToSave,
+            tournamentMatchId: null,
+            matchType: matchTypeToSave,
+            details: tournamentId
+        }
+        try {
+            maxId = await createData('match-history', newMatch);
+            if(listId.tournamentIdToSave){
+                await addPlayerPoints(teamId,10,listId.tournamentIdToSave,maxId)
+            }else{
+                await addPlayerPoints(teamId,10,null,maxId)
+            }
+            poolData.matchHistory.push(newMatch);
+            console.log(newMatch);
+            
+        } catch (err) {
+            console.log(err);
+            console.error("❌ Lỗi khi lưu:", err);
+
+        }
+
+    }
 
     function checkEnd() {
         if (score1 == listId.raceTo || score2 == listId.raceTo) {
@@ -261,7 +322,7 @@ export async function render({ id }) {
 
         (score_counter_data_local || []).forEach((item, index) => {
             const tr = document.createElement("tr");
-            tr.className =`${item.description=="Chấm"? "bg-yellow-200": item.playerId == player1.id ? "bg-blue-300" :"bg-red-300"}`;
+            tr.className = `${item.description == "Chấm" ? "bg-yellow-200" : item.playerId == player1.id ? "bg-blue-300" : "bg-red-300"}`;
             // rack
             const tdRack = document.createElement("td");
             tdRack.className = `border px-2 py-`;
@@ -351,7 +412,7 @@ export async function render({ id }) {
             winnerId,
             date: new Date().toLocaleDateString('vi-VN'),
             tournamentId: tournamentIdToSave,
-            tournamentMatchId: '',
+            tournamentMatchId: null,
             matchType: matchTypeToSave,
             details: tournamentId
         }
@@ -401,7 +462,7 @@ export async function render({ id }) {
             console.log("✅ Lưu thành công toàn bộ score_counter_data_local!");
             if (matchTypeToSave == "Chung kết") {
                 startConfettiChaimpion()
-            }else{
+            } else {
                 startConfetti()
             }
             showResultModal()

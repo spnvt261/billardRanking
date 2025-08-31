@@ -145,9 +145,24 @@ export function render({ id }) {
             const matchesTable = document.getElementById('matches-table');
             matchesTable.innerHTML = '';
             const matches = poolData.matchHistory.filter(match => match.tournamentId == tournamentId);
+
             let indexShow = 0;
+
+            // Thứ tự ưu tiên matchType
+            const matchOrder = {
+                "Vòng bảng": 1,
+                "Tứ kết": 2,
+                "Bán kết": 3,
+                "Tranh hạng 3": 4,
+                "Chung kết": 5
+            };
+
             matches
-                .sort((a, b) => parseInt(a.tournamentMatchId) - parseInt(b.tournamentMatchId))
+                .sort((a, b) => {
+                    const orderA = matchOrder[a.matchType] ?? 0; // nếu không có thì đẩy lên đầu
+                    const orderB = matchOrder[b.matchType] ?? 0;
+                    return orderA - orderB;
+                })
                 .forEach(match => {
                     const row = document.createElement('tr');
                     row.className = 'border-b';
@@ -155,6 +170,7 @@ export function render({ id }) {
                     const player2 = poolData.players.find(u => u.id == match.player2Id)?.name || 'Unknown';
                     const player1Class = match.winnerId == match.player1Id ? 'text-green-600' : 'text-red-600';
                     const player2Class = match.winnerId == match.player2Id ? 'text-green-600' : 'text-red-600';
+
                     if (player2 === "Chấm") {
                         // Nếu là trận đi chấm
                         row.classList.add("bg-yellow-100"); // nền vàng
@@ -414,7 +430,7 @@ export function render({ id }) {
                 winnerId,
                 date: new Date().toLocaleDateString('vi-VN'),
                 tournamentId,
-                tournamentMatchId: String(currentMatches + 1),
+                tournamentMatchId: null,
                 matchType
             };
             createData('match-history', newMatch);
@@ -422,31 +438,6 @@ export function render({ id }) {
             addPlayerPoints(player2Id, parseInt(score2), tournament.id, maxId);
             poolData.matchHistory.push(newMatch);
             renderMatchsTable()
-            // Thêm hàng mới vào bảng
-            // const row = document.createElement('tr');
-            // row.className = 'border-b';
-            // const player1 = poolData.players.find(u => u.id === newMatch.player1Id)?.name || 'Unknown';
-            // const player2 = poolData.players.find(u => u.id === newMatch.player2Id)?.name || 'Unknown';
-            // const player1Class = newMatch.winnerId === newMatch.player1Id ? 'text-green-600' : 'text-red-600';
-            // const player2Class = newMatch.winnerId === newMatch.player2Id ? 'text-green-600' : 'text-red-600';
-            // row.innerHTML = `
-            //                     <td class="p-3">${newMatch.tournamentMatchId}</td>
-            //                     <td class="p-3">${newMatch.matchType}</td>
-            //                     <td class="p-3"><span class="${player1Class}">${player1}</span> ${newMatch.score1} - ${newMatch.score2} <span class="${player2Class}">${player2}</span></td>
-            //                 `;
-            // matchesTable.appendChild(row);
-
-            // Sắp xếp bảng theo tournamentMatchId tăng dần
-            // const rows = Array.from(matchesTable.querySelectorAll('tr'));
-            // rows.sort((a, b) => {
-            //     const idA = parseInt(a.querySelector('td:first-child').textContent) || 0;
-            //     const idB = parseInt(b.querySelector('td:first-child').textContent) || 0;
-            //     return idA - idB;
-            // });
-
-            // Xóa các hàng hiện tại và thêm lại các hàng đã sắp xếp
-            // matchesTable.innerHTML = '';
-            // rows.forEach(row => matchesTable.appendChild(row));
 
 
             // Ẩn form và xóa dữ liệu
@@ -720,7 +711,7 @@ export function render({ id }) {
             .filter(h => h.tournamentId === tournamentId)
             .sort((a, b) => a.racks - b.racks);
         // console.log(poolData.history_points_den);
-        
+
         if (history.length === 0) {
             document.getElementById("div-rack-history-chart").classList.add("hidden")
             return;

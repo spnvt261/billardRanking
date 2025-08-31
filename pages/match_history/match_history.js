@@ -399,6 +399,8 @@ export function render() {
             alert('Please select different players and enter valid scores.');
             return;
         }
+
+        // let playerId=null;
         if (player2name == "Chấm") {
             if (!confirm(`Bạn có chắc ${player1name} đi chấm và nhận ${score1} Elo ?`)) {
                 return;
@@ -439,7 +441,7 @@ export function render() {
             winnerId,
             date: new Date().toLocaleDateString('vi-VN'),
             tournamentId: tournamentName,
-            tournamentMatchId: '',
+            tournamentMatchId: null,
             matchType: '',
         };
         createData('match-history', newMatch);
@@ -826,7 +828,7 @@ export function render() {
             winnerId,
             date: new Date().toLocaleDateString('vi-VN'),
             tournamentId: tournamentName,
-            tournamentMatchId: '',
+            tournamentMatchId: null,
             matchType: '',
         };
         createData('match-history', newMatch);
