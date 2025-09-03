@@ -1,123 +1,130 @@
 <main class="container mx-auto p-4">
-        <h2 class="text-2xl font-bold mb-4">Player Details</h2>
+    <h2 class="text-2xl font-bold mb-4">Player Details</h2>
 
-        <section id="player-info" class="bg-white p-4 rounded shadow mb-6 hidden">
-            <div class="flex items-center mb-4">
-                <img id="player-avatar" src="" alt="Avatar" class=" rounded-full mr-4"
-                    style="width: 10rem; height:10rem">
-                <div>
-                    <h3 id="player-name" class="text-xl font-bold"></h3>
-                    <p>Elo: <span id="player-points"></span> - Rank <span id="player-rank" class="font-bold"></span></p>
+    <section id="player-info" class="bg-white p-4 rounded shadow mb-6 hidden">
+        <div class="flex items-center mb-4">
+            <img id="player-avatar" src="" alt="Avatar" class=" rounded-full mr-4" style="width: 10rem; height:10rem">
+            <div>
+                <h3 id="player-name" class="text-xl font-bold"></h3>
+                <p>Elo: <span id="player-points"></span> - Rank <span id="player-rank" class="font-bold"></span></p>
 
-                </div>
             </div>
-            <table class="min-w-full border border-gray-300 rounded-lg shadow-sm">
-                <tbody class="divide-y divide-gray-200">
-                    <!-- Matches + Win Rate -->
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-2 font-semibold bg-gray-100"></td>
-                        <td class="px-4 py-2">
-                            <div class="grid grid-cols-2 gap-4">
-                                <!-- Matches Played -->
-                                <div>
-                                    <div class=" text-tr">Matches Played</div>
-                                    <ul class="space-y-1">
-                                        <li>Tổng: <span id="player-matches-count"></span></li>
-                                        <li>Đơn: <span id="player-singles-count"></span></li>
-                                        <li>Đôi: <span id="player-doubles-count"></span></li>
-                                    </ul>
-                                </div>
-                                <!-- Win Rate -->
-                                <div>
-                                    <div class=" text-tr">Win Rate</div>
-                                    <ul class="space-y-1">
-                                        <li><span id="player-winrate"></span></li>
-                                        <li><span id="player-singles-winrate"></span></li>
-                                        <li><span id="player-doubles-winrate"></span></li>
-                                    </ul>
-                                </div>
+        </div>
+        <table class="min-w-full border border-gray-300 rounded-lg shadow-sm">
+            <tbody class="divide-y divide-gray-200">
+                <!-- Matches + Win Rate -->
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-2 font-semibold bg-gray-100"></td>
+                    <td class="px-4 py-2">
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- Matches Played -->
+                            <div>
+                                <div class=" text-tr">Matches Played: <br><span id="player-matches-count"></span></div>
+                                <ul class="space-y-1">
+                                    <!-- <li>Tổng: <span id="player-matches-count"></span></li> -->
+                                    <li>Đơn: <span id="player-singles-count"></span></li>
+                                    <li>Đôi: <span id="player-doubles-count"></span></li>
+                                </ul>
                             </div>
-                        </td>
-                    </tr>
-
-                    <!-- Racks + Rack Win Rate -->
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-2 font-semibold bg-gray-100"></td>
-                        <td class="px-4 py-2">
-                            <div class="grid grid-cols-2 gap-4">
-                                <!-- Racks Played -->
-                                <div>
-                                    <div class=" text-tr">Racks Played</div>
-                                    <ul class="space-y-1">
-                                        <li>Tổng: <span id="player-racks-count"></span></li>
-                                        <li>Đơn: <span id="player-racks-singles-count"></span></li>
-                                        <li>Đôi: <span id="player-racks-doubles-count"></span></li>
-                                    </ul>
-                                </div>
-                                <!-- Rack Win Rate -->
-                                <div>
-                                    <div class=" text-tr">Win Rate</div>
-                                    <ul class="space-y-1">
-                                        <li><span id="player-racks-winrate"></span></li>
-                                        <li><span id="player-racks-singles-winrate"></span></li>
-                                        <li><span id="player-racks-doubles-winrate"></span></li>
-                                    </ul>
-                                </div>
+                            <!-- Win Rate -->
+                            <div>
+                                <div class=" text-tr">Win Rate:<br> <span id="player-winrate"></span></div>
+                                <ul class="space-y-1">
+                                    <!-- <li><span id="player-winrate"></span></li> -->
+                                    <li><span id="player-singles-winrate"></span></li>
+                                    <li><span id="player-doubles-winrate"></span></li>
+                                </ul>
                             </div>
-                        </td>
-                    </tr>
+                        </div>
+                    </td>
+                </tr>
 
-                    <!-- Chấm -->
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-2 font-semibold bg-gray-100">Chấm</td>
-                        <td class="px-4 py-2">
-                            <ul class="space-y-1">
-                                <li>Chấm đơn: <span id="cham-don"></span></li>
-                                <li>Chấm đôi: <span id="cham-doi"></span></li>
-                            </ul>
-                        </td>
-                    </tr>
+                <!-- Racks + Rack Win Rate -->
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-2 font-semibold bg-gray-100"></td>
+                    <td class="px-4 py-2">
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- Racks Played -->
+                            <div>
+                                <div class=" text-tr">Racks Played: <br> <span id="player-racks-count"></span></div>
+                                <ul class="space-y-1">
+                                    <!-- <li>Tổng: <span id="player-racks-count"></span></li> -->
+                                    <li>Đơn: <span id="player-racks-singles-count"></span></li>
+                                    <li>Đôi: <span id="player-racks-doubles-count"></span></li>
+                                </ul>
+                            </div>
+                            <!-- Rack Win Rate -->
+                            <div>
+                                <div class=" text-tr">Win Rate: <br> <span id="player-racks-winrate"></span></div>
+                                <ul class="space-y-1">
+                                    <!-- <li><span id="player-racks-winrate"></span></li> -->
+                                    <li><span id="player-racks-singles-winrate"></span></li>
+                                    <li><span id="player-racks-doubles-winrate"></span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
 
-                    <!-- Achievements -->
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-2 font-semibold bg-gray-100">Achievements</td>
-                        <td class="px-4 py-2">
-                            <ul id="achievements-list" class="list-disc pl-5"></ul>
-                        </td>
-                    </tr>
+                <!-- Chấm -->
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-2 font-semibold bg-gray-100">Chấm</td>
+                    <td class="px-4 py-2">
+                        <ul class="space-y-1">
+                            <li>Chấm đơn: <span id="cham-don"></span></li>
+                            <li>Chấm đôi: <span id="cham-doi"></span></li>
+                        </ul>
+                    </td>
+                </tr>
 
-                    <!-- Đền -->
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-2 font-semibold bg-gray-100">Đền</td>
-                        <td class="px-4 py-2">
-                            <ul id="achievements-den-list" class="list-disc pl-5"></ul>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                <!-- Achievements -->
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-2 font-semibold bg-gray-100">Achievements</td>
+                    <td class="px-4 py-2">
+                        <ul id="achievements-list" class="list-disc pl-5"></ul>
+                    </td>
+                </tr>
 
-        </section>
+                <!-- Đền -->
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-2 font-semibold bg-gray-100">Đền</td>
+                    <td class="px-4 py-2">
+                        <ul id="achievements-den-list" class="list-disc pl-5"></ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
-        <section id="matches-section" class="bg-white p-4 rounded shadow mb-6 hidden">
-            <h4 class="text-lg font-bold mb-2">Match History</h4>
-            <table class="w-full mb-4">
-                <thead class="bg-blue-800 text-white">
-                    <tr>
-                        <th class="p-3 text-left">Match</th>
-                        <th class="p-3 text-left">Date</th>
-                        <th class="p-3 text-left">Tournament</th>
-                    </tr>
-                </thead>
-                <tbody id="player-matches-table"></tbody>
-            </table>
-            <div id="pagination" class="flex space-x-2"></div>
-        </section>
+    </section>
 
-        <section id="points-chart-section" class="bg-white p-4 rounded shadow mb-6 hidden">
-            <h4 class="text-lg font-bold mb-2">Elo Received History</h4>
-            <!-- <canvas id="points-chart" width="400" height="200"></canvas> -->
-            <div class="bg-white p-4 rounded shadow" style="height: 450px;">
-                <canvas id="points-chart" width="400" height="200"></canvas>
-            </div>
-        </section>
-    </main>
+    <section id="matches-section" class="bg-white p-4 rounded shadow mb-6 hidden">
+        <h4 class="text-lg font-bold mb-2">Match History</h4>
+        <table class="w-full mb-4">
+            <thead class="bg-blue-800 text-white">
+                <tr>
+                    <th class="p-3 text-left">Match</th>
+                    <th class="p-3 text-left">Date</th>
+                    <th class="p-3 text-left">Tournament</th>
+                </tr>
+            </thead>
+            <tbody id="player-matches-table"></tbody>
+        </table>
+        <div id="pagination" class="flex space-x-2"></div>
+    </section>
+
+    <section id="points-chart-section" class="bg-white p-4 rounded shadow mb-6 hidden">
+        <h4 class="text-lg font-bold mb-2">Elo Received History</h4>
+        <!-- <canvas id="points-chart" width="400" height="200"></canvas> -->
+        <div class="bg-white p-4 rounded shadow" style="height: 450px;">
+            <canvas id="points-chart" width="400" height="200"></canvas>
+        </div>
+    </section>
+    <section id="points-chart-section-2" class="bg-white p-4 rounded shadow mb-6">
+        <h4 class="text-lg font-bold mb-2">Biểu đồ điểm của Player</h4>
+        <div class="bg-white p-4 rounded shadow" 
+        style="height: 450px;"
+        >
+            <canvas id="playerChart" width="400" height="200"></canvas>
+        </div>
+    </section>
+</main>

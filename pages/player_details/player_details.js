@@ -353,6 +353,7 @@ async function renderPlayerDetails() {
 
     // Vẽ biểu đồ points history
     renderPointsChart();
+    renderPlayerPointReceivedChart(poolData, playerId)
 
     // Hiển thị sections
     document.getElementById('player-info').classList.remove('hidden');
@@ -546,6 +547,142 @@ function renderPointsChart() {
         }
     });
 }
+let playerChartInstance = null; // Biến toàn cục để lưu chart
+
+function renderPlayerPointReceivedChart(poolData, pId) {
+    // Chuyển tournaments thành map
+    const tournamentMap = {};
+    poolData.tournaments.forEach(t => {
+        tournamentMap[t.id] = t;
+    });
+
+    // Lọc dữ liệu player
+    const playerData = poolData.history_point.filter(d => d.playerId == pId);
+
+    // Kết quả
+    const result = {
+        others: 0,
+        bannuoc: 0,
+        den: 0,
+        tournament: { gold: 0, silver: 0, bronze: 0 }
+    };
+
+    playerData.forEach(item => {
+        const { point, tournamentId, matchId } = item;
+
+        if (tournamentId && tournamentMap[tournamentId]) {
+            if (tournamentMap[tournamentId].name === "Đền") {
+                result.den += point;
+            } else {
+                if (matchId === "Vô địch") {
+                    result.tournament.gold += point;
+                } else if (matchId === "Á quân") {
+                    result.tournament.silver += point;
+                } else {
+                    result.tournament.bronze += point;
+                }
+            }
+        } else if (tournamentId == null && matchId != null) {
+            result.bannuoc += point;
+        } else {
+            result.others += point;
+        }
+    });
+
+    // Nếu đã có chart thì destroy để vẽ lại
+    if (playerChartInstance) {
+        playerChartInstance.destroy();
+    }
+
+    const ctx = document.getElementById('playerChart').getContext('2d');
+    playerChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ["Others", "Tournament", "Đền", "Bàn nước"],
+            datasets: [
+                {
+                    label: "Others",
+                    data: [result.others, 0, 0, 0],
+                    backgroundColor: "#9CA3AF"
+                },
+                {
+                    label: "Tournament - Bronze",
+                    data: [0, result.tournament.bronze, 0, 0],
+                    backgroundColor: "#CD7F32"
+                },
+                {
+                    label: "Tournament - Gold",
+                    data: [0, result.tournament.gold, 0, 0],
+                    backgroundColor: "#FFD700"
+                },
+                {
+                    label: "Tournament - Silver",
+                    data: [0, result.tournament.silver, 0, 0],
+                    backgroundColor: "#C0C0C0"
+                },
+                {
+                    label: "Đền",
+                    data: [0, 0, result.den, 0],
+                    backgroundColor: "#FCA5A5"
+                },
+                {
+                    label: "Bàn nước",
+                    data: [0, 0, 0, result.bannuoc],
+                    backgroundColor: "#0EA5E9"
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        generateLabels: (chart) => {
+                            return [
+                                { text: "Others", fillStyle: "#9CA3AF" },
+                                { text: "Tournament", fillStyle: "#FFD700", strokeStyle: "#CD7F32" },
+                                { text: "Đền", fillStyle: "#FCA5A5" },
+                                { text: "Bàn nước", fillStyle: "#0EA5E9" }
+                            ];
+                        }
+                    }
+                },
+                tooltip: { mode: 'index', intersect: false }
+            },
+            scales: {
+                x: { stacked: true },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    title: { display: true, text: 'Điểm' }
+                }
+            },
+            animation: {
+                onComplete: (animation) => {
+                    const chart = animation.chart;
+                    const ctx = chart.ctx;
+                    ctx.save();
+                    chart.data.datasets.forEach((dataset, i) => {
+                        const meta = chart.getDatasetMeta(i);
+                        meta.data.forEach((bar, index) => {
+                            const value = dataset.data[index];
+                            if (value > 0) {
+                                ctx.fillStyle = "#111827";
+                                ctx.font = "12px sans-serif";
+                                ctx.textAlign = "center";
+                                ctx.textBaseline = "bottom";
+                                ctx.fillText(value, bar.x, bar.y - 5);
+                            }
+                        });
+                    });
+                    ctx.restore();
+                }
+            }
+        }
+    });
+}
+
 
 
 
