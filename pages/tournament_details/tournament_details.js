@@ -393,7 +393,7 @@ export function render({ id }) {
             tournament.top1Id = winnerId;
             tournament.top2Id = player1Id == winnerId ? player2Id : player1Id
             const championUp = poolData.players.find(u => u.id === tournament.top1Id);
-            const runnerUp = poolData.players.find(u => u.id === tournament.top1Id);
+            const runnerUp = poolData.players.find(u => u.id === tournament.top2Id);
             // console.log(winnerId,player1Id,player2Id);
             if (matchType == "Chung kết") {
                 if (confirm(`Chung kết tỉ số [ ${player1name} ${score1} - ${score2} ${player2name} ] và người vô địch là ${championUp.name} ?`)) {

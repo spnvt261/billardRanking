@@ -310,10 +310,10 @@ export async function render({ id }) {
 
     // --- Cooldown 30s ---
     function startCooldown() {
-        // cooldown = true;
-        // setTimeout(() => {
-        //     cooldown = false;
-        // }, 30000);
+        cooldown = true;
+        setTimeout(() => {
+            cooldown = false;
+        }, 30000);
     }
     //View racks history
     document.getElementById("historyBtn").addEventListener("click", () => {
@@ -434,8 +434,8 @@ export async function render({ id }) {
 
                 // console.log(updatedTournament);
                 await updateData('tournaments', tournamentIdToSave, updatedTournament);
-                addPlayerPoints(updatedTournament.top1Id, updatedTournament.top1_point, tournamentIdToSave, null)
-                addPlayerPoints(updatedTournament.top2Id, updatedTournament.top2_point, tournamentIdToSave, null)
+                addPlayerPoints(updatedTournament.top1Id, updatedTournament.top1_point, tournamentIdToSave, "Vô địch")
+                addPlayerPoints(updatedTournament.top2Id, updatedTournament.top2_point, tournamentIdToSave, "Á quân")
                 // Cập nhật điểm cho các người chơi khác tham gia giải
                 if (updatedTournament.other_point > 0) {
                     const otherPlayers = poolData.players.filter(player =>
